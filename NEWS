@@ -1,3 +1,10 @@
+Changes for version 1.5 (2003-12-22)
+   - None yet.
+
+Changes for version 1.4a (2003-05-04)
+   * Using AdPlug core library 1.4.1:
+      - Fixed bug that caused rejected files being left open
+
 Changes for version 1.4 (2003-03-18)
    - Major cosmetic liftoff :)
    - Config data moved to player's .ini

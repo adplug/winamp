@@ -6,13 +6,17 @@
  * debug_init() opens a console window and initializes console output.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <io.h>
 #include <windows.h>
 #include <fcntl.h>
 #include <conio.h>
 
-void debug_init(void)
+static void debug_init(void)
 {
 	int hCrt;
 	FILE *hf;
@@ -24,3 +28,7 @@ void debug_init(void)
 	setvbuf( stdout, NULL, _IONBF, 0 );
 	puts("[AdPlug] Debug Started.");
 }
+
+#ifdef __cplusplus
+}
+#endif

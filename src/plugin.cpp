@@ -253,6 +253,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 	filetypes.add("sng",    "SNGPlay Files (*.SNG)");
 	filetypes.add("xms",    "XMS-Tracker Modules (*.XMS)");
 	filetypes.add("xad",    "Exotic Adlib Files (*.XAD)");
+	filetypes.add("xsm",	"eXtra Simple Music Files (*.XSM)");
 
 	filetypes.set_ignore_list(config.get_ignored());
 

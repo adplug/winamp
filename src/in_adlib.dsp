@@ -199,6 +199,10 @@ SOURCE=.\player.h
 
 SOURCE=.\plugin.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\rsrc\resource.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 
