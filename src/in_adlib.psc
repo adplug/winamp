@@ -1,5 +1,5 @@
 ; AdPlug Winamp plugin Pimpscript
-; Copyright (c) 1999 - 2003 Simon Peter <dn.tlp@gmx.net>
+; Copyright (c) 1999 - 2004 Simon Peter <dn.tlp@gmx.net>
 
 ; Variables you can use in many of the strings:
 ;   $PROGRAMFILES (usually c:\program files)
@@ -10,9 +10,9 @@
 ;   $VISDIR  (visualization plug-in directory. DO NOT USE IN DefaultDir)
 ;   $DSPDIR  (dsp plug-in directory. DO NOT USE IN DefaultDir)
 
-Name AdPlug Winamp plugin v1.5
+Name AdPlug Winamp plugin v1.6
 Text This will install the AdPlug Winamp plugin on your computer.
-OutFile in_adlib-1.5.exe
+OutFile in_adlib-1.6.exe
 
 ; File listing section
 ; --------------------
