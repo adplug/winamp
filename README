@@ -88,6 +88,11 @@ and AdPlug won't ever again try to play back these files, until you re-select
 the file types, of course. Remember to restart Winamp after you made changes,
 since this is sometimes necessary.
 
+Also in this tab is a checkbox to enable a workaround for S3M files in
+conjunction with Nullsoft's Module Decoder Plugin. It is enabled by default
+and fixes a problem with sample based S3M files not playing anymore, when
+AdPlug is told to handle S3M files.
+
 Known Problems:
 ---------------
 The hardware replay won't work with SB AWE32/64 soundcards on the fly.
