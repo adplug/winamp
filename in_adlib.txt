@@ -1,5 +1,6 @@
-AdPlug Winamp2 plugin v1.3
-Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>, et al.
+AdPlug Winamp2 plugin v1.4
+Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
 Website: http://adplug.sourceforge.net
 Module Archive: http://www.chiptune.de
@@ -117,6 +118,10 @@ which is located at http://www.gnu.org.
 
 Release History:
 ----------------
+- v1.4 (2002-10-06)
+  - New About box
+  - Support for the PortTalk device driver to enable hardware replay on
+    Windows NT/2000/XP.
 - v1.3 (2002-06-25)
   - OPL Disk Writer support
   - Completely new appearance
