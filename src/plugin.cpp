@@ -221,8 +221,8 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 
 	mod.UsesOutputPlug = config.useoutputplug;
 
-	filetypes.add("a2m",    "Adlib Tracker 2 Modules (*.A2M)");
-	filetypes.add("amd",    "AMUSIC Modules (*.AMD)");
+	filetypes.add("a2m",	"Adlib Tracker 2 Modules (*.A2M)");
+	filetypes.add("amd",	"AMUSIC Modules (*.AMD)");
 	filetypes.add("bam",    "Bob's Adlib Music Files (*.BAM)");
 	filetypes.add("cmf",    "Creative Adlib Music Files (*.CMF)");
 	filetypes.add("cff",    "BoomTracker 4 Modules (*.CFF)");
@@ -231,8 +231,8 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 	filetypes.add("dmo",    "TwinTeam Modules (*.DMO)");
 	filetypes.add("dtm",    "DeFy Adlib Tracker Modules (*.DTM)");
 	filetypes.add("hsc",    "HSC-Tracker Modules (*.HSC)");
-	filetypes.add("hsp",    "Packed HSC-Tracker Modules (*.HSP)");
-	filetypes.add("imf;wlf","Apogee IMF Files (*.IMF;*.WLF)");
+	filetypes.add("hsp",	"Packed HSC-Tracker Modules (*.HSP)");
+	filetypes.add("imf;wlf;adlib","Apogee IMF Files (*.IMF;*.WLF)");
 	filetypes.add("ksm",    "Ken Silverman's Music Files (*.KSM)");
 	filetypes.add("laa",    "LucasArts Adlib Audio Files (*.LAA)");
 	filetypes.add("lds",    "LOUDNESS Files (*.LDS)");

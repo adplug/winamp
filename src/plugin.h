@@ -59,7 +59,7 @@ using namespace std;
 
 #include "rsrc\resource.h"
 
-#define PLUGIN_VER "AdPlug/Winamp2 v1.5"
+#define PLUGIN_VER "AdPlug/Winamp v1.5"
 
 #define WM_UPDATE     WM_USER+1
 #define WM_UPDATE_ALL WM_USER+2

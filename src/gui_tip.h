@@ -21,7 +21,8 @@ class GuiCtrlTooltip
 {
 	public:
 
-		GuiCtrlTooltip();
+		GuiCtrlTooltip(HWND parent);
+		~GuiCtrlTooltip();
 
 		void					add(HWND hwnd, const char *title, const char *text);
 
@@ -40,12 +41,13 @@ class GuiCtrlTooltip
 		{
 			vector<HWND>		hwnd;
 			vector<WNDPROC>		proc;
-			vector<string>		text;
-			vector<string>		title;
+			vector<char *>		text;
+			vector<char *>		title;
 		} work;
 
 		HWND					tooltip_hwnd;
 		HWND					trigger_hwnd;
+		HWND					parent_hwnd;
 
 		POINT					pt1;
 };

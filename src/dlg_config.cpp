@@ -19,19 +19,21 @@
 
 #include "plugin.h"
 
-#define STRING_TRUNC	40
+#define STRING_TRUNC	55
+#define TOOLTIP_WIDTH	300
 
 extern HINSTANCE myInstance;
 extern Config config;
 extern FileTypes filetypes;
 
-GuiCtrlTooltip tooltip;
+GuiCtrlTooltip *tooltip;
 
 void GuiDlgConfig::open(HWND parent)
 {
 	config.get(&next);
 
 	DialogBoxParam(myInstance,MAKEINTRESOURCE(IDD_CONFIG),parent,(DLGPROC)DlgProc_Wrapper,(LPARAM)this);
+	delete tooltip;
 
 	if (!cancelled)
 		config.set(&next);
@@ -47,11 +49,13 @@ BOOL APIENTRY GuiDlgConfig::DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, L
 	switch (message)
 	{
 	    case WM_INITDIALOG:
-
 			tab_hwnd = NULL;
 
+			// enable tooltips
+			tooltip = new GuiCtrlTooltip(hwndDlg);
+
 			// enable tooltip trigger
-			tooltip.trigger(GetDlgItem(hwndDlg,IDC_TOOLTIPS));
+			tooltip->trigger(GetDlgItem(hwndDlg,IDC_TOOLTIPS));
 
 			// init tab control
 			tci.mask = TCIF_TEXT;
@@ -97,6 +101,11 @@ BOOL APIENTRY GuiDlgConfig::DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, L
 				case TCN_SELCHANGE:
 					PostMessage(hwndDlg,WM_UPDATE,0,0);
 					return FALSE;
+
+				case TTN_GETDISPINFO:
+					SendMessage(((NMHDR *)lParam)->hwndFrom, TTM_SETMAXTIPWIDTH, 0, TOOLTIP_WIDTH);
+					((LPNMTTDISPINFO)lParam)->lpszText = (char *)((LPNMTTDISPINFO)lParam)->lParam;
+					return 0;
 			}
 
 			return FALSE;
@@ -134,23 +143,23 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 		case WM_INITDIALOG:
 
 			// add tooltips
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FREQ1),      "freq1",      "Set 11 khz frequency");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FREQ2),      "freq2",      "Set 22 khz frequency");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FREQ3),      "freq3",      "Set 44 khz frequency");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FREQ4),      "freq4",      "Set 48 khz frequency");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FREQC),      "freqc",      "Set custom frequency");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FREQC_VALUE),"freqc_value","Specify custom frequency value");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_QUALITY8),   "quality8",   "Set 8-bit quality");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_QUALITY16),  "quality16",  "Set 16-bit quality");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_MONO),       "mono",       "Set mono output");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_STEREO),     "stereo",     "Set stereo output");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_OUTTS),      "outts",      "Use Tatsuyuki Satoh's emulator output");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_OUTKS),      "outks",      "Use Ken Silverman's emulator output");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_OUTDISK),    "outdisk",    "Use Disk Writer output.\r\nWrites Rdos' RAW files, they can be replayed by AdPlug).");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_OUTOPL2),    "outopl2",    "Use OPL2 chip output");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_ADLIBPORT),  "adlibport",  "Specify OPL2 chip port (usually 388)");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_NOTEST),     "notest",     "Disable OPL2 chip detection at specified port");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_DIRECTORY),  "directory",  "Select output directory for Disk Writer");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ1),      "freq1",      "Set 11 KHz frequency");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ2),      "freq2",      "Set 22 KHz frequency");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ3),      "freq3",      "Set 44 KHz frequency");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ4),      "freq4",      "Set 48 KHz frequency");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FREQC),      "freqc",      "Set custom frequency (in Hz)");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FREQC_VALUE),"freqc_value","Specify custom frequency value (in Hz)");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY8),   "quality8",   "Set 8-bit quality");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY16),  "quality16",  "Set 16-bit quality");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_MONO),       "mono",       "Set mono output");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_STEREO),     "stereo",     "Set stereo output");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_OUTTS),      "outts",      "Use Tatsuyuki Satoh's emulator");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_OUTKS),      "outks",      "Use Ken Silverman's emulator");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_OUTDISK),    "outdisk",    "Use disk writer output\r\nWrites RdosPlay RAW files. These can be replayed by AdPlug again.");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_OUTOPL2),    "outopl2",    "Use OPL2 hardware output");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_ADLIBPORT),  "adlibport",  "Specify OPL2 port (default 0x388h)");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_NOTEST),     "notest",     "Disable OPL2 hardware detection");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_DIRECTORY),  "directory",  "Select output directory for disk writer");
 
 			// set "output"
 			if (next.useoutput == emuts)
@@ -313,12 +322,12 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
 		case WM_INITDIALOG:
 
 			// add tooltips
-			tooltip.add(GetDlgItem(hwndDlg,IDC_TESTLOOP),"autoend" ,"Enable detection of song looping." );
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FASTSEEK),"fastseek","Enable fast seek for OPL2 chip output.\r\nThis can results in inaccurate replaying.");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_STDTIMER),"stdtimer","Use default playing speed for Disk Writer output.\r\nDisable, if you wanna quick song writing.\r\n\r\nNever disable, if you disabled song looping detection!");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_PRIORITY),"priority","Set playing thread priority, like in Winamp.");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_DATABASE),"database","Set database to be used for file information.");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_USEDB),"usedb","If checked, the database will be used.");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_TESTLOOP),"autoend" ,"Enable songend autodetection\r\nIf disabled, the song will loop endlessly and Winamp won't advance in the playlist.");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FASTSEEK),"fastseek","Enable fast seeking for OPL2 hardware output\r\nWhile this speeds up seeking a lot, it can result in inaccurate replaying for quite some time after the seek.");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_STDTIMER),"stdtimer","Use actual replay speed for disk writer output\r\nDisable this for full speed disk writing. Never disable this if you also disabled songend detection!");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_PRIORITY),"priority","Set replay thread priority\r\nIf you encounter sound skips, try to set this to a higher value.");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_DATABASE),"database","Set path to database file to be used for replay information");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_USEDB),"usedb","If unchecked, the database will be disabled");
 
 			// set checkboxes
 			if (next.testloop)
@@ -415,9 +424,9 @@ BOOL APIENTRY GuiDlgConfig::FormatsTabDlgProc(HWND hwndDlg, UINT message, WPARAM
 		case WM_INITDIALOG:
 
 			// add tooltips
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FORMATLIST),"formatlist","All replayable formats listed here.\r\nDeselected formats will be ignored.");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FTSELALL),  "ftselall",  "Select all formats.");
-			tooltip.add(GetDlgItem(hwndDlg,IDC_FTDESELALL),"ftdeselall","Deselect all formats.");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FORMATLIST),"formatlist","All supported formats are listed here\r\nDeselected formats will be ignored by AdPlug to make room for other plugins to play these.");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FTSELALL),  "ftselall",  "Select all formats");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FTDESELALL),"ftdeselall","Deselect all formats");
 
 			// fill listbox
 			for (i=0;i<filetypes.get_size();i++)

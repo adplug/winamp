@@ -21,10 +21,19 @@
 
 extern HINSTANCE myInstance;
 
-GuiCtrlTooltip::GuiCtrlTooltip()
+GuiCtrlTooltip::GuiCtrlTooltip(HWND parent)
 {
 	tooltip_hwnd = NULL;
 	trigger_hwnd = NULL;
+	parent_hwnd  = parent;
+}
+
+GuiCtrlTooltip::~GuiCtrlTooltip()
+{
+	int i;
+
+	for(i = 0; i < work.text.size(); i++) free(work.text[i]);
+	for(i = 0; i < work.title.size(); i++) free(work.title[i]);
 }
 
 void GuiCtrlTooltip::add(HWND hwnd, const char *title, const char *text)
@@ -32,8 +41,8 @@ void GuiCtrlTooltip::add(HWND hwnd, const char *title, const char *text)
 	// add tooltip data to list
 	work.hwnd.push_back(hwnd);
 	work.proc.push_back((WNDPROC)GetWindowLong(hwnd,GWL_WNDPROC));
-	work.text.push_back(text);
-	work.title.push_back(title);
+	work.text.push_back(strdup(text));
+	work.title.push_back(strdup(title));
 
 	// change window parameters
 	SetWindowLong(hwnd,GWL_USERDATA,(LONG)this);
@@ -44,8 +53,8 @@ void GuiCtrlTooltip::remove(int i)
 {
 	work.hwnd.erase(work.hwnd.begin()+i);
 	work.proc.erase(work.proc.begin()+i);
-	work.text.erase(work.text.begin()+i);
-	work.title.erase(work.title.begin()+i);
+	free(work.text[i]); work.text.erase(work.text.begin()+i);
+	free(work.title[i]); work.title.erase(work.title.begin()+i);
 }
 
 void GuiCtrlTooltip::trigger(HWND hwnd)
@@ -54,7 +63,7 @@ void GuiCtrlTooltip::trigger(HWND hwnd)
 
 	SendMessage(hwnd,BM_SETCHECK,BST_CHECKED,0);
 
-	add(hwnd,"ToolTip trigger","You can enable/disable tooltips displaying by changing state of this checkbox.");
+	add(hwnd,"ToolTip trigger","You can enable/disable tooltips by changing the state of this checkbox");
 }
 
 LRESULT CALLBACK GuiCtrlTooltip::WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
@@ -127,17 +136,11 @@ void GuiCtrlTooltip::show(int i)
 
 	GetCursorPos(&pt);
 
-    tooltip_hwnd = CreateWindowEx(WS_EX_TOPMOST,
-								  TOOLTIPS_CLASS,
-								  NULL,
-								  WS_POPUP | TTS_NOPREFIX /*| TTS_BALLOON*/,
-								  CW_USEDEFAULT,
-								  CW_USEDEFAULT,
-								  CW_USEDEFAULT,
-								  CW_USEDEFAULT,
-								  NULL,
-								  NULL,
-								  myInstance,
+    tooltip_hwnd = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL,
+								  WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP/*| TTS_BALLOON*/,
+								  CW_USEDEFAULT, CW_USEDEFAULT,
+								  CW_USEDEFAULT, CW_USEDEFAULT,
+								  parent_hwnd, NULL, myInstance,
 								  NULL);
     if (!tooltip_hwnd)
         return;
@@ -156,9 +159,10 @@ void GuiCtrlTooltip::show(int i)
 
 	ti.cbSize   = sizeof(TOOLINFO);
 	ti.uFlags   = TTF_TRACK | TTF_ABSOLUTE;
-	ti.hwnd     = NULL;
+	ti.hwnd     = parent_hwnd;
 	ti.hinst    = myInstance;
-	ti.lpszText = (char *)work.text[i].c_str();
+	ti.lpszText = LPSTR_TEXTCALLBACK;
+	ti.lParam   = (long)work.text[i];
 
     SendMessage(tooltip_hwnd,TTM_ADDTOOL,0,(LPARAM)&ti);
     //SendMessage(tooltip_hwnd,TTM_SETTITLE,1,(LPARAM)work.title[i].c_str());

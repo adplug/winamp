@@ -165,7 +165,7 @@ BEGIN
                     SS_REALSIZEIMAGE,5,41,267,71
     CTEXT           "",IDC_PLUGIN_VER,6,0,273,8,NOT WS_GROUP
     LTEXT           "url_sp",IDC_URL_SP,175,14,50,8,NOT WS_GROUP
-    RTEXT           "Copyright (c) 1999 - 2003 Simon Peter <",IDC_STATIC,49,
+    RTEXT           "Copyright (c) 1999 - 2004 Simon Peter <",IDC_STATIC,49,
                     14,126,8,NOT WS_GROUP
     LTEXT           ">",IDC_STATIC,226,14,8,8,NOT WS_GROUP
     LTEXT           "url_nk",IDC_URL_NK,181,23,38,8,NOT WS_GROUP
@@ -177,7 +177,7 @@ BEGIN
     LTEXT           " ]",IDC_STATIC,207,119,8,8,NOT WS_GROUP
     CTEXT           "url_adplug",IDC_URL_ADPLUG,133,119,74,8,NOT WS_GROUP
     RTEXT           "[ get music at ",IDC_STATIC,5,130,45,8,NOT WS_GROUP
-    LTEXT           " ]",IDC_STATIC,107,130,8,8,NOT WS_GROUP
+    LTEXT           " ]",IDC_STATIC,131,130,8,8,NOT WS_GROUP
     CTEXT           "url_chiptune",IDC_URL_CHIPTUNE,51,130,56,8,NOT WS_GROUP
     RTEXT           "[ get soft at ",IDC_STATIC,149,130,38,8,NOT WS_GROUP
     LTEXT           " ]",IDC_STATIC,265,130,8,8,NOT WS_GROUP
