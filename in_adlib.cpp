@@ -1,23 +1,5 @@
 /*
- * Adplug - Replayer for many OPL2/OPL3 audio file formats.
- * Copyright (C) 1999, 2000, 2001 Simon Peter, <dn.tlp@gmx.net>, et al.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * AdPlug - Winamp input plugin, by Simon Peter (dn.tlp@gmx.net)
+ * AdPlug - Winamp input plugin, (c) 1999, 2000, 2001 Simon Peter <dn.tlp@gmx.net>
  */
 
 #include <fstream.h>
@@ -148,7 +130,7 @@ void setvolume(int volume)
 }
 
 char *upstr(char *str)
-/* converts a string to all uppercase letters */
+// converts a string to all uppercase letters
 {
 	unsigned int i;
 
@@ -160,26 +142,18 @@ char *upstr(char *str)
 
 bool testignore(char *fn)
 {
-	char *tmpstr,*fmt,*p;
+	char *p;
 
 	if(!strrchr(fn,'.'))
 		return false;
 
-	for(int i=0;alltypes[i].extension;i++) {
-		tmpstr = (char *)malloc(strlen(alltypes[i].extension)+1);
-		upstr(strcpy(tmpstr,alltypes[i].extension));
-		fmt = upstr(strrchr(fn,'.')+1);
-		for(p=tmpstr;(p-1);p=strchr(p,';')+1) {
-			if(!strncmp(fmt,p,strchr(p,';') ? strchr(p,';') - p : strlen(p))) {
-				free(tmpstr);
+	for(int i=0;alltypes[i].extension;i++)
+		for(p=alltypes[i].extension;(p-1);p=strchr(p,';')+1)
+			if(!strnicmp(strrchr(fn,'.')+1,p,strchr(p,';') ? strchr(p,';') - p : strlen(p)))
 				if(alltypes[i].ignore)
 					return true;
 				else
 					return false;
-			} else
-				free(tmpstr);
-		}
-	}
 
 	return false;
 }
