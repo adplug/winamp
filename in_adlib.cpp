@@ -29,7 +29,7 @@ extern "C" {
 enum outputs {emuks, emuts, opl2, opl2emuks, opl2emuts};
 
 // globals
-#define ADPLUGVERS		"AdPlug v1.0"		// AdPlug version string
+#define ADPLUGVERS		"AdPlug v1.1"		// AdPlug version string
 #define WM_WA_MPEG_EOF	WM_USER+2			// post to Winamp at EOF
 #define WM_AP_UPDATE	WM_USER+100			// post to FileInfoProc to update window
 #define DFLEMU			emuts				// default (safe) emulation mode
@@ -70,7 +70,7 @@ tFiletypes alltypes[] = {
 	"sng\0SNGPlay Files (*.SNG)\0",false,
 	"ksm\0Ken Silverman's Music Format (*.KSM)\0",false,
 	"m\0Ultima 6 Music Format (*.M)\0",false,
-//	"mkj\0MKJamz Audio Files (*.MKJ)\0",false,
+	"mkj\0MKJamz Audio Files (*.MKJ)\0",false,
 	NULL
 };
 

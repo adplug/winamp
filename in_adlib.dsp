@@ -196,7 +196,6 @@ SOURCE=..\adplug\players\mid.cpp
 # Begin Source File
 
 SOURCE=..\adplug\players\mkj.cpp
-# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
@@ -329,7 +328,6 @@ SOURCE=..\adplug\players\mididata.h
 # Begin Source File
 
 SOURCE=..\adplug\players\mkj.h
-# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
