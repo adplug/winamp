@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib winmm.lib comctl32.lib newpst.lib /nologo /subsystem:windows /dll /profile /machine:I386 /out:"C:\Programme\Winamp\Plugins\in_adlib.dll"
+# ADD LINK32 newpst.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib winmm.lib comctl32.lib adplug.lib /nologo /subsystem:windows /dll /profile /machine:I386 /out:"C:\Programme\Winamp\Plugins\in_adlib.dll" /libpath:"..\adplug\Release"
 # SUBTRACT LINK32 /debug /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "in_adlib - Win32 Debug"
@@ -82,7 +82,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib winmm.lib comctl32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"C:\Programme\Winamp\Plugins\in_adlib.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib winmm.lib comctl32.lib adplug.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"C:\Programme\Winamp\Plugins\in_adlib.dll" /libpath:"..\adplug\Debug"
 # SUBTRACT LINK32 /nodefaultlib
 
 !ENDIF 
@@ -94,77 +94,6 @@ LINK32=link.exe
 # Begin Group "Quellcodedateien"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
-# Begin Source File
-
-SOURCE=..\adplug\players\a2m.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\adlibemu.c
-# ADD CPP /W1
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\adplug.cpp
-
-!IF  "$(CFG)" == "in_adlib - Win32 Release"
-
-# ADD CPP /O2 /I ".\players\\" /I "..\adplug\players"
-
-!ELSEIF  "$(CFG)" == "in_adlib - Win32 Debug"
-
-# ADD CPP /I "..\adplug\players"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\amd.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\bam.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\d00.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\dfm.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\emuopl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\fmopl.c
-
-!IF  "$(CFG)" == "in_adlib - Win32 Release"
-
-# ADD CPP /Zp8 /W1 /O2
-
-!ELSEIF  "$(CFG)" == "in_adlib - Win32 Debug"
-
-# ADD CPP /W1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\hsc.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\hsp.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\imf.cpp
-# End Source File
 # Begin Source File
 
 SOURCE=.\in_adlib.cpp
@@ -184,106 +113,13 @@ SOURCE=.\in_adlib.cpp
 
 SOURCE=.\in_adlib.rc
 # End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\ksm.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\lds.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\mid.cpp
-
-!IF  "$(CFG)" == "in_adlib - Win32 Release"
-
-# ADD CPP /Zp8 /W3 /O2 /Op- /Oy /Ob1
-
-!ELSEIF  "$(CFG)" == "in_adlib - Win32 Debug"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\mkj.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\mtk.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\protrack.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\rad.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\raw.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\realopl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\s3m.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\sa2.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\sng.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\u6m.cpp
-
-!IF  "$(CFG)" == "in_adlib - Win32 Release"
-
-# ADD CPP /Zp8 /O2 /Ob1
-# SUBTRACT CPP /Z<none>
-
-!ELSEIF  "$(CFG)" == "in_adlib - Win32 Debug"
-
-# ADD CPP /Zp8 /Od
-
-!ENDIF 
-
-# End Source File
 # End Group
 # Begin Group "Header-Dateien"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
 # Begin Source File
 
-SOURCE=..\adplug\players\a2m.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\adlibemu.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\adplug\adplug.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\amd.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\bam.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\d00.h
 # End Source File
 # Begin Source File
 
@@ -291,19 +127,7 @@ SOURCE=.\debug.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\adplug\players\dfm.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\adplug\emuopl.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\fm.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\fmopl.h
 # End Source File
 # Begin Source File
 
@@ -311,75 +135,11 @@ SOURCE=.\frontend.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\adplug\players\hsc.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\hsp.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\imf.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\imfcrc.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\in2.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\adplug\kemuopl.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\ksm.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\lds.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\mid.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\mididata.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\mkj.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\mtk.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\opl.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\out.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\player.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\protrack.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\rad.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\raw.h
 # End Source File
 # Begin Source File
 
@@ -391,23 +151,7 @@ SOURCE=.\resource.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\adplug\players\s3m.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\sa2.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\adplug\silentopl.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\sng.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\players\u6m.h
 # End Source File
 # End Group
 # Begin Group "Ressourcen-Dateien"

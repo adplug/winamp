@@ -21,7 +21,6 @@ extern "C" {
 
 // OPL devices
 #include "emuopl.h"							// Tatsuyuki's OPL2 emulator
-#include "kemuopl.h"						// Ken's OPL2 emulator
 #include "realopl.h"						// hardware OPL2
 #include "silentopl.h"						// completely silent OPL2
 
@@ -90,7 +89,6 @@ CAdPlug			ap;									// global AdPlug object
 CPlayer			*player;							// global replayer
 Copl			*opl;								// global OPL2 chip
 CEmuopl			*emuopl;							// global emulated OPL2
-CKemuopl		*kemuopl;							// global second emulated OPL2
 CRealopl		*realopl=0;							// global real OPL2
 int				killDecodeThread=0;					// kill switch for decode thread
 HANDLE			thread_handle=INVALID_HANDLE_VALUE; // handle to decode thread
@@ -322,7 +320,6 @@ BOOL APIENTRY GeneralConfigProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 
 			// check "hardware"
 			if(IsDlgButtonChecked(hwndDlg,IDC_HARDWAREEMU) == BST_CHECKED) mnextusehardware = emuts;
-			if(IsDlgButtonChecked(hwndDlg,IDC_HARDWAREEMU2) == BST_CHECKED) mnextusehardware = emuks;
 			if(IsDlgButtonChecked(hwndDlg,IDC_HARDWAREOPL2) == BST_CHECKED) mnextusehardware = opl2;
 
 			// check "OPL2 Port"
@@ -374,7 +371,6 @@ BOOL APIENTRY GeneralConfigProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 
 			switch(mnextusehardware) {		// set "hardware" state
 			case emuts: CheckRadioButton(hwndDlg,IDC_HARDWAREEMU,IDC_HARDWAREOPL2,IDC_HARDWAREEMU); break;
-			case emuks: CheckRadioButton(hwndDlg,IDC_HARDWAREEMU,IDC_HARDWAREOPL2,IDC_HARDWAREEMU2); break;
 			case opl2: CheckRadioButton(hwndDlg,IDC_HARDWAREEMU,IDC_HARDWAREOPL2,IDC_HARDWAREOPL2); break;
 			}
 
@@ -688,7 +684,6 @@ int play(char *fn)
 
 	// init OPL2 output
 	switch(usehardware) {
-	case emuks: opl = kemuopl = new CKemuopl(replayfreq,use16bit,stereo); break;
 	case emuts: opl = emuopl = new CEmuopl(replayfreq,use16bit,stereo); break;
 	case opl2: opl = realopl = new CRealopl(adlibport); realopl->setvolume(savevol); break;
 	}
@@ -861,9 +856,6 @@ DWORD WINAPI __stdcall DecodeThread(void *b)
 		case emuts:
 			emuopl->update(tempbuf,towrite);
 			break;
-		case emuks:
-			kemuopl->update(tempbuf,towrite);
-			break;
 		}
 		towrite = mod.dsp_dosamples(tempbuf,towrite,use16bit ? 16 : 8,stereo ? 2 : 1,replayfreq);	// update dsp
 		if(use16bit) towrite *= 2; if(stereo) towrite *= 2;
@@ -938,9 +930,6 @@ DWORD WINAPI __stdcall DecodeThread(void *b)
 			switch(usehardware) {
 			case emuts:
 				emuopl->update((short *)pos,i);
-				break;
-			case emuks:
-				kemuopl->update((short *)pos,i);
 				break;
 			}
 			pos += i * sampsize; towrite -= i;

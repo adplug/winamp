@@ -23,7 +23,6 @@
 #define IDC_SONGINFO                    1044
 #define IDC_INSTNAMES                   1045
 #define IDC_HARDWAREEMU                 1046
-#define IDC_HARDWAREEMU2                1047
 #define IDC_HARDWAREOPL2                1048
 #define IDC_AUTOEND                     1050
 #define IDC_FASTSEEK                    1051

@@ -40,54 +40,52 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,32,269,23
 END
 
-IDD_PROPGENERAL DIALOG DISCARDABLE  0, 0, 207, 151
+IDD_PROPGENERAL DIALOG DISCARDABLE  0, 0, 197, 156
 STYLE WS_POPUP | WS_CAPTION
 CAPTION "General"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "8-bit",IDC_QUALITY8,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,162,15,29,10
-    CONTROL         "16-bit",IDC_QUALITY16,"Button",BS_AUTORADIOBUTTON,162,
+                    WS_GROUP,147,15,29,10
+    CONTROL         "16-bit",IDC_QUALITY16,"Button",BS_AUTORADIOBUTTON,147,
                     25,33,12
-    GROUPBOX        "Resolution",IDC_STATIC,160,5,45,34
+    GROUPBOX        "Resolution",IDC_STATIC,145,5,45,35
     CONTROL         "11025",IDC_RATE1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    162,50,36,10
-    CONTROL         "22050",IDC_RATE2,"Button",BS_AUTORADIOBUTTON,162,60,36,
+                    147,55,36,10
+    CONTROL         "22050",IDC_RATE2,"Button",BS_AUTORADIOBUTTON,147,65,36,
                     10
-    CONTROL         "44100",IDC_RATE3,"Button",BS_AUTORADIOBUTTON,162,70,36,
+    CONTROL         "44100",IDC_RATE3,"Button",BS_AUTORADIOBUTTON,147,75,36,
                     10
-    CONTROL         "48000",IDC_RATE4,"Button",BS_AUTORADIOBUTTON,162,80,36,
+    CONTROL         "48000",IDC_RATE4,"Button",BS_AUTORADIOBUTTON,147,85,36,
                     10
-    CONTROL         "",IDC_RATE5,"Button",BS_AUTORADIOBUTTON,162,92,9,8
-    GROUPBOX        "Frequency",IDC_STATIC,160,40,45,65
-    EDITTEXT        IDC_CUSTOMRATE,172,90,25,12,ES_NUMBER
-    GROUPBOX        "Hardware",IDC_STATIC,5,5,150,45
-    CONTROL         "Tatsuyuki Satoh's emulator",IDC_HARDWAREEMU,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP,10,15,101,10
-    CONTROL         "Ken Silverman's emulator",IDC_HARDWAREEMU2,"Button",
-                    BS_AUTORADIOBUTTON,10,25,95,10
+    CONTROL         "",IDC_RATE5,"Button",BS_AUTORADIOBUTTON,147,97,9,8
+    GROUPBOX        "Frequency",IDC_STATIC,145,45,45,65
+    EDITTEXT        IDC_CUSTOMRATE,157,95,25,12,ES_NUMBER
+    GROUPBOX        "Hardware",IDC_STATIC,5,5,135,35
+    CONTROL         "Emulated",IDC_HARDWAREEMU,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,10,15,45,10
     CONTROL         "Real OPL2",IDC_HARDWAREOPL2,"Button",BS_AUTORADIOBUTTON,
-                    10,35,51,10
-    EDITTEXT        IDC_ADLIBPORT,122,34,21,12,ES_UPPERCASE
-    GROUPBOX        "OPL2 Port",IDC_STATIC,112,23,43,27
-    GROUPBOX        "Options",IDC_STATIC,5,55,150,45
+                    10,25,51,10
+    EDITTEXT        IDC_ADLIBPORT,110,20,21,12,ES_UPPERCASE
+    GROUPBOX        "OPL2 Port",IDC_STATIC,99,5,41,35
+    GROUPBOX        "Options",IDC_STATIC,5,45,135,45
     CONTROL         "Autodetect Songend",IDC_AUTOEND,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,65,112,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,55,100,10
     CONTROL         "Fast Seeks",IDC_FASTSEEK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,10,75,112,10
+                    WS_TABSTOP,10,65,95,10
     CONTROL         "Bypass all Hardware Tests",IDC_NOTEST,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,85,115,10
-    GROUPBOX        "Channels",IDC_STATIC,160,110,45,35
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,75,100,10
+    GROUPBOX        "Channels",IDC_STATIC,145,115,45,35
     CONTROL         "Mono",IDC_MONO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    165,121,34,10
-    CONTROL         "Stereo",IDC_STEREO,"Button",BS_AUTORADIOBUTTON,165,130,
+                    151,126,34,10
+    CONTROL         "Stereo",IDC_STEREO,"Button",BS_AUTORADIOBUTTON,151,135,
                     37,10
-    GROUPBOX        "Thread priority",IDC_STATIC,5,105,150,40
+    GROUPBOX        "Thread priority",IDC_STATIC,5,95,135,40
     CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,10,115,140,10
-    LTEXT           "Idle",IDC_STATIC,10,130,12,8
-    LTEXT           "Normal",IDC_STATIC,70,130,23,8
-    RTEXT           "Realtime",IDC_STATIC,120,130,28,8
+                    WS_TABSTOP,10,105,125,10
+    LTEXT           "Idle",IDC_STATIC,10,119,12,8
+    LTEXT           "Normal",IDC_STATIC,60,120,23,8
+    RTEXT           "Realtime",IDC_STATIC,105,120,28,8
 END
 
 IDD_FILEINFO DIALOGEX 0, 0, 271, 250
@@ -163,9 +161,9 @@ BEGIN
     IDD_PROPGENERAL, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 200
+        RIGHTMARGIN, 190
         TOPMARGIN, 7
-        BOTTOMMARGIN, 144
+        BOTTOMMARGIN, 149
     END
 
     IDD_FILEINFO, DIALOG

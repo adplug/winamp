@@ -1,6 +1,6 @@
 AdPlug Winamp plugin v1.1, (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>
 
-Website       : http://adplug.sourceforge.net
+Website       : http://adplug.sourceforge.net/winamp.shtml
 Module Archive: http://www.chiptune.de
 
 Description:
@@ -22,7 +22,7 @@ Usage:
 ------
 You can now open a supported file in Winamp. Doubleclicking on the song name
 scroller displays some infos about the currently playing file. AdPlug should
-automatically configure itself to the best replay conditions.
+automatically configure itself to the best available replay condition.
 
 Configuration:
 --------------
@@ -41,7 +41,7 @@ turned off.
 too long on your machine, you can turn on this option to make it significantly
 faster. The drawback with it is that the replayer won't preserve the module
 commands that would normally have been played in the time you skipped and the
-module may sound wrong after the seek.
+module may sound a bit wrong shortly after the seek.
 
 "Bypass all Hardware Tests": With this option turned on, the plugin won't
 complain about a nonexistant or already in use OPL2 board anymore. This can be
@@ -63,9 +63,10 @@ issue.
 
 Release History:
 ----------------
-- v1.1 (2001-10-17)
+- v1.1 (2001-10-22)
   - Fixed vis with high timer rates
   - No more messing in Winamp's own memory
+  - Using AdPlug library v1.1
 - v1.0 (2001-07-08)
   - AdPlug is open-source now!
   - Some small fixes
