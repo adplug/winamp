@@ -734,7 +734,7 @@ int play(char *fn)
 	} else {			// hardware replay uses timer
 		timecaps = (LPTIMECAPS) malloc(sizeof(TIMECAPS));
 		timeGetDevCaps(timecaps,sizeof(TIMECAPS));
-		timerperiod = min(max(timecaps->wPeriodMin,0),timecaps->wPeriodMax);
+		timerperiod = timecaps->wPeriodMin;
 		free(timecaps);
 		timeBeginPeriod(timerperiod);
 		timerhandle = timeSetEvent((int)(1000/player->getrefresh()),0,TimerThread,0,TIME_PERIODIC);
@@ -779,7 +779,7 @@ void CALLBACK TimerThread(UINT wTimerID,UINT msg,DWORD dwUser,DWORD dw1,DWORD dw
 //	int				buffersize;		// size of vis buffer
 	static float	oldrefresh;		// caches old refresh value
 
-	if(paused)
+	if(wTimerID != timerhandle || paused)
 		return;
 
 	if(!decode_pos_ms)
