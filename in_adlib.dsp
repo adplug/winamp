@@ -124,6 +124,10 @@ SOURCE=..\adplug\players\amd.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\adplug\players\bam.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\adplug\players\d00.cpp
 # End Source File
 # Begin Source File
@@ -272,6 +276,10 @@ SOURCE=..\adplug\adplug.h
 # Begin Source File
 
 SOURCE=..\adplug\players\amd.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\adplug\players\bam.h
 # End Source File
 # Begin Source File
 
