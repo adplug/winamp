@@ -24,8 +24,10 @@
 #define MSGC_DISK      "You selected GODSPEED ENDLESS Disk Writing mode."
 #define	MSGE_OPL2      "OPL2 chip on given port was not detected." "\n\n" \
                        "Emulated output forced."
-#define MSGE_WINNT     "You can't use OPL2 output under Windows NT/2000/XP." "\n\n" \
-                       "Emulated output forced."
+#define MSGE_WINNT     "You can't use OPL2 output under plain Windows NT/2000/XP." "\n\n" \
+	"However, there are some ways around it. Please refer to the readme file for\n" \
+	"information on companion software that enables hardware replay with AdPlug.\n\n" \
+	"Emulated output forced."
 #define MSGE_XMPLAY    "You can't use own output under XMPlay." "\n\n" \
                        "Emulated output forced."
 
@@ -155,12 +157,13 @@ void Config::check()
 	if (next.useoutput == opl2)
 		if (test_winnt())
 			if (!test_porttalk())
-			{
-				next.useoutput = DFL_EMU;
-				next.useoutputplug = true;
+				if(next.testopl2)
+				{
+					next.useoutput = DFL_EMU;
+					next.useoutputplug = true;
 
-				MessageBox(NULL,MSGE_WINNT,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
-			}
+					MessageBox(NULL,MSGE_WINNT,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
+				}
 
 	if (next.useoutput == opl2)
 		if (next.testopl2)
