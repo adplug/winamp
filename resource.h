@@ -7,10 +7,12 @@
 #define IDD_CFG_OUTPUT                  103
 #define IDD_CFG_FORMATS                 104
 #define IDD_FILEINFO                    105
-#define IDD_OVERWRITE                   106
-#define IDD_CFG_OTHER                   109
 #define IDD_CFG_PLAYBACK                109
-#define IDC_ABOUT_TEXT                  1000
+#define IDD_ABT_ADPLUG                  113
+#define IDD_ABT_LICENSE                 114
+#define IDD_ABT_HISTORY                 115
+#define IDR_TEXT_HISTORY                116
+#define IDR_TEXT_LICENSE                117
 #define IDC_FREQ1                       1001
 #define IDC_FREQ2                       1002
 #define IDC_FREQ3                       1003
@@ -27,7 +29,6 @@
 #define IDC_OUTOPL2                     1014
 #define IDC_ADLIBPORT                   1015
 #define IDC_NOTEST                      1016
-#define IDC_NOAUTOEND                   1017
 #define IDC_AUTOEND                     1017
 #define IDC_FASTSEEK                    1018
 #define IDC_PRIORITY                    1019
@@ -35,9 +36,7 @@
 #define IDC_STDTIMER                    1020
 #define IDC_FTSELALL                    1021
 #define IDC_FTDESELALL                  1022
-#define IDC_OVERWRITE                   1025
 #define IDC_DIRECTORY                   1027
-#define IDC_WARNING                     1028
 #define IDC_TITLE                       1032
 #define IDC_AUTHOR                      1033
 #define IDC_SUBSONGSLIDER               1035
@@ -54,15 +53,21 @@
 #define IDC_SUBSONGMIN                  1046
 #define IDC_SUBSONGMAX                  1049
 #define IDC_SUBSONG                     1050
+#define IDC_ATABS                       1052
+#define IDC_HISTORY                     1053
+#define IDC_LICENSE                     1054
+#define IDC_URL_AUTHORS                 1058
+#define IDC_URL_GNU                     1060
+#define IDC_URL_LINKS                   1062
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        111
+#define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1051
+#define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
