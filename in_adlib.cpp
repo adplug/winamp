@@ -302,6 +302,7 @@ void config_apply(bool to)
 }
 
 bool test_filetype(char *fn)
+/* returns whether a file extension belongs to us (true) or not (false) */
 {
   char *tmpstr = strrchr(fn,'.');
   if (!tmpstr)
@@ -1064,7 +1065,7 @@ DWORD WINAPI thread_emuts(void *status)
 
   while (*(int *)status)
   {
-    // seek requested ?
+	// seek requested ?
     if (plr.seek != -1)
     {
       // backward seek ?
@@ -1294,6 +1295,8 @@ void wa2_About(HWND hwndParent)
 
 void wa2_GetFileInfo(char *file, char *title, int *length_in_ms)
 {
+	printf("wa2_GetFileInfo(%s, %s, %d) - returned: ",file,title,*length_in_ms);
+
   // info for current file ?
   if ((!file) || (!*file))
     file = plr.file;
@@ -1315,6 +1318,8 @@ void wa2_GetFileInfo(char *file, char *title, int *length_in_ms)
       *length_in_ms = CAdPlug::songlength(p,((file) ? plr.subsong : DFL_SUBSONG));
     delete p;
   }
+
+  printf("%s, %s, %d\n",file,title,*length_in_ms);
 }
 
 int wa2_InfoBox(char *file, HWND hwndParent)
@@ -1362,18 +1367,24 @@ int wa2_InfoBox(char *file, HWND hwndParent)
 
 int wa2_IsOurFile(char *fn)
 {
-  // is that filetype ignored ?
-  if (test_filetype(fn))
-    return 0;
+	printf("wa2_IsOurFile? %s - ",fn);
+
+  // is the file extension one of ours ?
+	if(test_filetype(fn)) {
+		printf("seems so (by file extension)...\n");
+		return 0;
+	}
 
   // try to init player
   CPlayer *p = CAdPlug::factory(fn,out.silent);
   if (p)
   {
     delete p;
+	printf("yep!\n");
     return 1;
   }
 
+  printf("nope, don't know about it...\n");
   return 0;
 }
 
@@ -1382,6 +1393,8 @@ int wa2_Play(char *fn)
   int maxlatency;
   DWORD tmpd;
 
+	printf("wa2_Play: %s - ",fn);
+
   // apply config
   config_apply(true);
 
@@ -1389,8 +1402,8 @@ int wa2_Play(char *fn)
   if (strcmp(fn,plr.file))
   {
     plr.subsong = DFL_SUBSONG;
-
     strcpy(plr.file,fn);
+	printf("new file - ");
   }
 
   // init MIDI, if opl2 used
@@ -1405,6 +1418,7 @@ int wa2_Play(char *fn)
               MessageBox(mod.hMainWindow,"The OPL2 chip is already in use by the MIDI sequencer!\n"
                              "\n"
                              "Please quit all running MIDI applications before going on.","AdPlug :: Error",MB_OK | MB_ICONERROR);
+			  printf("OPL2 already in use!\n");
             return 1;
           }
           else
@@ -1415,6 +1429,7 @@ int wa2_Play(char *fn)
   if (!player)
   {
     opl_done();
+	printf("load error (AdPlug refused the file)!\n");
     return 1;
   }
 
@@ -1439,6 +1454,7 @@ int wa2_Play(char *fn)
       {
         delete player;
         opl_done();
+		printf("output plugin init error!\n");
         return 1;
       }
       mod.outMod->SetVolume(-666);
@@ -1482,17 +1498,22 @@ int wa2_Play(char *fn)
     FileInfoPlayer = player;
   }
 
+  printf("success!\n");
   return 0;
 }
 
 void wa2_Pause()
 {
   plr.paused = 1;
+  if(cfg.useoutput < disk)
+	  mod.outMod->Pause(1);
 }
 
 void wa2_UnPause()
 {
   plr.paused = 0;
+  if(cfg.useoutput < disk)
+	  mod.outMod->Pause(0);
 }
 
 int wa2_IsPaused()
@@ -1502,8 +1523,12 @@ int wa2_IsPaused()
 
 void wa2_Stop()
 {
-  if (!plr.playing)
-    return;
+	printf("wa2_Stop: ");
+
+	if (!plr.playing) {
+		printf("not playing!\n");
+		return;
+	}
 
   plr.playing = 0;
 
@@ -1511,6 +1536,7 @@ void wa2_Stop()
   switch (cfg.useoutput)
   {
     case emuts:
+		printf("waiting for thread - ");
       if (WaitForSingleObject(plr.thread.emuts,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)
         TerminateThread(plr.thread.emuts,0);
       CloseHandle(plr.thread.emuts);
@@ -1521,6 +1547,7 @@ void wa2_Stop()
       timeEndPeriod(tc.wPeriodMin);
       break;
     case disk:
+		printf("waiting for thread - ");
       if (WaitForSingleObject(plr.thread.disk,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)
         TerminateThread(plr.thread.disk,0);
       CloseHandle(plr.thread.disk);
@@ -1562,6 +1589,8 @@ void wa2_Stop()
   // free MIDI, if was used
   if (midiout)
     midiOutClose(midiout);
+
+  printf("stopped.\n");
 }
 
 int wa2_GetLength()
@@ -1590,12 +1619,14 @@ int wa2_GetOutputTime()
 
 void wa2_SetOutputTime(int time_in_ms)
 {
+	printf("wa2_SetOutputTime(%d)\n",time_in_ms);
   plr.seek = time_in_ms;
 }
 
 void wa2_SetVolume(int volume)
 {
-  plr.volume = (int)(63 - volume/(255/63));
+	printf("wa2_SetVolume(%d)\n",volume);
+	plr.volume = (int)(63 - volume/(255/63));
 
   switch (cfg.useoutput)
   {
@@ -1612,6 +1643,8 @@ void wa2_SetVolume(int volume)
 
 void wa2_SetPan(int pan)
 {
+	printf("wa2_SetPan(%d)\n",pan);
+
   switch (cfg.useoutput)
   {
     case emuts:
@@ -1623,10 +1656,13 @@ void wa2_SetPan(int pan)
 
 void wa2_EQSet(int on, char data[10], int preamp)
 {
+	printf("wa2_EQSet(%d, data, %d) - ignored.\n",on, preamp);
 }
 
 void wa2_Init()
 {
+	printf("wa2_Init()\n");
+
   InitCommonControls();
 
   LoadLibrary("riched20.dll");
@@ -1644,6 +1680,8 @@ void wa2_Init()
 
 void wa2_Quit()
 {
+	printf("wa2_Quit()\n");
+
   // free diskfile
   if (diskfile)
     free(diskfile);

@@ -1,14 +1,16 @@
 //Microsoft Developer Studio generated resource script.
 //
 
+#define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include <winresrc.h>
+#include "winresrc.h"
 #include "resource.h"
 
 /////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
 // Neutral resources
@@ -16,7 +18,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(1251)
+#pragma code_page(1252)
 #endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
@@ -38,7 +40,7 @@ STYLE DS_MODALFRAME | WS_CHILD | WS_CAPTION
 CAPTION "Formats"
 FONT 8, "MS Sans Serif"
 BEGIN
-    LTEXT           "Select the file formats that AdPlug should accept to replay. Deselected items will be ignored by AdPlug to make room for other plugins to play these files.\n\nSometimes, Winamp has to be restarted for the changes to take effect.",
+    LTEXT           "Select the file formats that AdPlug should accept to replay. Deselected items will be ignored by AdPlug to make room for other plugins to play these files.\n\nWinamp has to be restarted for the changes to take effect.",
                     IDC_STATIC,7,7,250,35
     LISTBOX         IDC_FORMATLIST,7,42,250,75,LBS_MULTIPLESEL | 
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
@@ -525,3 +527,55 @@ END
 
 #endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resrc1.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""winresrc.h""\r\n"
+    "#include ""resource.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
