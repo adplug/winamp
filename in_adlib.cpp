@@ -20,6 +20,7 @@
 */
 
 #include <windows.h>
+#include <winioctl.h>
 #include <commctrl.h>
 #include <mmsystem.h>
 #include <shlobj.h>
@@ -83,6 +84,7 @@ struct
         "a2m\0",        "Adlib Tracker 2 Modules (*.A2M)\0",                false,
         "amd\0",        "AMUSIC Adlib Tracker Modules (*.AMD)\0",           false,
         "bam\0",        "Bob's Adlib Music Format (*.BAM)\0",               false,
+		"cff\0",		"CUD BoomTracker Modules (*.CFF)\0",				false,
         "cmf\0",        "Creative Music Files (*.CMF)\0",                   false,
         "d00\0",        "EdLib Modules (*.D00)\0",                          false,
         "dfm\0",        "Digital-FM Modules (*.DFM)\0",                     false,
@@ -204,11 +206,58 @@ char *lowstring(char *s)
   return s;
 }
 
+bool porttalk_enable()
+/* Enables I/O port permissions on Windows NT, using the PortTalk device driver.
+ * Returns true on success. Returns false if PortTalk isn't installed.
+ */
+{
+	DWORD BytesReturned, our_pid;
+	HANDLE PortTalk_Driver;
+
+	// Try to open PortTalk driver
+	if((PortTalk_Driver = CreateFile("\\\\.\\PortTalk",GENERIC_READ,0,NULL,
+		OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE) {
+		puts("porttalk_enable(): PortTalk not installed.");
+		return false;
+	}
+
+	// Reset I/O permission map
+	if(!DeviceIoControl(PortTalk_Driver,
+		CTL_CODE(40000, 0x900, METHOD_BUFFERED, FILE_ANY_ACCESS),
+		NULL,0,NULL,0,&BytesReturned,NULL)) {
+		puts("porttalk_enable(): Error on resetting I/O permission map!");
+		CloseHandle(PortTalk_Driver);
+		return false;
+	}
+
+	// Set I/O permission map
+	if(!DeviceIoControl(PortTalk_Driver,
+		CTL_CODE(40000, 0x901, METHOD_BUFFERED, FILE_ANY_ACCESS),
+		NULL,0,NULL,0,&BytesReturned,NULL)) {
+		puts("porttalk_enable(): Error on setting I/O permission map!");
+		CloseHandle(PortTalk_Driver);
+		return false;
+	}
+
+	// Enable I/O permissions on ourself
+	our_pid = GetCurrentProcessId();
+	printf("porttalk_enable(): Our process ID is %u.\n",our_pid);
+	if(!DeviceIoControl(PortTalk_Driver,
+		CTL_CODE(40000, 0x903, METHOD_BUFFERED, FILE_ANY_ACCESS),
+		&our_pid,4,NULL,0,&BytesReturned,NULL)) {
+		puts("porttalk_enable(): Error on establishing I/O permissions on our process!");
+		CloseHandle(PortTalk_Driver);
+		return false;
+	}
+
+	CloseHandle(PortTalk_Driver);
+	Sleep(1);	// Very important !! Wait for device driver to carry out our requests.
+	return true;
+}
+
 bool test_opl2()
 {
-  CRealopl temp_adlib(cfg.nextadlibport);
-
-  return temp_adlib.detect();
+	return CRealopl(cfg.nextadlibport).detect();
 }
 
 bool test_os()
@@ -249,15 +298,17 @@ void config_test()
   }
 
   // WinNT ?
-  if ((cfg.nextuseoutput == opl2) && test_os())
-  {
-    cfg.nextuseoutput = DFL_EMU;
-    cfg.nextuseoutputplug = 1;
+  if ((cfg.nextuseoutput == opl2) && test_os())	// Hardware OPL2 on WinNT ?
+	  if(!porttalk_enable())	// Try to use PortTalk driver
+		  if(cfg.nexttestopl2) {	// ...and bail out on errors ?
+			// Switch back to default emulator
+			cfg.nextuseoutput = DFL_EMU; cfg.nextuseoutputplug = 1;
 
-    MessageBox(mod.hMainWindow, "OPL2 hardware replay is not possible on Windows NT/XP!\n"
-                     "\n"
-                     "Switching to emulation mode.","AdPlug :: Error",MB_OK | MB_ICONERROR);
-  }
+			MessageBox(mod.hMainWindow,"OPL2 hardware replay is not possible on plain Windows NT/2000/XP!\n\n"
+				"However, there are some ways around it. Please refer to the readme file for\n"
+				"information on companion software that enables hardware replay with AdPlug.\n\n"
+				"Switching to emulation mode.","AdPlug :: Error",MB_OK | MB_ICONERROR);
+		  }
 
   // No OPL ?
   if ((cfg.nextuseoutput == opl2) && cfg.nexttestopl2 && !test_opl2())
