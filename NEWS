@@ -2,6 +2,8 @@ Changes for version 1.5 (2004-04-15)
    - Greets from Breakpoint 2004! ;-)
    - Fixed config dialog box not opening on Winamp 5 bug
    - Added multiline tooltips
+   - Added workaround for S3M files and Nullsoft's Module Decoder Plugin,
+     so sample based S3M files are playable again
 
    * Using AdPlug core library 1.5-CVS20040415:
       - New format support:
