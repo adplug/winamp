@@ -31,15 +31,15 @@ char *FileTypes::export(char *buf)
 	char *retval = buf;
 
 	for (int i=0;i<get_size();i++)
-	{
-		memcpy(buf,work.type[i].c_str(),work.type[i].length());
-		buf += work.type[i].length();
-		*buf++ = 0;
+		if(!work.ignore[i]) {
+			memcpy(buf,work.type[i].c_str(),work.type[i].length());
+			buf += work.type[i].length();
+			*buf++ = 0;
 
-		memcpy(buf,work.name[i].c_str(),work.name[i].length());
-		buf += work.name[i].length();
-		*buf++ = 0;
-	}
+			memcpy(buf,work.name[i].c_str(),work.name[i].length());
+			buf += work.name[i].length();
+			*buf++ = 0;
+		}
 
 	*(int *)buf = 0;
 

@@ -216,9 +216,8 @@ extern In_Module mod =
 
 extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 {
-	//debug_init();
 #ifdef _DEBUG
-	CAdPlug::debug_output("c:\\work\\adplug.log");
+	debug_init();
 #endif
 	config.load();
 

@@ -1,12 +1,17 @@
-Changes for version 1.4 (2002-mm-dd)
+Changes for version 1.4 (2003-02-22)
    - Major cosmetic liftoff :)
    - Config data moved to player's .ini
    - Smarter fileinfo :)
    - Support for the PortTalk device driver to enable hardware replay on
-     Windows NT/2000/XP.
+     Windows NT/2000/XP
+   - AdPlug Database support
    - Some fixes
 
-   * Using AdPlug library v1.3:
+   * Using AdPlug library v1.4:
+      - New, modularized file loading framework
+      - Now using 'libbinio' for platform-independant binary I/O
+      - Added database framework for storing music file information
+      - Uses newest fmopl OPL2 emulator version 0.60 from MAME 0.65
       - New or corrected IMF timer rates for the following games:
          - Duke Nukem 2
       - New format support:
@@ -26,17 +31,17 @@ Changes for version 1.2 (2002-03-28)
 
    * Using AdPlug library v1.2:
       - Added a whole bunch of new players: SAT, ROL, SNG, XAD, XMS, MAD
-      - SA2 player now handles version 7 files.
-      - New OPL disk writer that creates RdosPlay RAW files.
+      - SA2 player now handles version 7 files
+      - New OPL disk writer that creates RdosPlay RAW files
 
 Changes for version 1.1 (2001-10-26)
    - Fixed vis with high timer rates
    - No more messing in Winamp's own memory
 
    * Using AdPlug library v1.1:
-      - Added MKJ, DFM and BAM players.
-      - Removed Ken Silverman's YM3812 emulator due to portability issues.
-      - Fixed memory leak in SNG player.
+      - Added MKJ, DFM and BAM players
+      - Removed Ken Silverman's YM3812 emulator due to portability issues
+      - Fixed memory leak in SNG player
 
 Changes for version 1.0 (2001-07-08)
    - AdPlug is open-source now!
