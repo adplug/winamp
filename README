@@ -72,6 +72,10 @@ this option is enabled, AdPlug will write the output to disk, but in the speed
 it would have played it, would a real output be in use. So this takes
 significantly longer.
 
+"Use Database": If checked, AdPlug will use the database file, selected with
+the next button, to get replay information about some problematic files. An
+up-to-date version of the database can always be downloaded at AdPlug's website.
+
 "Thread Priority": This can be used to make AdPlug a more or lesser important
 task in your system. Depending on your needs, this could be useful.
 
