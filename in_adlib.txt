@@ -1,4 +1,4 @@
-AdPlug v1.0 by Simon Peter (dn.tlp@gmx.net)
+AdPlug v1.1 by Simon Peter (dn.tlp@gmx.net)
   - YM3812 emulator by Tatsuyuki Satoh (tatuyuki@tky.3web.ne.jp)
   - Second YM3812 emulator by Ken Silverman (kjs@lems.brown.edu)
   - MID, CMF, LAA & SCI replayer by Phil Hassey (philhassey@hotmail.com)
@@ -109,6 +109,8 @@ of the LGPL can be found at http://www.gnu.org/copyleft/lesser.html.
 
 Release History:
 ----------------
+- v1.1 (2001-09-26)
+  - Fixed vis with high timer rates
 - v1.0 (2001-07-08)
   - AdPlug is open-source now!
   - Some small fixes

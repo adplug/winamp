@@ -51,6 +51,7 @@ enum outputs {emuks, emuts, opl2, opl2emuks, opl2emuts};
 #define WM_WA_MPEG_EOF	WM_USER+2			// post to Winamp at EOF
 #define WM_AP_UPDATE	WM_USER+100			// post to FileInfoProc to update window
 #define DFLEMU			emuts				// default (safe) emulation mode
+#define BUFSIZE			576					// sound buffer size in samples (vis needs min. 576)
 
 // default configuration
 #define REPLAYFREQ	44100					// default replay frequency
@@ -98,7 +99,7 @@ int prioresolve[] = {THREAD_PRIORITY_IDLE, THREAD_PRIORITY_LOWEST, THREAD_PRIORI
 					THREAD_PRIORITY_TIME_CRITICAL};
 
 // global variables
-In_Module		mod;
+In_Module		mod;								// Winamp input plugin interface
 char			lastfn[MAX_PATH];					// currently playing file
 int				paused;								// pause flag
 CAdPlug			ap;									// global AdPlug object
@@ -129,8 +130,9 @@ bool			use16bit,nextuse16bit = USE16BIT,infplay=INFPLAY,fastseek=FASTSEEK,notest
 enum outputs	usehardware,nextusehardware = USEHARDWARE;
 unsigned short	adlibport,nextadlibport = ADLIBPORT;
 
-DWORD WINAPI __stdcall DecodeThread(void *b); // the emulator thread
-void CALLBACK TimerThread(UINT wTimerID,UINT msg,DWORD dwUser,DWORD dw1,DWORD dw2);	// the hardware-replay thread
+// forward declarations
+DWORD WINAPI __stdcall DecodeThread(void *b); // emulator thread
+void CALLBACK TimerThread(UINT wTimerID,UINT msg,DWORD dwUser,DWORD dw1,DWORD dw2);	// hardware-replay thread
 
 void setvolume(int volume)
 {
@@ -845,92 +847,8 @@ void CALLBACK TimerThread(UINT wTimerID,UINT msg,DWORD dwUser,DWORD dw1,DWORD dw
 	decode_pos_ms += 1000/player->getrefresh();
 }
 
-/*DWORD WINAPI __stdcall DecodeThread(void *b)
-{
-	short	*tempbuf=NULL,*cpybuf;			// our handover buffer
-	int		oldsize,newwrite,newsize,towrite,pos,written,cw,size,nibble=0;	// write buffer sizes
-	bool	eos=false;								// end of song flag
-
-	while (!*(int *)b) {			// kill switch
-		if(seek_needed != -1) {			// seek needed?
-			if(seek_needed < decode_pos_ms) {	// seek backwards?
-				player->rewind(subsong);	// rewind module
-				decode_pos_ms = 0.0f;
-				eos = false;
-			}
-			// seek to new position
-			while(decode_pos_ms < seek_needed && player->update())
-				decode_pos_ms += 1000/player->getrefresh();
-			mod.outMod->Flush((int)decode_pos_ms);	// tell new position
-			seek_needed = -1;						// reset seek flag
-		}
-
-		if(eos)
-			if (!mod.outMod->IsPlaying()) {	// sound ended?
-				PostMessage(mod.hMainWindow,WM_WA_MPEG_EOF,0,0);
-				break;
-			} else {
-				Sleep(10);
-				continue;
-			}
-
-		// do some output
-		towrite = 0; pos = 0; size = 0;
-		do
-			if(player->update() || infplay) {	// update replayer
-				newwrite = (int)(replayfreq/player->getrefresh());
-				towrite += newwrite;	// how much to write?
-				newsize = newwrite; if(use16bit) newsize *= 2; if(stereo) newsize *= 2;
-				size += newsize; if(mod.dsp_isactive()) size *= 2;
-				if(!pos)
-					tempbuf = (short *)realloc(tempbuf,size*2);
-				else {
-					cpybuf = (short *)malloc(size*2);
-					memcpy(cpybuf,tempbuf,oldsize);
-					free(tempbuf);
-					tempbuf = cpybuf;
-				}
-				switch(usehardware) {
-				case emuts:
-					emuopl->update(tempbuf+pos,newwrite);
-					break;
-				case emuks:
-					kemuopl->update(tempbuf+pos,newwrite);
-					break;
-				}
-				oldsize = newsize;
-				pos += newwrite;
-				decode_pos_ms += 1000/player->getrefresh();
-			} else {
-				eos = true;
-				break;
-			}
-		while(towrite < 576);
-		towrite = mod.dsp_dosamples(tempbuf,towrite,use16bit ? 16 : 8,stereo ? 2 : 1,replayfreq);	// update dsp
-		if(use16bit) towrite *= 2; if(stereo) towrite *= 2;
-		written = towrite;
-
-		while(written) {
-			while(!(cw = mod.outMod->CanWrite()))
-				Sleep(10);
-			if(cw > written) cw = written;	// just write the rest
-			if(cw > 8192) cw = 8192;		// doesn't accept more than 8192 bytes
-			mod.outMod->Write((char *)tempbuf+(towrite-written),cw);
-			written -= cw;
-			if(*(int *)b || seek_needed != -1)
-				break;
-		}
-		if(towrite > (use16bit ? 576 * 2 : 576)) {	// update vis
-			mod.SAAddPCMData(tempbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
-			mod.VSAAddPCMData(tempbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
-		}
-
-		if(fidialog) // update file info box, if displayed
-			SendMessage(fidialog,WM_AP_UPDATE,0,0);
-	}
-	free(tempbuf);					// free buffer
-	return 0;
-} */
+/*
+ * old DecodeThread()
 
 DWORD WINAPI __stdcall DecodeThread(void *b)
 {
@@ -995,6 +913,73 @@ DWORD WINAPI __stdcall DecodeThread(void *b)
 			PostMessage(fidialog,WM_AP_UPDATE,0,0);
 	}
 	free(tempbuf);					// free buffer
+	return 0;
+}
+*/
+
+DWORD WINAPI __stdcall DecodeThread(void *b)
+{
+	char	*pos,*sndbuf;			// the sample buffer
+	int		sampsize = 1;			// sample size
+	long	i,towrite,minicnt=0;
+	bool	playing=true;
+
+	if(use16bit) sampsize *= 2; if(stereo) sampsize *= 2;
+	sndbuf = (char *)malloc(BUFSIZE*sampsize*2);	// need twice the size for DSP
+	while (!*(int *)b) {			// kill switch
+		if(seek_needed != -1) {			// seek needed?
+			if(seek_needed < decode_pos_ms) {	// seek backwards?
+				player->rewind(subsong);	// rewind module
+				decode_pos_ms = 0.0f;
+			}
+			// seek to new position
+			while(decode_pos_ms < seek_needed && player->update())
+				decode_pos_ms += 1000/player->getrefresh();
+			mod.outMod->Flush((int)decode_pos_ms);	// tell new position
+			seek_needed = -1;						// reset seek flag
+		}
+
+		if(!playing && !infplay)	// update replayer
+			if (!mod.outMod->IsPlaying()) {	// sound ended?
+				PostMessage(mod.hMainWindow,WM_WA_MPEG_EOF,0,0);
+				break;
+			} else {
+				Sleep(10);
+				continue;
+			}
+
+		// do some output
+		towrite = BUFSIZE; pos = sndbuf;
+		while(towrite > 0)
+		{
+			while(minicnt < 0)
+			{
+				minicnt += replayfreq;
+				playing = player->update();
+				decode_pos_ms += 1000/player->getrefresh();
+			}
+			i = min(towrite,(long)(minicnt/player->getrefresh()+4)&~3);
+			switch(usehardware) {
+			case emuts:
+				emuopl->update((short *)pos,i);
+				break;
+			case emuks:
+				kemuopl->update((short *)pos,i);
+				break;
+			}
+			pos += i * sampsize; towrite -= i;
+			minicnt -= player->getrefresh()*i;
+		}
+		towrite = mod.dsp_dosamples((short *)sndbuf,BUFSIZE,use16bit ? 16 : 8,stereo ? 2 : 1,replayfreq) * sampsize;	// update dsp
+		while(mod.outMod->CanWrite() < towrite) Sleep(10);	// wait for output plugin
+		mod.outMod->Write(sndbuf,towrite);
+		mod.SAAddPCMData(sndbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
+		mod.VSAAddPCMData(sndbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
+
+		if(fidialog) // update file info box, if displayed
+			PostMessage(fidialog,WM_AP_UPDATE,0,0);
+	}
+	free(sndbuf);
 	return 0;
 }
 
