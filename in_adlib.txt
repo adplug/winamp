@@ -109,8 +109,9 @@ of the LGPL can be found at http://www.gnu.org/copyleft/lesser.html.
 
 Release History:
 ----------------
-- v1.0 (2001-05-30)
+- v1.0 (2001-06-30)
   - AdPlug is open-source now!
+  - Some small fixes
 - v0.10 (2001-05-25)
   - Fixes to severe bugs in v0.9, i apologize for that
   - Inverted usage of "Formats" configuration tab to conform to the usual
