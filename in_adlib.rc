@@ -34,7 +34,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,118,72,50,14
     RTEXT           "AdPlug vx.xx, (c)'99-2001 Simon Peter (dn.tlp@gmx.net) et al.",
                     IDC_ABOUT,57,16,197,8,SS_CENTERIMAGE
-    LTEXT           "Look into the README file for additional author information.\n--\nAdPlug official website: http://dfg.theunderdogs.org/adlib/adplug\nGet modules at: http://www.chiptune.de",
+    LTEXT           "Look into the README file for additional author information.\n--\nAdPlug official website: http://adplug.sourceforge.net\nGet modules at: http://www.chiptune.de",
                     IDC_STATIC,12,35,242,33
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,7,254,22
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,32,254,38

@@ -63,7 +63,7 @@ tFiletypes alltypes[] = {
 	"mtk\0MPU-401 Trakker Modules (*.MTK)\0",false,
 	"amd\0AMUSIC Adlib Tracker Modules (*.AMD)\0",false,
 	"rad\0Reality ADlib Tracker Modules (*.RAD)\0",false,
-	"a2m\0AdLib Tracker 2 (*.A2M)\0",false,
+	"a2m\0AdLib Tracker 2 Modules (*.A2M)\0",false,
 	"hsp\0Packed HSC-Tracker Modules (*.HSP)\0",false,
 	"hsc\0HSC-Tracker Modules (*.HSC)\0",false,
 	"imf;wlf\0Apogee IMF Files (*.IMF;*.WLF)\0",false,
