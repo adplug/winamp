@@ -18,7 +18,6 @@
 */
 
 #include "plugin.h"
-#include <winioctl.h>
 
 #define MSGA_WINAMP    "You must restart Winamp after switching from own to standard output."
 #define MSGC_DISK      "You selected GODSPEED ENDLESS Disk Writing mode."

@@ -16,6 +16,7 @@
 #define IDR_TEXT_HISTORY                116
 #define IDR_TEXT_LICENSE                117
 #define IDD_CONFIG                      120
+#define IDC_HAND2                       124
 #define IDC_FREQ1                       1001
 #define IDC_FREQ2                       1002
 #define IDC_FREQ3                       1003
@@ -75,7 +76,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        123
+#define _APS_NEXT_RESOURCE_VALUE        125
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1079
 #define _APS_NEXT_SYMED_VALUE           101
