@@ -91,7 +91,7 @@ struct
         "imf;wlf\0",    "Apogee IMF Files (*.IMF;*.WLF)\0",                 false,
         "ksm\0",        "Ken Silverman's Music Format (*.KSM)\0",           false,
         "laa\0",        "LucasArts Adlib Audio Files (*.LAA)\0",            false,
-//      "lds\0",        "LOUDNESS Modules (*.LDS)\0",                       false,
+        "lds\0",        "LOUDNESS Modules (*.LDS)\0",                       false,
         "m\0",          "Ultima 6 Music Format (*.M)\0",                    false,
         "mad\0",        "Mlat Adlib Tracker Modules (*.MAD)\0",             false,
         "mid\0",        "MIDI Audio Files (*.MID)\0",                       false,
@@ -106,6 +106,7 @@ struct
         "sci\0",        "Sierra Adlib Audio Files (*.SCI)\0",               false,
         "sng\0",        "SNGPlay Files (*.SNG)\0",                          false,
         "sng\0",        "Faust Music Creator Modules (*.SNG)\0",            false,
+		"sng\0",		"Adlib Tracker Modules (*.SNG)\0",					false,
         "xad\0",        "Exotic Adlib Music Format (*.XAD)\0",              false,
         "xms\0",        "XMS-Tracker (*.XMS)\0",                            false
 };
