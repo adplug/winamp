@@ -1,3 +1,7 @@
+Changes for version 1.7 (2005-01-12)
+   - Now using the GNU build-system and compiled with MinGW by default. This
+     fixes a lot of bugs.
+
 Changes for version 1.6 (2004-09-30)
    - Re-enabled Ken Silverman's emulator
 
@@ -145,7 +149,7 @@ Changes for version 0.2 (2000-01-03)
    - Added a whopping new About box
    - Configuration is supported now, incl. saving to plugin.ini (tough job
      getting around with those old INI files)
-   - Added th File-Info box with future support for subsongs
+   - Added a File-Info box with future support for subsongs
 
 Changes for version 0.1 (1999-12-18)
    - Seeking is supported now, and i fixed some annoying bugs
