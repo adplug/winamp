@@ -186,6 +186,10 @@ SOURCE=..\adplug\players\ksm.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\adplug\players\lds.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\adplug\players\mid.cpp
 
 !IF  "$(CFG)" == "in_adlib - Win32 Release"
@@ -324,6 +328,10 @@ SOURCE=..\adplug\kemuopl.h
 # Begin Source File
 
 SOURCE=..\adplug\players\ksm.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\adplug\players\lds.h
 # End Source File
 # Begin Source File
 

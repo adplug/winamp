@@ -26,18 +26,18 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 267, 93
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 282, 79
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
 CAPTION "About AdPlug"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,118,72,50,14
-    RTEXT           "AdPlug vx.xx, (c)'99-2001 Simon Peter (dn.tlp@gmx.net) et al.",
-                    IDC_ABOUT,57,16,197,8,SS_CENTERIMAGE
-    LTEXT           "Look into the README file for additional author information.\n--\nAdPlug official website: http://adplug.sourceforge.net\nGet modules at: http://www.chiptune.de",
-                    IDC_STATIC,12,35,242,33
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,7,254,22
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,32,254,38
+    DEFPUSHBUTTON   "OK",IDOK,118,58,50,14
+    RTEXT           "AdPlug vx.xx, (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>, et al.",
+                    IDC_ABOUT,55,16,215,8,SS_CENTERIMAGE
+    LTEXT           "AdPlug official website:\thttp://adplug.sourceforge.net\nGet modules at:\t\thttp://www.chiptune.de",
+                    IDC_STATIC,12,35,257,18
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,7,269,22
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,32,269,23
 END
 
 IDD_PROPGENERAL DIALOG DISCARDABLE  0, 0, 207, 151
@@ -155,9 +155,9 @@ BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
         LEFTMARGIN, 6
-        RIGHTMARGIN, 260
+        RIGHTMARGIN, 275
         TOPMARGIN, 7
-        BOTTOMMARGIN, 86
+        BOTTOMMARGIN, 72
     END
 
     IDD_PROPGENERAL, DIALOG

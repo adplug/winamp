@@ -91,6 +91,7 @@ tFiletypes alltypes[] = {
 	"m\0Ultima 6 Music Format (*.M)\0",false,
 	"mkj\0MKJamz Audio Files (*.MKJ)\0",false,
 	"dfm\0Digital-FM Modules (*.DFM)\0",false,
+	"lds\0LOUDNESS Modules (*.LDS)\0",false,
 	NULL
 };
 
@@ -207,7 +208,7 @@ BOOL APIENTRY AboutBoxProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 	switch (message) {
 	case WM_INITDIALOG:
 		SetDlgItemText(hwndDlg,IDC_ABOUT,
-		 ADPLUGVERS ", (c)'99-2001 Simon Peter (dn.tlp@gmx.net) et al.");
+		 ADPLUGVERS ", (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>, et al.");
 		return TRUE;
 
 	case WM_PAINT:
