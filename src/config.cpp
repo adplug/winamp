@@ -43,7 +43,7 @@
 #define DFL_PRIORITY   4
 #define DFL_STDTIMER   true
 #define DFL_DISKDIR    "C:\\"
-#define DFL_IGNORED    "15;"
+#define DFL_IGNORED    "17;"
 #define DFL_DBFILE     "adplug.db"
 #define DFL_USEDB      true
 

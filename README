@@ -65,7 +65,7 @@ that you can obviously forget about using playlists when doing this.
 too long on your machine, you can turn on this option to make it significantly
 faster. The drawback with it is that the replayer won't preserve the module
 commands that would normally have been played in the time you skipped and the
-module may sound a bit wrong shortly after the seek.
+module may sound a bit wrong for a short time after the seek.
 
 "Standard refresh rate": This is only needed for .RAW Disk Writer output. If
 this option is enabled, AdPlug will write the output to disk, but in the speed
@@ -93,4 +93,14 @@ Luszpinski found a possible way around it and wrote a little program to do the
 trick. It can be downloaded at the AdPlug website.
 
 Realtime song position display in AdPlug's file info box is ahead of the heard
-sound, when the emulator is used.
+sound when the emulator is used.
+
+OPL2 hardware output on Windows NT/2000/XP:
+-------------------------------------------
+This version of AdPlug is capable to use a hardware OPL2 also under
+Windows NT/2000/XP! To do this, AdPlug uses the PortTalk device driver. This
+driver can be downloaded from http://www.beyondlogic.org/porttalk/porttalk.htm.
+
+After downloading the driver, please read the enclosed PDF file for
+installation instructions. I strongly recommend the manual installation method,
+using the registry file!
