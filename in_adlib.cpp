@@ -1,5 +1,6 @@
 /*
   AdPlug Winamp2 input plugin
+
   Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
   Copyright (c)	2002 Nikita V. Kalaganov <riven@ok.ru>
 
@@ -24,15 +25,17 @@
 #include <shlobj.h>
 #include <stdio.h>
 #include <string.h>
+#include <richedit.h>
 #include "resource.h"
 
 #ifdef _DEBUG
-#include "debug.h"
+  #include "debug.h"
 #endif
 
-extern "C" {
-#include "in2.h"
-#include "frontend.h"
+extern "C"
+{
+  #include "in2.h"
+  #include "frontend.h"
 }
 
 #include <adplug/adplug.h>
@@ -48,7 +51,7 @@ enum    output              {emuts, emuks, disk, opl2};
 
         /* constants */
 
-#define PLUGINVER           "AdPlug Winamp2 Plugin v1.3"
+#define PLUGINVER           "AdPlug Winamp2 plugin v1.4"
 //
 #define SNDBUFSIZE          576
 //
@@ -144,6 +147,8 @@ struct
         int                         nextuseoutputplug;
 } cfg;
 //
+char            cfgfile[_MAX_PATH];
+//
 struct
 {
         CEmuopl         *emu;
@@ -154,15 +159,15 @@ struct
 //
 struct
 {
-        char            file[_MAX_PATH];                // current file name
-        int             playing;                        // is playing ?
-        int             paused;                         // is paused ?
-        unsigned int    subsong;                        // current subsong
-        unsigned int    maxsubsong;                     // how many subsongs in current file
-        float           outtime;                        // played time in msec.
-        unsigned long   fulltime;                       // (sub)song length in msec.
-        int             seek;                           // seek value (-1 if no seek needed)
-        int             volume;                         // current volume
+        char            file[_MAX_PATH];
+        int             playing;
+        int             paused;
+        unsigned int    subsong;
+        unsigned int    maxsubsong;
+        float           outtime;
+        unsigned long   fulltime;
+        int             seek;
+        int             volume;
         union
         {
                 HANDLE          emuts;
@@ -171,15 +176,20 @@ struct
         } thread;
 } plr;
 //
-char            cfgfile[_MAX_PATH];
 CPlayer         *player = NULL;
-char            *diskfile = NULL;
+//
 MIDIOUTCAPS     mc;
 TIMECAPS        tc;
 HMIDIOUT        midiout;
-CPlayer         *FileInfoPlayer;
+//
 char            FileInfoFile[_MAX_PATH];
 HWND            FileInfoWnd = NULL;
+CPlayer         *FileInfoPlayer;
+//
+HWND            AboutTabWnd = NULL;
+int             AboutTabIndex;
+//
+char            *diskfile = NULL;
 
         /* private functions */
 
@@ -291,10 +301,13 @@ void config_apply(bool to)
 bool test_filetype(char *fn)
 {
   char *tmpstr = strrchr(fn,'.');
-  if(!tmpstr) return false;
+  if (!tmpstr)
+    return false;
 
   char *p = (char *)malloc(strlen(++tmpstr)+1);
-  if(!p) return false;
+  if (!p)
+    return false;
+
   strcpy(p,tmpstr);
 
   for (int i=0;i<FTELEMCOUNT;i++)
@@ -305,28 +318,33 @@ bool test_filetype(char *fn)
     if (str)
     {
       // for "aaa;bbb;ccc" and "ccc"
-	  if (strlen(p) == strlen(str)) {
+	  if (strlen(p) == strlen(str))
+	  {
 		free(p);
 		return true;
 	  }
+
       if (str[strlen(p)] == ';')
       {
         // for "aaa;bbb;ccc" and "aaa"
-		  if (ext == str) {
-			  free(p);
-			  return true;
-		  }
+        if (ext == str)
+		{
+		  free(p);
+		  return true;
+		}
 
         // for "aaa;bbb;ccc" and "bbb"
-		  if (ext[str-ext-1] == ';') {
-			  free(p);
-			  return true;
-		  }
+		if (ext[str-ext-1] == ';')
+		{
+		  free(p);
+		  return true;
+		}
       }
     }
   }
 
   free(p);
+
   return false;
 }
 
@@ -398,49 +416,205 @@ void opl_done()
 
 /* -------- window procedures ----------------------------- */
 
-BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL APIENTRY AboutTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  PAINTSTRUCT  ps;
-  HDC          wdc,bdc;
-  HANDLE       bm;
-  COLORREF     tp,sp;
-  unsigned int x,y;
+  char url1[50];
+  char url2[50];
 
   switch (message)
   {
     case WM_INITDIALOG:
+
+      // move tab content on top
+      SetWindowPos(hwndDlg,HWND_TOP,13,33,0,0,SWP_NOSIZE);
+
       return TRUE;
 
 
-    case WM_PAINT:
+    case WM_NOTIFY:
+      switch (((NMHDR *)lParam)->code)
+      {
+        case EN_LINK:
+          if (((ENLINK *)lParam)->msg == WM_LBUTTONDOWN)
+		  {
+            SendDlgItemMessage(AboutTabWnd,((NMHDR *)lParam)->idFrom,WM_KILLFOCUS,0,0);
 
-      // draw adplug bitmap
-      wdc = BeginPaint(hwndDlg,&ps);
-      bdc = CreateCompatibleDC(wdc);
-      bm = LoadImage(mod.hDllInstance,MAKEINTRESOURCE(IDB_LOGO),IMAGE_BITMAP,0,0,LR_DEFAULTCOLOR);
-      SelectObject(bdc,bm);
-      tp = GetPixel(bdc,0,0);
-      sp = GetPixel(wdc,12,12);
+            if (((NMHDR *)lParam)->idFrom == IDC_URL_AUTHORS)
+              strcpy(url1,"mailto://");
+            else
+              strcpy(url1,"http://");
 
-      // make bitmap transparent
-      for (x=0;x<69;x++)
-        for (y=0;y<35;y++)
-          if (GetPixel(bdc,x,y) == tp)
-            SetPixel(bdc,x,y,sp);
+            SendDlgItemMessage(AboutTabWnd,((NMHDR *)lParam)->idFrom,EM_SETSEL,((ENLINK *)lParam)->chrg.cpMin,((ENLINK *)lParam)->chrg.cpMax);
+            SendDlgItemMessage(AboutTabWnd,((NMHDR *)lParam)->idFrom,EM_GETSELTEXT,0,(LPARAM)url2);
 
-      BitBlt(wdc,18,108,75,131,bdc,0,0,SRCCOPY);
-      DeleteObject(bm);
-      ReleaseDC(hwndDlg,bdc);
-      EndPaint(hwndDlg,&ps);
-      return TRUE;
+            ShellExecute(hwndDlg,"open",strcat(url1,url2),NULL,NULL,SW_SHOWNORMAL);
+		  }
+
+          return TRUE;
+      }
+  }
+
+  return FALSE;
+}
+
+BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  TCITEM tci;
+  CHARFORMAT2 cf2;
+
+  char *license     = (char *)LockResource(LoadResource(mod.hDllInstance,FindResource(mod.hDllInstance,MAKEINTRESOURCE(IDR_TEXT_LICENSE),"TEXT")));
+  char *history     = (char *)LockResource(LoadResource(mod.hDllInstance,FindResource(mod.hDllInstance,MAKEINTRESOURCE(IDR_TEXT_HISTORY),"TEXT")));
+
+  cf2.cbSize        = sizeof(CHARFORMAT);
+  cf2.dwMask        = CFM_LINK;
+  cf2.dwEffects     = CFE_LINK;
+
+  switch (message)
+  {
+    case WM_INITDIALOG:
+
+      // init tab control
+      tci.mask = TCIF_TEXT;
+
+      tci.pszText = "General";
+      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_INSERTITEM,(WPARAM)(int)0,(LPARAM)&tci);
+		
+      tci.pszText = "Disclaimer";
+      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_INSERTITEM,(WPARAM)(int)1,(LPARAM)&tci);
+		
+      tci.pszText = "What's New";
+      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_INSERTITEM,(WPARAM)(int)2,(LPARAM)&tci);
+
+      // set default tab index
+      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_SETCURSEL,(WPARAM)(int)0,0);
+
+
+    case WM_AP_UPDATE:
+
+      // delete old tab window
+      if (AboutTabWnd)
+      {
+        DestroyWindow(AboutTabWnd);
+
+        AboutTabWnd = NULL;
+      }
+
+      // display new tab window
+      AboutTabIndex = (int)SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_GETCURSEL,0,0);
+
+      switch (AboutTabIndex)
+      {
+        case 0:
+
+          AboutTabWnd = CreateDialog(mod.hDllInstance,MAKEINTRESOURCE(IDD_ABT_ADPLUG),hwndDlg,(DLGPROC)AboutTabDlgProc);
+
+        /* authors */
+
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETBKGNDCOLOR,0,0x0C0C0C0);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETEVENTMASK,0,(LPARAM)ENM_LINK);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,WM_KILLFOCUS,0,0);
+
+          SetDlgItemText(AboutTabWnd,IDC_URL_AUTHORS,
+
+                          PLUGINVER " (" __DATE__ ")\n\nCopyright (c) 1"
+                          "999 - 2002 Simon Peter <dn.tlp@gmx.net>" "\n"
+                          "Copyright (c) 2002 Nikita V. Kalaganov <rive"
+                          "n@ok.ru>"
+
+                         );
+
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETSEL,81,95);
+		  SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
+
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETSEL,137,148);
+		  SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
+
+        /* logo */
+
+
+        /* links */
+
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETEVENTMASK,0,(LPARAM)ENM_LINK);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETBKGNDCOLOR,0,0x0C0C0C0);
+
+          SetDlgItemText(AboutTabWnd,IDC_URL_LINKS,
+
+                          "visit adplug.sourceforge.net for updates\n\n"
+                          "get modules at www.chiptune.de, get software"
+                          " at www.astercity.com/~malf"
+
+                         );
+
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETSEL,6,28);
+		  SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
+
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETSEL,57,72);
+		  SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
+
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETSEL,90,113);
+		  SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
+
+          break;
+
+        case 1:
+
+          AboutTabWnd = CreateDialog(mod.hDllInstance,MAKEINTRESOURCE(IDD_ABT_LICENSE),hwndDlg,(DLGPROC)AboutTabDlgProc);
+
+        /* license */
+
+          SendDlgItemMessage(AboutTabWnd,IDC_LICENSE,WM_KILLFOCUS,0,0);
+
+          SetDlgItemText(AboutTabWnd,IDC_LICENSE,license);
+
+        /* link */
+
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETEVENTMASK,0,(LPARAM)ENM_LINK);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETBKGNDCOLOR,0,0x0C0C0C0);
+
+          SetDlgItemText(AboutTabWnd,IDC_URL_GNU,
+
+                          "Read GNU GPL: www.gnu.org/licenses/lgpl.txt"
+
+                         );
+
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETSEL,14,44);
+		  SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
+
+          break;
+
+        case 2:
+
+          AboutTabWnd = CreateDialog(mod.hDllInstance,MAKEINTRESOURCE(IDD_ABT_HISTORY),hwndDlg,(DLGPROC)AboutTabDlgProc);
+
+        /* history */
+
+          SendDlgItemMessage(AboutTabWnd,IDC_HISTORY,WM_KILLFOCUS,0,0);
+
+          SetDlgItemText(AboutTabWnd,IDC_HISTORY,history);
+
+          break;
+      }
+
+	  return TRUE;
+
+
+    case WM_NOTIFY:
+      switch (((NMHDR FAR *)lParam)->code)
+      {
+        case TCN_SELCHANGE:
+
+          PostMessage(hwndDlg,WM_AP_UPDATE,0,0);
+          return TRUE;
+      }
 
 
     case WM_COMMAND:
       switch (LOWORD(wParam))
       {
         case IDCANCEL:
+          
           EndDialog(hwndDlg,wParam);
-            return TRUE;
+          return TRUE;
       }
   }
 
@@ -803,6 +977,7 @@ BOOL APIENTRY FileInfoDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM 
             delete FileInfoPlayer;
 
           DestroyWindow(hwndDlg);
+
           FileInfoWnd = NULL;
 
           return TRUE;
@@ -1192,6 +1367,7 @@ int wa2_Play(char *fn)
     for (int i=0;i<midiOutGetNumDevs();i++)
       if (midiOutGetDevCaps(i,&mc,sizeof(MIDIOUTCAPS)) == MMSYSERR_NOERROR)
         if (mc.wTechnology == MOD_FMSYNTH)
+
 		  if(cfg.testopl2)
             if (midiOutOpen(&midiout,i,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR)
 			{
@@ -1218,6 +1394,7 @@ int wa2_Play(char *fn)
   plr.fulltime = get_song_length(plr.file,plr.subsong);
   plr.seek = -1;
   plr.playing = 1;
+
 
   maxlatency = 0;
 
@@ -1419,6 +1596,9 @@ void wa2_EQSet(int on, char data[10], int preamp)
 
 void wa2_Init()
 {
+  LoadLibrary("riched32.dll");
+  LoadLibrary("riched20.dll");
+
   // init opls
   out.silent = new CSilentopl;
 
