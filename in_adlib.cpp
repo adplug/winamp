@@ -221,7 +221,7 @@ bool porttalk_enable()
 		return false;
 	}
 
-	// Reset I/O permission map
+	// Reset I/O permission map (deny all access)
 	if(!DeviceIoControl(PortTalk_Driver,
 		CTL_CODE(40000, 0x900, METHOD_BUFFERED, FILE_ANY_ACCESS),
 		NULL,0,NULL,0,&BytesReturned,NULL)) {
@@ -230,7 +230,7 @@ bool porttalk_enable()
 		return false;
 	}
 
-	// Set I/O permission map
+	// Set I/O permission map (exclusive access to all ports)
 	if(!DeviceIoControl(PortTalk_Driver,
 		CTL_CODE(40000, 0x901, METHOD_BUFFERED, FILE_ANY_ACCESS),
 		NULL,0,NULL,0,&BytesReturned,NULL)) {
@@ -260,7 +260,7 @@ bool test_opl2()
 	return CRealopl(cfg.nextadlibport).detect();
 }
 
-bool test_os()
+bool test_os_nt()
 {
   OSVERSIONINFO ver;
 
@@ -276,7 +276,7 @@ bool test_os()
 
 bool test_xmplay()
 {
-  return GetModuleHandle("xmplay.exe") ? true : false;
+  return (GetModuleHandle("xmplay.exe") ? true : false);
 }
 
 void config_test()
@@ -298,7 +298,7 @@ void config_test()
   }
 
   // WinNT ?
-  if ((cfg.nextuseoutput == opl2) && test_os())	// Hardware OPL2 on WinNT ?
+  if ((cfg.nextuseoutput == opl2) && test_os_nt())	// Hardware OPL2 on WinNT ?
 	  if(!porttalk_enable())	// Try to use PortTalk driver
 		  if(cfg.nexttestopl2) {	// ...and bail out on errors ?
 			// Switch back to default emulator
