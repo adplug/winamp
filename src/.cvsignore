@@ -5,3 +5,5 @@ Debug
 *.ncb
 *.opt
 *.plg
+Makefile
+Makefile.in
