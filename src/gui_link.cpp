@@ -174,7 +174,7 @@ void GuiCtrlHyperlink::set_normal(int i)
 void GuiCtrlHyperlink::set_hover(int i)
 {
 	work.state[i] = HL_HOVER;
-	SetCursor(LoadCursor(NULL,IDC_HAND));
+	SetCursor(LoadCursor(NULL,/*IDC_HAND*/ IDC_ARROW));
 	paint(i);
 }
 
