@@ -4,6 +4,7 @@ Changes for version 1.4 (2002-mm-dd)
    - Smarter fileinfo :)
    - Support for the PortTalk device driver to enable hardware replay on
      Windows NT/2000/XP.
+   - Some fixes
 
    * Using AdPlug library v1.3:
       - New or corrected IMF timer rates for the following games:

@@ -1,0 +1,14 @@
+AdPlug/Winamp To Do List:
+--------------------------
+- fix: gui_tips: multiline tooltips
+- add: gui_config: good texts for tooltips :)
+- fix: playlist sometimes fails in background
+- fix: make porttalk support only occupy ports ADLIB_BASEPORT and ADLIB_BASEPORT + 1,
+       instead of the whole range. [dynamite]
+- add: install script for latest nsis (from nsis.sf.net)
+
+[winamp]
+- fix: not all extensions winamp uses in file selection dialog 
+
+[xmplay]
+- fix: xad.rat player fails
