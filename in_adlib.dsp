@@ -109,6 +109,17 @@ SOURCE=.\in_adlib.cpp
 # Begin Source File
 
 SOURCE=.\in_adlib.rc
+
+!IF  "$(CFG)" == "in_adlib - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "in_adlib - Win32 Debug"
+
+# ADD BASE RSC /l 0x407
+# ADD RSC /l 0x407
+# SUBTRACT RSC /x
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header-Dateien"

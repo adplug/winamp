@@ -5,8 +5,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
+#include <winresrc.h>
 #include "resource.h"
-#include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 

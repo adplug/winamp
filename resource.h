@@ -2,6 +2,8 @@
 // Microsoft Developer Studio generated include file.
 // Used by in_adlib.rc
 //
+#define IDC_STATIC	(-1)
+
 #define IDB_LOGO                        101
 #define IDD_ABOUT                       102
 #define IDD_CFG_OUTPUT                  103
