@@ -45,6 +45,8 @@ struct t_config_data
 	string         diskdir;
 	string         ignored;
 	bool           useoutputplug;
+	string         db_file;
+	bool           usedb;
 };
 
 class Config
@@ -67,6 +69,7 @@ class Config
 	private:
 
 		void			apply(bool testout);
+		bool			use_database();
 
 		void			check();
 
@@ -75,7 +78,8 @@ class Config
 		bool			test_xmplay();
 		bool			test_porttalk();
 
-		string			fname;
+		string					fname;
+		static CAdPlugDatabase	*mydb;
 
-		t_config_data	work,next;
+		t_config_data	work, next;
 };

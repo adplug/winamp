@@ -2,8 +2,6 @@
 // Microsoft Developer Studio generated include file.
 // Used by in_adlib.rc
 //
-#define IDC_STATIC                      -1
-
 #define IDB_LOGO                        101
 #define IDD_ABOUT                       102
 #define IDD_CFG_OUTPUT                  103
@@ -37,9 +35,10 @@
 #define IDC_FASTSEEK                    1018
 #define IDC_PRIORITY                    1019
 #define IDC_FORMATLIST                  1020
-#define IDC_STDTIMER                    1023
 #define IDC_FTSELALL                    1021
 #define IDC_FTDESELALL                  1022
+#define IDC_STDTIMER                    1023
+#define IDC_USEDB                       1024
 #define IDC_DIRECTORY                   1027
 #define IDC_TITLE                       1032
 #define IDC_AUTHOR                      1033
@@ -69,7 +68,9 @@
 #define IDC_URL_CHIPTUNE                1075
 #define IDC_URL_MALF                    1076
 #define IDC_TOOLTIPS                    1077
-#define IDC_ATABWND			1078
+#define IDC_ATABWND                     1078
+#define IDC_DATABASE                    1079
+#define IDC_STATIC                      -1
 
 // Next default values for new objects
 // 
@@ -78,7 +79,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        125
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1079
+#define _APS_NEXT_CONTROL_VALUE         1080
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

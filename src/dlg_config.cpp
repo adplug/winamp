@@ -19,6 +19,8 @@
 
 #include "plugin.h"
 
+#define STRING_TRUNC	40
+
 extern HINSTANCE myInstance;
 extern Config config;
 extern FileTypes filetypes;
@@ -195,9 +197,9 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 
 			// set "directory"
 			bufxstr = tmpxdiskdir = next.diskdir;
-			if (bufxstr.size() > 40)
+			if (bufxstr.size() > STRING_TRUNC)
 			{
-				bufxstr.resize(40);
+				bufxstr.resize(STRING_TRUNC);
 				bufxstr.append("...");
 			}
 			SetDlgItemText(hwndDlg,IDC_DIRECTORY,bufxstr.c_str());
@@ -283,9 +285,9 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 					if (SHGetPathFromIDList(SHBrowseForFolder(&bi),shd))
 					{
 						bufxstr = next.diskdir = shd;
-						if (bufxstr.size() > 40)
+						if (bufxstr.size() > STRING_TRUNC)
 						{
-							bufxstr.resize(40);
+							bufxstr.resize(STRING_TRUNC);
 							bufxstr.append("...");
 						}
 						SetDlgItemText(hwndDlg,IDC_DIRECTORY,bufxstr.c_str());
@@ -300,6 +302,8 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 
 BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	string bufxstr;
+
 #ifdef _DEBUG
 	//printf("GuiDlgConfig::PlaybackTabDlgProc(): Message 0x%08X received.\n",message);
 #endif
@@ -312,6 +316,8 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
 			tooltip.add(GetDlgItem(hwndDlg,IDC_FASTSEEK),"fastseek","Enable fast seek for OPL2 chip output.\r\nThis can results in inaccurate replaying.");
 			tooltip.add(GetDlgItem(hwndDlg,IDC_STDTIMER),"stdtimer","Use default playing speed for Disk Writer output.\r\nDisable, if you wanna quick song writing.\r\n\r\nNever disable, if you disabled song looping detection!");
 			tooltip.add(GetDlgItem(hwndDlg,IDC_PRIORITY),"priority","Set playing thread priority, like in Winamp.");
+			tooltip.add(GetDlgItem(hwndDlg,IDC_DATABASE),"database","Set database to be used for file information.");
+			tooltip.add(GetDlgItem(hwndDlg,IDC_USEDB),"usedb","If checked, the database will be used.");
 
 			// set checkboxes
 			if (next.testloop)
@@ -320,10 +326,21 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
 				CheckDlgButton(hwndDlg,IDC_FASTSEEK,BST_CHECKED);
 			if (next.stdtimer)
 				CheckDlgButton(hwndDlg,IDC_STDTIMER,BST_CHECKED);
+			if (next.usedb)
+				CheckDlgButton(hwndDlg,IDC_USEDB,BST_CHECKED);
 
 			// set "priority"
 			SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_SETRANGE,(WPARAM)FALSE,(LPARAM)MAKELONG(1,7));
 			SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_SETPOS,(WPARAM)TRUE,(LPARAM)next.priority);
+
+			// set "database"
+			bufxstr = next.db_file;
+			if (bufxstr.size() > STRING_TRUNC)
+			{
+				bufxstr.resize(STRING_TRUNC);
+				bufxstr.append("...");
+			}
+			SetDlgItemText(hwndDlg,IDC_DATABASE,bufxstr.c_str());
 
 			// move tab content on top
 			SetWindowPos(hwndDlg,HWND_TOP,3,22,0,0,SWP_NOSIZE);
@@ -340,11 +357,46 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
 			next.testloop = (IsDlgButtonChecked(hwndDlg,IDC_TESTLOOP) == BST_CHECKED);
 			next.fastseek = (IsDlgButtonChecked(hwndDlg,IDC_FASTSEEK) == BST_CHECKED);
 			next.stdtimer = (IsDlgButtonChecked(hwndDlg,IDC_STDTIMER) == BST_CHECKED);
+			next.usedb = (IsDlgButtonChecked(hwndDlg,IDC_USEDB) == BST_CHECKED);
 
 			// check "priority"
 			next.priority = (int)SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_GETPOS,0,0);
 
 			return 0;
+
+		case WM_COMMAND:
+			switch (LOWORD(wParam))
+			{
+				case IDC_DATABASE:
+					OPENFILENAME ofn;
+
+					ofn.lStructSize = sizeof(ofn);
+					ofn.hwndOwner = hwndDlg;
+					ofn.lpstrFilter = "AdPlug Database Files (*.DB)\0*.db\0";
+					ofn.lpstrCustomFilter = NULL;
+					ofn.nFilterIndex = 0;
+					ofn.lpstrFile = (LPSTR)malloc(_MAX_PATH);
+					strcpy(ofn.lpstrFile, next.db_file.c_str());
+					ofn.nMaxFile = _MAX_PATH;
+					ofn.lpstrFileTitle = NULL;
+					ofn.lpstrInitialDir = NULL;
+					ofn.lpstrTitle = "Select Database File";
+					ofn.Flags = OFN_FILEMUSTEXIST;
+					ofn.lpstrDefExt = NULL;
+
+					if (GetOpenFileName(&ofn))
+					{
+						bufxstr = next.db_file = ofn.lpstrFile;
+						if (bufxstr.size() > STRING_TRUNC)
+						{
+							bufxstr.resize(STRING_TRUNC);
+							bufxstr.append("...");
+						}
+						SetDlgItemText(hwndDlg,IDC_DATABASE,bufxstr.c_str());
+					}
+
+					return 0;
+			}
 	}
 
 	return FALSE;

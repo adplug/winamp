@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2003 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -20,17 +20,17 @@
 #include "plugin.h"
 #include "debug.h"
 
-HINSTANCE myInstance;
-HWND *myWindow;
+HINSTANCE	myInstance;
+HWND		*myWindow;
 
-In_Module mod;
+In_Module	mod;
 
-Config config;
-FileTypes filetypes;
-MyPlayer my_player;
-GuiDlgAbout dlg_about;
-GuiDlgConfig dlg_config;
-GuiDlgInfo dlg_info;
+Config			config;
+FileTypes		filetypes;
+MyPlayer		my_player;
+GuiDlgAbout		dlg_about;
+GuiDlgConfig	dlg_config;
+GuiDlgInfo		dlg_info;
 
 void wa2_Init()
 {
@@ -41,9 +41,7 @@ void wa2_Init()
 void wa2_Quit()
 {
 	free(mod.FileExtensions);
-
 	config.set_ignored(filetypes.get_ignore_list());
-
 	config.save();
 }
 

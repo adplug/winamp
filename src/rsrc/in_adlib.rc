@@ -13,12 +13,57 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// Russisch resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""winresrc.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_HAND2               CURSOR  DISCARDABLE     "hand.cur"
+#endif    // Russisch resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // Neutral resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(1251)
+#pragma code_page(1252)
 #endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
@@ -95,7 +140,7 @@ BEGIN
     CONTROL         "&Autodetect song end",IDC_TESTLOOP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,7,7,82,10
     CONTROL         "&Fast seek",IDC_FASTSEEK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,37,47,10
+                    WS_TABSTOP,12,30,47,10
     CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
                     WS_TABSTOP,12,116,238,11
     LTEXT           "Idle",IDC_STATIC,12,130,12,8
@@ -103,9 +148,13 @@ BEGIN
     RTEXT           "Realtime",IDC_STATIC,222,130,28,8
     GROUPBOX        "Thread priority ",IDC_STATIC,7,105,250,39
     CONTROL         "&Standard refresh rate",IDC_STDTIMER,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,12,68,82,10
-    LTEXT           "OPL2:",IDC_STATIC,7,27,21,8
-    LTEXT           "Disk Writer:",IDC_STATIC,7,57,38,8
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,54,82,10
+    LTEXT           "OPL2:",IDC_STATIC,7,20,21,8
+    LTEXT           "Disk Writer:",IDC_STATIC,7,43,38,8
+    LTEXT           "Database:",IDC_STATIC,7,68,34,8
+    PUSHBUTTON      "adplug.db",IDC_DATABASE,13,88,237,15
+    CONTROL         "&Use Database",IDC_USEDB,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,13,77,61,10
 END
 
 IDD_ABT_ADPLUG DIALOG DISCARDABLE  0, 0, 279, 141
@@ -115,10 +164,10 @@ BEGIN
     CONTROL         101,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | 
                     SS_REALSIZEIMAGE,5,41,267,71
     CTEXT           "",IDC_PLUGIN_VER,6,0,273,8,NOT WS_GROUP
-    LTEXT           "url_sp",IDC_URL_SP,171,14,50,8,NOT WS_GROUP
-    RTEXT           "Copyright (c) 1999-2002 Simon Peter <",IDC_STATIC,49,14,
-                    122,8,NOT WS_GROUP
-    LTEXT           ">",IDC_STATIC,221,14,8,8,NOT WS_GROUP
+    LTEXT           "url_sp",IDC_URL_SP,175,14,50,8,NOT WS_GROUP
+    RTEXT           "Copyright (c) 1999 - 2003 Simon Peter <",IDC_STATIC,49,
+                    14,126,8,NOT WS_GROUP
+    LTEXT           ">",IDC_STATIC,226,14,8,8,NOT WS_GROUP
     LTEXT           "url_nk",IDC_URL_NK,181,23,38,8,NOT WS_GROUP
     RTEXT           "Copyright (c) 2002 Nikita V. Kalaganov <",IDC_STATIC,51,
                     23,129,8,NOT WS_GROUP
@@ -137,7 +186,7 @@ END
 
 IDD_ABT_LICENSE DIALOGEX 0, 0, 279, 141
 STYLE WS_CHILD | WS_VISIBLE
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_LICENSE,0,0,279,124,ES_MULTILINE | ES_READONLY | NOT 
                     WS_BORDER | NOT WS_TABSTOP,WS_EX_CLIENTEDGE
@@ -147,7 +196,7 @@ END
 
 IDD_ABT_HISTORY DIALOGEX 0, 0, 279, 141
 STYLE WS_CHILD | WS_VISIBLE
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_HISTORY,0,0,279,140,ES_MULTILINE | ES_READONLY | NOT 
                     WS_BORDER | WS_VSCROLL | NOT WS_TABSTOP,WS_EX_CLIENTEDGE
@@ -343,52 +392,6 @@ END
 
 IDR_TEXT_HISTORY        TEXT    DISCARDABLE     "..\\..\\news"
 #endif    // Neutral resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Russian resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
-#ifdef _WIN32
-LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
-#pragma code_page(1251)
-#endif //_WIN32
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "#include ""winresrc.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Cursor
-//
-
-IDC_HAND2                CURSOR  DISCARDABLE     "hand.cur"
-
-#endif    // Russian resources
 /////////////////////////////////////////////////////////////////////////////
 
 

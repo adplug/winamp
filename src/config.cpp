@@ -21,6 +21,7 @@
 
 #define MSGA_WINAMP    "You must restart Winamp after switching from own to standard output."
 #define MSGC_DISK      "You selected GODSPEED ENDLESS Disk Writing mode."
+#define MSGC_DATABASE  "Database could not be loaded!"
 #define	MSGE_OPL2      "OPL2 chip on given port was not detected." "\n\n" \
                        "Emulated output forced."
 #define MSGE_WINNT     "You can't use OPL2 output under plain Windows NT/2000/XP." "\n\n" \
@@ -43,6 +44,10 @@
 #define DFL_STDTIMER   true
 #define DFL_DISKDIR    "C:\\"
 #define DFL_IGNORED    "15;"
+#define DFL_DBFILE     "adplug.db"
+#define DFL_USEDB      true
+
+CAdPlugDatabase *Config::mydb = 0;
 
 Config::Config()
 {
@@ -51,7 +56,7 @@ Config::Config()
 
 void Config::load()
 {
-	char bufstr[MAX_PATH+1];
+	char bufstr[MAX_PATH+1], dbfile[MAX_PATH];
 
     // get default path to .ini file
 	GetModuleFileName(NULL,bufstr,MAX_PATH);
@@ -116,6 +121,17 @@ void Config::load()
 	GetPrivateProfileString("in_adlib","ignored",DFL_IGNORED,bufstr,MAX_PATH,fname.c_str());
 		next.ignored = bufstr;
 
+	// Build database default path (in winamp plugin directory)
+	GetModuleFileName(GetModuleHandle("in_adlib"), dbfile, MAX_PATH);
+	strcpy(strrchr(dbfile, '\\') + 1, DFL_DBFILE);
+
+	GetPrivateProfileString("in_adlib","database",dbfile,bufstr,MAX_PATH,fname.c_str());
+		next.db_file = bufstr;
+
+	bufval = GetPrivateProfileInt("in_adlib","usedb",DFL_USEDB,fname.c_str());
+	if (bufval != -1)
+		next.usedb = bufval ? true : false;
+
 	apply(false);
 }
 
@@ -135,6 +151,8 @@ void Config::save()
 	WritePrivateProfileString("in_adlib","stdtimer",_itoa(next.stdtimer,bufstr,10),fname.c_str());
 	WritePrivateProfileString("in_adlib","diskdir",next.diskdir.c_str(),fname.c_str());
 	WritePrivateProfileString("in_adlib","ignored",next.ignored.c_str(),fname.c_str());
+	WritePrivateProfileString("in_adlib","database",next.db_file.c_str(),fname.c_str());
+	WritePrivateProfileString("in_adlib","usedb",_itoa(next.usedb,bufstr,10),fname.c_str());
 }
 
 void Config::check()
@@ -180,6 +198,9 @@ void Config::check()
 
 	if (next.useoutputplug > useoutputplug)
 		MessageBox(NULL,MSGA_WINAMP,"AdPlug :: Attention",MB_ICONINFORMATION | MB_TASKMODAL);
+
+	if(!use_database())
+		MessageBox(NULL,MSGC_DATABASE,"AdPlug :: Caution",MB_ICONWARNING | MB_TASKMODAL);
 }
 
 void Config::apply(bool testout)
@@ -197,6 +218,8 @@ void Config::apply(bool testout)
 	work.stdtimer   = next.stdtimer;
 	work.diskdir    = next.diskdir;
 	work.ignored    = next.ignored;
+	work.db_file	= next.db_file;
+	work.usedb		= next.usedb;
 
 	if (!testout || (next.useoutputplug <= useoutputplug))
 	{
@@ -225,6 +248,20 @@ const char *Config::get_ignored()
 void Config::set_ignored(const char *ignore_list)
 {
 	next.ignored = ignore_list;
+}
+
+bool Config::use_database()
+{
+	bool success = true;
+
+	if(mydb) { delete mydb; mydb = 0; }
+	if(next.usedb) {
+		mydb = new CAdPlugDatabase;
+		success = mydb->load(next.db_file);
+	}
+	CAdPlug::set_database(mydb);
+
+	return success;
 }
 
 bool Config::test_opl2()
