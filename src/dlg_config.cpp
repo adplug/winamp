@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2004 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -22,11 +22,11 @@
 #define STRING_TRUNC	55
 #define TOOLTIP_WIDTH	300
 
-extern HINSTANCE myInstance;
-extern Config config;
-extern FileTypes filetypes;
+extern HINSTANCE	myInstance;
+extern Config		config;
+extern FileTypes	filetypes;
 
-GuiCtrlTooltip *tooltip;
+GuiCtrlTooltip		*tooltip;
 
 void GuiDlgConfig::open(HWND parent)
 {

@@ -26,7 +26,7 @@ void FileTypes::add(const char *type, const char *name, bool ignore)
 	work.ignore.push_back(ignore);
 }
 
-char *FileTypes::export(char *buf)
+char *FileTypes::export_filetypes(char *buf)
 {
 	char *retval = buf;
 

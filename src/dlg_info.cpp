@@ -165,10 +165,7 @@ BOOL APIENTRY GuiDlgInfo::DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPA
 			SetDlgItemInt(hwndDlg,IDC_PATTERNS,fileinfo_player->getpatterns(),FALSE);
 
 			// reset "info" data
-			fi_order   = -1;
-			fi_pattern = -1;
-			fi_row     = -1;
-			fi_speed   = -1;
+			fi_order = fi_pattern = fi_row = fi_speed = 255;
 			fi_refresh = -1;
 
 

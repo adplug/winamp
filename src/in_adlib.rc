@@ -385,7 +385,7 @@ BEGIN
     0x3132, 0x3131, 0x312d, 0x3033, 0x2037, 0x5520, 0x4153, "\000" 
 END
 
-IDR_TEXT_HISTORY        TEXT    DISCARDABLE     "..\\..\\news"
+IDR_TEXT_HISTORY        TEXT    DISCARDABLE     "../NEWS"
 
 /////////////////////////////////////////////////////////////////////////////
 //

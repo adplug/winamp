@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2004 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -64,7 +64,7 @@ int MyPlayer::play(const char *fname)
 			if (midiOutGetDevCaps(i,&moc,sizeof(moc)) == MMSYSERR_NOERROR)
 				if (moc.wTechnology == MOD_FMSYNTH) {
 					printf("MyPlayer::play(): FM Synth found! Device ID: %d Name: %s\n", i, moc.szPname);
-					if (midiOutOpen(&midiout,i,NULL,0,CALLBACK_NULL) != MMSYSERR_NOERROR && work.testopl2)
+					if (midiOutOpen(&midiout,i,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR && work.testopl2)
 					{
 						MessageBox(NULL,MSGE_MIDIBUSY,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
 						return 1;
@@ -218,7 +218,7 @@ int MyPlayer::get_position()
 			break;
 		case opl2:
 		case disk:
-			outtime = plr.outtime;
+			outtime = (int)plr.outtime;
 			break;
 	}
 

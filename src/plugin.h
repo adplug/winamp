@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2004 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -18,7 +18,12 @@
 */
 
 // Get rid of VC compiler limitation warnings
-#pragma warning(disable: 4786)
+#ifdef _MSC_VER
+#	pragma warning(disable: 4786)
+#endif
+
+// We use some special functions of Internet Explorer 3.x
+#define _WIN32_IE	0x0300
 
 // windows
 #include <windows.h>
@@ -57,7 +62,7 @@ using namespace std;
 #include "gui_link.h"
 #include "gui_tip.h"
 
-#include "rsrc/resource.h"
+#include "resource.h"
 
 #define PLUGIN_VER "AdPlug/Winamp v1.6"
 

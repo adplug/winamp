@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2003 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2005 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -20,16 +20,16 @@
 #include "plugin.h"
 #include "debug.h"
 
-HINSTANCE	myInstance;
-HWND		*myWindow;
+HINSTANCE		myInstance;
+HWND			*myWindow;
 
-In_Module	mod;
+extern In_Module	mod;
 
 Config			config;
 FileTypes		filetypes;
 MyPlayer		my_player;
 GuiDlgAbout		dlg_about;
-GuiDlgConfig	dlg_config;
+GuiDlgConfig		dlg_config;
 GuiDlgInfo		dlg_info;
 
 void wa2_Init()
@@ -179,7 +179,7 @@ int wa2_DlgInfo(char *file, HWND hwndParent)
 	return dlg_info.open(file,hwndParent);
 }
 
-extern In_Module mod =
+In_Module mod =
 {
         IN_VER,
         PLUGIN_VER,
@@ -232,16 +232,17 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 	filetypes.add("d00",    "Packed EdLib Modules (*.D00)");
 	filetypes.add("dfm",    "Digital-FM Modules (*.DFM)");
 	filetypes.add("dmo",    "TwinTeam Modules (*.DMO)");
+	filetypes.add("dro",    "DOSBox Raw OPL2 Files (*.DRO)");
 	filetypes.add("dtm",    "DeFy Adlib Tracker Modules (*.DTM)");
 	filetypes.add("hsc",    "HSC-Tracker Modules (*.HSC)");
 	filetypes.add("hsp",	"Packed HSC-Tracker Modules (*.HSP)");
-	filetypes.add("imf;wlf;adlib","Apogee IMF Files (*.IMF;*.WLF)");
+	filetypes.add("imf;wlf;adlib","Apogee IMF Files (*.IMF;*.WLF;*.ADLIB)");
 	filetypes.add("ksm",    "Ken Silverman's Music Files (*.KSM)");
 	filetypes.add("laa",    "LucasArts Adlib Audio Files (*.LAA)");
-	filetypes.add("lds",    "LOUDNESS Files (*.LDS)");
+	filetypes.add("lds",    "LOUDNESS Sound System Files (*.LDS)");
 	filetypes.add("m",      "Ultima 6 Music Files (*.M)");
 	filetypes.add("mad",    "Mlat Adlib Tracker Modules (*.MAD)");
-	filetypes.add("mid",    "MIDI Audio Files (*.MID)");
+	filetypes.add("mid;kar","MIDI Audio Files (*.MID;*.KAR)");
 	filetypes.add("mkj",    "MKJamz Audio Files (*.MKJ)");
 	filetypes.add("mtk",    "MPU-401 Trakker Modules (*.MTK)");
 	filetypes.add("rad",    "Reality Adlib Tracker Modules (*.RAD)");
@@ -261,7 +262,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 
 	filetypes.set_ignore_list(config.get_ignored());
 
-	mod.FileExtensions = filetypes.export((char *)malloc(4096));
+	mod.FileExtensions = filetypes.export_filetypes((char *)malloc(4096));
 
 	return &mod;
 }
