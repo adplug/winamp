@@ -1,5 +1,5 @@
 /*
- * AdPlug - Winamp input plugin, (c) 1999, 2000, 2001 Simon Peter <dn.tlp@gmx.net>
+ * AdPlug - Winamp input plugin, (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
  */
 
 #include <fstream.h>
@@ -28,11 +28,12 @@ extern "C" {
 enum outputs {emuks, emuts, opl2, opl2emuks, opl2emuts};
 
 // globals
-#define ADPLUGVERS		"AdPlug v1.1"		// AdPlug version string
-#define WM_WA_MPEG_EOF	WM_USER+2			// post to Winamp at EOF
-#define WM_AP_UPDATE	WM_USER+100			// post to FileInfoProc to update window
-#define DFLEMU			emuts				// default (safe) emulation mode
-#define BUFSIZE			576					// sound buffer size in samples (vis needs min. 576)
+#define ADPLUGVERS		"AdPlug Winamp plugin v1.2"	// AdPlug version string
+#define WM_WA_MPEG_EOF	WM_USER+2					// post to Winamp at EOF
+#define WM_AP_UPDATE	WM_USER+100					// post to FileInfoProc to update window
+#define DFLEMU			emuts						// default (safe) emulation mode
+#define BUFSIZE			576							// sound buffer size in samples (vis needs min. 576)
+#define DFLSUBSONG		0							// default subsong to start with
 
 // default configuration
 #define REPLAYFREQ	44100					// default replay frequency
@@ -73,8 +74,9 @@ tFiletypes alltypes[] = {
 	"m\0Ultima 6 Music Format (*.M)\0",false,
 	"mkj\0MKJamz Audio Files (*.MKJ)\0",false,
 	"dfm\0Digital-FM Modules (*.DFM)\0",false,
-//	"lds\0LOUDNESS Modules (*.LDS)\0",false,
+	"lds\0LOUDNESS Modules (*.LDS)\0",false,
 	"bam\0Bob's Adlib Music Format (*.BAM)\0",false,
+	"rol\0Adlib Visual Composer (*.ROL)\0",false,
 	NULL
 };
 
@@ -86,7 +88,6 @@ int prioresolve[] = {THREAD_PRIORITY_IDLE, THREAD_PRIORITY_LOWEST, THREAD_PRIORI
 In_Module		mod;								// Winamp input plugin interface
 char			lastfn[MAX_PATH];					// currently playing file
 int				paused;								// pause flag
-CAdPlug			ap;									// global AdPlug object
 CPlayer			*player;							// global replayer
 Copl			*opl;								// global OPL2 chip
 CEmuopl			*emuopl;							// global emulated OPL2
@@ -159,7 +160,7 @@ bool testignore(char *fn)
 
 // unimplemented plugin functions
 void eq_set(int on, char data[10], int preamp) {}
-void init() {}
+void init() { }
 
 // pause/seek/length/pan handling
 void pause() { paused=1; if(usehardware >= opl2) realopl->setquiet(); else mod.outMod->Pause(1); }
@@ -182,7 +183,7 @@ BOOL APIENTRY AboutBoxProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 	switch (message) {
 	case WM_INITDIALOG:
 		SetDlgItemText(hwndDlg,IDC_ABOUT,
-		 ADPLUGVERS ", (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>, et al.");
+		 ADPLUGVERS ", (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>");
 		return TRUE;
 
 	case WM_PAINT:
@@ -523,7 +524,7 @@ int infoDlg(char *fn, HWND hwnd)
 		fidialog = CreateDialogParam(mod.hDllInstance,MAKEINTRESOURCE(IDD_FILEINFO),hwnd,(DLGPROC)FileInfoProc,(LPARAM)player);
 	else {
 		CSilentopl	sopl;
-		CPlayer		*p = ap.factory(fn,&sopl);
+		CPlayer		*p = CAdPlug::factory(fn,&sopl);
 		if(p) {
 			fidialog = CreateDialogParam(mod.hDllInstance,MAKEINTRESOURCE(IDD_FILEINFO),hwnd,(DLGPROC)FileInfoProc,(LPARAM)p);
 			delete p;
@@ -536,7 +537,7 @@ int infoDlg(char *fn, HWND hwnd)
 char *getsongtitle(char *title,char *filename)
 {
 	CSilentopl	sopl;
-	CPlayer *p = ap.factory(filename,&sopl);
+	CPlayer *p = CAdPlug::factory(filename,&sopl);
 
 	strcpy(title,strrchr(filename,'\\')+1);
 	if(!p) return title;
@@ -550,9 +551,9 @@ int getsonglength(char *filename, int subsng)
 	int slen;
 
 	CSilentopl	sopl;
-	CPlayer *p = ap.factory(filename,&sopl);
+	CPlayer *p = CAdPlug::factory(filename,&sopl);
 	if(!p) return 0;
-	slen = ap.songlength(p,subsng);	// get songlength
+	slen = CAdPlug::songlength(p,subsng);	// get songlength
 	delete p;
 	return slen;
 }
@@ -587,7 +588,7 @@ int isourfile(char *fn)
 		return 0;
 
 	CSilentopl	sopl;
-	CPlayer *p = ap.factory(fn,&sopl);
+	CPlayer *p = CAdPlug::factory(fn,&sopl);
 	if(p) {
 		delete p;
 		return 1;
@@ -690,7 +691,7 @@ int play(char *fn)
 	}
 
 	// init file player
-	if(!(player = ap.factory(fn,opl))) {
+	if(!(player = CAdPlug::factory(fn,opl))) {
 		// error! deinit everything
 		delete opl;
 		if(usehardware >= opl2 && adlibmidi)

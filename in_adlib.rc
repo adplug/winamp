@@ -26,18 +26,18 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 282, 79
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 316, 79
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
 CAPTION "About AdPlug"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,118,58,50,14
-    RTEXT           "AdPlug vx.xx, (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>, et al.",
-                    IDC_ABOUT,55,16,215,8,SS_CENTERIMAGE
+    DEFPUSHBUTTON   "OK",IDOK,132,58,50,14
+    RTEXT           "AdPlug Winamp plugin vx.xx, (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>",
+                    IDC_ABOUT,55,16,247,8,SS_CENTERIMAGE
     LTEXT           "AdPlug official website:\thttp://adplug.sourceforge.net\nGet modules at:\t\thttp://www.chiptune.de",
-                    IDC_STATIC,12,35,257,18
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,7,269,22
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,32,269,23
+                    IDC_STATIC,12,35,291,18
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,7,303,22
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,32,303,23
 END
 
 IDD_PROPGENERAL DIALOG DISCARDABLE  0, 0, 197, 156
@@ -153,7 +153,7 @@ BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
         LEFTMARGIN, 6
-        RIGHTMARGIN, 275
+        RIGHTMARGIN, 309
         TOPMARGIN, 7
         BOTTOMMARGIN, 72
     END
