@@ -1,21 +1,21 @@
 /*
-  This library is free software; you can redistribute it and/or
+  AdPlug Winamp2 input plugin
+  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c)	2002 Nikita V. Kalaganov <riven@ok.ru>
+
+  This plugin is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
+  This plugin is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
+  License along with this plugin; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-  in_adlib.cpp - AdPlug Winamp2 input plugin
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
-  Copyright (c)	2002 Nikita V. Kalaganov <riven@ok.ru>
 */
 
 #include <windows.h>
@@ -24,11 +24,15 @@
 #include <shlobj.h>
 #include <stdio.h>
 #include <string.h>
+#include "resource.h"
 
-extern "C"
-{
-  #include "in2.h"
-  #include "frontend.h"
+#ifdef _DEBUG
+#include "debug.h"
+#endif
+
+extern "C" {
+#include "in2.h"
+#include "frontend.h"
 }
 
 #include <adplug/adplug.h>
@@ -37,12 +41,6 @@ extern "C"
 #include <adplug/diskopl.h>
 #include <adplug/realopl.h>
 #include <adplug/silentopl.h>
-
-#include "resource.h"
-
-#ifdef _DEBUG
-  #include "debug.h"
-#endif
 
         /* outputs */
 
@@ -244,7 +242,7 @@ void config_test()
   {
     cfg.nextuseoutput = DFL_EMU;
 
-    MessageBox(mod.hMainWindow, "OPL2 hardware replay is forbidden under your OS!\n"
+    MessageBox(mod.hMainWindow, "OPL2 hardware replay is not possible on Windows NT/XP!\n"
                      "\n"
                      "Switching to emulation mode.","AdPlug :: Error",MB_OK | MB_ICONERROR);
   }
@@ -292,10 +290,12 @@ void config_apply(bool to)
 
 bool test_filetype(char *fn)
 {
-  char *p = strrchr(fn,'.');
-  if (!p)
-    return false;
-  p++;
+  char *tmpstr = strrchr(fn,'.');
+  if(!tmpstr) return false;
+
+  char *p = (char *)malloc(strlen(++tmpstr)+1);
+  if(!p) return false;
+  strcpy(p,tmpstr);
 
   for (int i=0;i<FTELEMCOUNT;i++)
   {
@@ -305,21 +305,28 @@ bool test_filetype(char *fn)
     if (str)
     {
       // for "aaa;bbb;ccc" and "ccc"
-      if (strlen(p) == strlen(str))
-        return true;
+	  if (strlen(p) == strlen(str)) {
+		free(p);
+		return true;
+	  }
       if (str[strlen(p)] == ';')
       {
         // for "aaa;bbb;ccc" and "aaa"
-        if (ext == str)
-          return true;
+		  if (ext == str) {
+			  free(p);
+			  return true;
+		  }
 
         // for "aaa;bbb;ccc" and "bbb"
-        if (ext[str-ext-1] == ';')
-          return true;
+		  if (ext[str-ext-1] == ';') {
+			  free(p);
+			  return true;
+		  }
       }
     }
   }
 
+  free(p);
   return false;
 }
 

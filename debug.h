@@ -22,5 +22,5 @@ void debug_init(void)
 	hf = _fdopen( hCrt, "w" );
 	*stdout = *hf;
 	setvbuf( stdout, NULL, _IONBF, 0 );
-	puts("Debug Started.");
+	puts("[AdPlug] Debug Started.");
 }
