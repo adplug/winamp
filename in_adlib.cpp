@@ -66,7 +66,7 @@ tFiletypes alltypes[] = {
 	"a2m\0AdLib Tracker 2 (*.A2M)\0",false,
 	"hsp\0Packed HSC-Tracker Modules (*.HSP)\0",false,
 	"hsc\0HSC-Tracker Modules (*.HSC)\0",false,
-	"imf\0Apogee IMF Files (*.IMF)\0",false,
+	"imf;wlf\0Apogee IMF Files (*.IMF;*.WLF)\0",false,
 	"sng\0SNGPlay Files (*.SNG)\0",false,
 	"ksm\0Ken Silverman's Music Format (*.KSM)\0",false,
 	"m\0Ultima 6 Music Format (*.M)\0",false,
@@ -136,21 +136,25 @@ char *upstr(char *str)
 
 bool testignore(char *fn)
 {
-	char *tmpstr;
+	char *tmpstr,*fmt,*p;
 
 	if(!strrchr(fn,'.'))
 		return false;
 
 	for(int i=0;alltypes[i].extension;i++) {
 		tmpstr = (char *)malloc(strlen(alltypes[i].extension)+1);
-		if(!strcmp(upstr(strcpy(tmpstr,alltypes[i].extension)),upstr(strrchr(fn,'.')+1))) {
-			free(tmpstr);
-			if(alltypes[i].ignore)
-				return true;
-			else
-				return false;
-		} else
-			free(tmpstr);
+		upstr(strcpy(tmpstr,alltypes[i].extension));
+		fmt = upstr(strrchr(fn,'.')+1);
+		for(p=tmpstr;(p-1);p=strchr(p,';')+1) {
+			if(!strncmp(fmt,p,strchr(p,';') ? strchr(p,';') - p : strlen(p))) {
+				free(tmpstr);
+				if(alltypes[i].ignore)
+					return true;
+				else
+					return false;
+			} else
+				free(tmpstr);
+		}
 	}
 
 	return false;
