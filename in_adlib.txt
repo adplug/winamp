@@ -62,7 +62,7 @@ sound, when the emulator is used.
 
 Release History:
 ----------------
-- v1.2 (2002-03-27)
+- v1.2 (2002-03-28)
   - Fixed file info box on other files, while playing
   - Some cosmetic fixes
   - XMPlay compatibility fixes
