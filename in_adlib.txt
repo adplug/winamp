@@ -1,6 +1,6 @@
 AdPlug Winamp plugin v1.1, (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>
 
-Website       : http://adplug.sourceforge.net/winamp.shtml
+Website: http://adplug.sourceforge.net/winamp.shtml
 Module Archive: http://www.chiptune.de
 
 Description:
@@ -56,14 +56,12 @@ sound output. This is a driver issue with the Creative FM driver. Zbigniew
 Luszpinski found a possible way around it and wrote a little program to do the
 trick. It can be downloaded at the AdPlug website.
 
-Some files (especially SA2) will sound distorted through the emulator. This is
-a well-known "problem" with software mixing, hearable when the composer plays
-the same sound on multiple channels. Hardware mixing is unaffected by this
-issue.
+Realtime song position display in AdPlug's file info box is ahead of the heard
+sound, when the emulator is used.
 
 Release History:
 ----------------
-- v1.1 (2001-10-22)
+- v1.1 (2001-10-26)
   - Fixed vis with high timer rates
   - No more messing in Winamp's own memory
   - Using AdPlug library v1.1
