@@ -1,5 +1,5 @@
 /*
-  AdPlug Winamp2 input plugin
+  AdPlug Winamp2 frontend
 
   Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
   Copyright (c)	2002 Nikita V. Kalaganov <riven@ok.ru>
@@ -51,7 +51,7 @@ enum    output              {emuts, emuks, disk, opl2};
 
         /* constants */
 
-#define PLUGINVER           "AdPlug Winamp2 plugin v1.4"
+#define PLUGINVER           "AdPlug Winamp2 frontend v1.4"
 //
 #define SNDBUFSIZE          576
 //
@@ -251,6 +251,7 @@ void config_test()
   if ((cfg.nextuseoutput == opl2) && test_os())
   {
     cfg.nextuseoutput = DFL_EMU;
+    cfg.nextuseoutputplug = 1;
 
     MessageBox(mod.hMainWindow, "OPL2 hardware replay is not possible on Windows NT/XP!\n"
                      "\n"
@@ -261,6 +262,7 @@ void config_test()
   if ((cfg.nextuseoutput == opl2) && cfg.nexttestopl2 && !test_opl2())
   {
     cfg.nextuseoutput = DFL_EMU;
+    cfg.nextuseoutputplug = 1;
 
     MessageBox(mod.hMainWindow, "OPL2 chip not detected!\n"
                      "\n"
@@ -348,7 +350,7 @@ bool test_filetype(char *fn)
   return false;
 }
 
-char *build_raw_name(char *fn)
+const char *build_raw_name(char *fn)
 {
   char bufstr[11];
 
@@ -418,8 +420,17 @@ void opl_done()
 
 BOOL APIENTRY AboutTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  char url1[50];
-  char url2[50];
+/*
+  // riven-mage: uncomment this, if you need bitmap transparency
+
+  BYTE *logo = (BYTE *)LockResource(LoadResource(mod.hDllInstance,FindResource(mod.hDllInstance,MAKEINTRESOURCE(IDB_LOGO),RT_BITMAP)));
+
+  int x,y;
+  BYTE bmobc;
+  BYTE *bmptr;
+*/
+
+  char url1[50],url2[50];
 
   switch (message)
   {
@@ -454,20 +465,41 @@ BOOL APIENTRY AboutTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM 
       }
   }
 
+/*
+  // riven-mage: uncomment this, if you need bitmap transparency
+
+  if (AboutTabIndex == 0)
+  {
+    *(DWORD *)&logo[0x424] = GetSysColor(COLOR_BTNFACE);
+
+    bmptr = &logo[0x428];
+    bmobc = *bmptr;
+
+    for(x=0;x<(*(WORD *)&logo[4]);x++)
+      for(y=0;y<(*(WORD *)&logo[8]);y++)
+      {
+        if (*bmptr == bmobc)
+          *bmptr = 0xff;
+
+        bmptr++;
+      }
+  }
+*/
+
   return FALSE;
 }
 
 BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
+  const char *license = (char *)LockResource(LoadResource(mod.hDllInstance,FindResource(mod.hDllInstance,MAKEINTRESOURCE(IDR_TEXT_LICENSE),"TEXT")));
+  const char *history = (char *)LockResource(LoadResource(mod.hDllInstance,FindResource(mod.hDllInstance,MAKEINTRESOURCE(IDR_TEXT_HISTORY),"TEXT")));
+
   TCITEM tci;
   CHARFORMAT2 cf2;
 
-  char *license     = (char *)LockResource(LoadResource(mod.hDllInstance,FindResource(mod.hDllInstance,MAKEINTRESOURCE(IDR_TEXT_LICENSE),"TEXT")));
-  char *history     = (char *)LockResource(LoadResource(mod.hDllInstance,FindResource(mod.hDllInstance,MAKEINTRESOURCE(IDR_TEXT_HISTORY),"TEXT")));
-
-  cf2.cbSize        = sizeof(CHARFORMAT);
-  cf2.dwMask        = CFM_LINK;
-  cf2.dwEffects     = CFE_LINK;
+  cf2.cbSize    = sizeof(CHARFORMAT);
+  cf2.dwMask    = CFM_LINK;
+  cf2.dwEffects = CFE_LINK;
 
   switch (message)
   {
@@ -477,16 +509,16 @@ BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
       tci.mask = TCIF_TEXT;
 
       tci.pszText = "General";
-      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_INSERTITEM,(WPARAM)(int)0,(LPARAM)&tci);
+      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_INSERTITEM,0,(LPARAM)&tci);
 		
-      tci.pszText = "Disclaimer";
-      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_INSERTITEM,(WPARAM)(int)1,(LPARAM)&tci);
+      tci.pszText = "License";
+      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_INSERTITEM,1,(LPARAM)&tci);
 		
       tci.pszText = "What's New";
-      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_INSERTITEM,(WPARAM)(int)2,(LPARAM)&tci);
+      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_INSERTITEM,2,(LPARAM)&tci);
 
       // set default tab index
-      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_SETCURSEL,(WPARAM)(int)0,0);
+      SendDlgItemMessage(hwndDlg,IDC_ATABS,TCM_SETCURSEL,0,0);
 
 
     case WM_AP_UPDATE:
@@ -510,7 +542,7 @@ BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 
         /* authors */
 
-          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETBKGNDCOLOR,0,0x0C0C0C0);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETBKGNDCOLOR,0,GetSysColor(COLOR_BTNFACE));
           SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETEVENTMASK,0,(LPARAM)ENM_LINK);
           SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,WM_KILLFOCUS,0,0);
 
@@ -523,35 +555,32 @@ BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 
                          );
 
-          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETSEL,81,95);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETSEL,83,97);
 		  SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
 
-          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETSEL,137,148);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETSEL,139,150);
 		  SendDlgItemMessage(AboutTabWnd,IDC_URL_AUTHORS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
-
-        /* logo */
-
 
         /* links */
 
           SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETEVENTMASK,0,(LPARAM)ENM_LINK);
-          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETBKGNDCOLOR,0,0x0C0C0C0);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETBKGNDCOLOR,0,GetSysColor(COLOR_BTNFACE));
 
           SetDlgItemText(AboutTabWnd,IDC_URL_LINKS,
 
-                          "visit adplug.sourceforge.net for updates\n\n"
-                          "get modules at www.chiptune.de, get software"
-                          " at www.astercity.com/~malf"
+                          "[ get latest version at adplug.sourceforge.net ]\n\n"
+                          "[ get modules at www.chiptune.de ]\t[ get trackers"
+                          " at www.astercity.net/~malf ]"
 
                          );
 
-          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETSEL,6,28);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETSEL,24,46);
 		  SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
 
-          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETSEL,57,72);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETSEL,67,82);
 		  SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
 
-          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETSEL,90,113);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETSEL,103,126);
 		  SendDlgItemMessage(AboutTabWnd,IDC_URL_LINKS,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
 
           break;
@@ -569,15 +598,15 @@ BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
         /* link */
 
           SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETEVENTMASK,0,(LPARAM)ENM_LINK);
-          SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETBKGNDCOLOR,0,0x0C0C0C0);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETBKGNDCOLOR,0,GetSysColor(COLOR_BTNFACE));
 
           SetDlgItemText(AboutTabWnd,IDC_URL_GNU,
 
-                          "Read GNU GPL: www.gnu.org/licenses/lgpl.txt"
+                          "Read GNU LGPL: www.gnu.org/licenses/lgpl.txt"
 
                          );
 
-          SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETSEL,14,44);
+          SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETSEL,15,45);
 		  SendDlgItemMessage(AboutTabWnd,IDC_URL_GNU,EM_SETCHARFORMAT,SCF_SELECTION,(LPARAM)&cf2);
 
           break;
@@ -599,7 +628,7 @@ BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 
 
     case WM_NOTIFY:
-      switch (((NMHDR FAR *)lParam)->code)
+      switch (((NMHDR *)lParam)->code)
       {
         case TCN_SELCHANGE:
 
@@ -623,8 +652,8 @@ BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 
 BOOL APIENTRY ConfigOutputDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  unsigned long buf;
   char bufstr[5];
+  unsigned long buf;
 
   switch (message)
   {
@@ -633,7 +662,7 @@ BOOL APIENTRY ConfigOutputDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPA
 
 
     case WM_NOTIFY:
-      switch (((NMHDR FAR *)lParam)->code)
+      switch (((NMHDR *)lParam)->code)
       {
         case PSN_SETACTIVE:
 
@@ -790,7 +819,7 @@ BOOL APIENTRY ConfigPlaybackDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, L
 
 
     case WM_NOTIFY:
-      switch (((NMHDR FAR *)lParam)->code)
+      switch (((NMHDR *)lParam)->code)
       {
         case PSN_SETACTIVE:
 
@@ -839,7 +868,7 @@ BOOL APIENTRY ConfigFormatsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LP
 
 
     case WM_NOTIFY:
-      switch (((NMHDR FAR *) lParam)->code)
+      switch (((NMHDR *) lParam)->code)
       {
         case PSN_SETACTIVE:
 
@@ -1367,7 +1396,6 @@ int wa2_Play(char *fn)
     for (int i=0;i<midiOutGetNumDevs();i++)
       if (midiOutGetDevCaps(i,&mc,sizeof(MIDIOUTCAPS)) == MMSYSERR_NOERROR)
         if (mc.wTechnology == MOD_FMSYNTH)
-
 		  if(cfg.testopl2)
             if (midiOutOpen(&midiout,i,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR)
 			{
@@ -1596,7 +1624,8 @@ void wa2_EQSet(int on, char data[10], int preamp)
 
 void wa2_Init()
 {
-  LoadLibrary("riched32.dll");
+  InitCommonControls();
+
   LoadLibrary("riched20.dll");
 
   // init opls

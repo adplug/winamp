@@ -10,9 +10,9 @@
 ;   $VISDIR  (visualization plug-in directory. DO NOT USE IN DefaultDir)
 ;   $DSPDIR  (dsp plug-in directory. DO NOT USE IN DefaultDir)
 
-Name AdPlug Winamp plugin v1.3
+Name AdPlug Winamp plugin v1.4
 Text This will install the AdPlug Winamp plugin on your computer.
-OutFile in_adlib-1.3.exe
+OutFile in_adlib-1.4.exe
 
 ; File listing section
 ; --------------------

@@ -59,6 +59,8 @@
 #define IDC_URL_AUTHORS                 1058
 #define IDC_URL_GNU                     1060
 #define IDC_URL_LINKS                   1062
+#define IDC_CO_TOOLTIP                  1063
+#define IDC_LOGO                        1065
 
 // Next default values for new objects
 // 
@@ -67,7 +69,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1063
+#define _APS_NEXT_CONTROL_VALUE         1066
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

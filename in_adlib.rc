@@ -1,16 +1,14 @@
 //Microsoft Developer Studio generated resource script.
 //
-#include "resource.h"
 
-#define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
+#include "resource.h"
 #include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
-#undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
 // Neutral resources
@@ -49,7 +47,7 @@ BEGIN
                     BS_MULTILINE
 END
 
-IDD_CFG_OUTPUT DIALOG DISCARDABLE  0, 0, 264, 151
+IDD_CFG_OUTPUT DIALOG DISCARDABLE  0, 0, 264, 189
 STYLE DS_MODALFRAME | WS_CHILD | WS_CAPTION
 CAPTION "Output"
 FONT 8, "MS Sans Serif"
@@ -89,6 +87,7 @@ BEGIN
                     94,68,10
     GROUPBOX        "",IDC_STATIC,20,85,237,24
     EDITTEXT        IDC_ADLIBPORT,63,74,21,12,ES_UPPERCASE | ES_NUMBER
+    CONTROL         "",IDC_CO_TOOLTIP,"tooltips_class32",0x0,7,152,250,30
 END
 
 IDD_CFG_PLAYBACK DIALOG DISCARDABLE  0, 0, 264, 151
@@ -120,11 +119,11 @@ BEGIN
     RTEXT           "Title",IDC_STATIC,7,7,27,12,SS_CENTERIMAGE
     RTEXT           "Author",IDC_STATIC,7,21,27,12,SS_CENTERIMAGE
     LTEXT           " Static",IDC_TITLE,41,7,262,12,SS_CENTERIMAGE,
-                    WS_EX_STATICEDGE
+                    WS_EX_CLIENTEDGE
     LTEXT           " Static",IDC_AUTHOR,41,21,262,12,SS_CENTERIMAGE,
-                    WS_EX_STATICEDGE
+                    WS_EX_CLIENTEDGE
     LTEXT           " Static",IDC_FORMAT,41,35,262,12,SS_CENTERIMAGE,
-                    WS_EX_STATICEDGE
+                    WS_EX_CLIENTEDGE
     RTEXT           "Format",IDC_STATIC,7,35,27,12,SS_CENTERIMAGE
     GROUPBOX        " Subsong ",IDC_STATIC,7,211,296,41,BS_LEFT
     CONTROL         "Slider1",IDC_SUBSONGSLIDER,"msctls_trackbar32",
@@ -166,6 +165,7 @@ BEGIN
                     292,32
     CONTROL         "",IDC_URL_LINKS,"RichEdit20A",WS_TABSTOP | 0x805,7,118,
                     292,27
+    CONTROL         101,IDC_STATIC,"Static",SS_BITMAP,19,44,267,71
 END
 
 IDD_ABT_LICENSE DIALOGEX 0, 0, 306, 152
@@ -216,7 +216,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 257
         TOPMARGIN, 7
-        BOTTOMMARGIN, 144
+        BOTTOMMARGIN, 182
     END
 
     IDD_CFG_PLAYBACK, DIALOG
@@ -241,6 +241,7 @@ BEGIN
         RIGHTMARGIN, 299
         TOPMARGIN, 7
         BOTTOMMARGIN, 145
+        HORZGUIDE, 115
     END
 
     IDD_ABT_LICENSE, DIALOG
@@ -524,54 +525,3 @@ END
 
 #endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// German (Germany) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
-#ifdef _WIN32
-LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
-#pragma code_page(1252)
-#endif //_WIN32
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-#endif    // German (Germany) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-
-
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
-
