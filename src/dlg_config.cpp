@@ -40,7 +40,7 @@ void GuiDlgConfig::open(HWND parent)
 BOOL APIENTRY GuiDlgConfig::DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 #ifdef _DEBUG
-	//printf("GuiDlgConfig::DlgProc(): Message 0x%08X received.\n",message);
+		//printf("GuiDlgConfig::DlgProc(): Message 0x%08X received. wParam = 0x%08X, lParam = 0x%08X\n", message, wParam, lParam);
 #endif
 	TCITEM tci;
 
@@ -67,7 +67,6 @@ BOOL APIENTRY GuiDlgConfig::DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, L
 
 			// set default tab index
 			SendDlgItemMessage(hwndDlg,IDC_CTABS,TCM_SETCURSEL,0,0);
-
 
 		case WM_UPDATE:
 
@@ -100,6 +99,8 @@ BOOL APIENTRY GuiDlgConfig::DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, L
 					return FALSE;
 			}
 
+			return FALSE;
+
 
 		case WM_COMMAND:
 			switch (LOWORD(wParam))
@@ -107,12 +108,12 @@ BOOL APIENTRY GuiDlgConfig::DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, L
 				case IDOK:
 					cancelled = false;
 					EndDialog(hwndDlg,wParam);
-					return 0;
+					return FALSE;
 
 				case IDCANCEL:
 					cancelled = true;
 					EndDialog(hwndDlg,wParam);
-					return 0;
+					return FALSE;
 			}
 	}
 
