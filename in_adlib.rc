@@ -13,12 +13,12 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Deutsch (Deutschland) resources
+// Neutral resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
-LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
-#pragma code_page(1252)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(1251)
 #endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
@@ -26,119 +26,146 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 330, 103
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
-CAPTION "About AdPlug Winamp plugin"
+IDD_ABOUT DIALOG DISCARDABLE  0, 0, 297, 119
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "AdPlug :: About"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,132,82,50,14
-    RTEXT           "AdPlug Winamp plugin vx.xx, (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>, et al.",
-                    IDC_ABOUT,55,16,262,8,SS_CENTERIMAGE
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,7,317,22
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,31,317,48
-    LTEXT           "Look in the file AUTHORS to see additional authors.\nThis plugin is released under the GNU LGPL (see http://www.gnu.org/licenses/lgpl.txt for more).\n\nAdPlug official website:\thttp://adplug.sourceforge.net\nGet modules at:\t\thttp://www.chiptune.de",
-                    IDC_STATIC,12,33,305,42
+    LTEXT           "AdPlug 1.2, (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>, et al.",
+                    IDC_STATIC,63,73,221,8,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "AdPlug official website:\thttp://adplug.sourceforge.net\nGet modules at:\t\thttp://www.chiptune.de",
+                    IDC_STATIC,12,91,272,16
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,66,284,22
+    LTEXT           "  This plugin is frontend for AdPlug, free OPL2 sound playing library:",
+                    IDC_STATIC,6,54,284,11,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "Winamp2 OPL2 input plugin v1.25, (c) 1999-2002 Simon Peter <dn.tlp@gmx.net>",
+                    IDC_STATIC,6,7,284,15,SS_CENTERIMAGE | SS_SUNKEN
+    LTEXT           "  Look in the file AUTHORS to see additional authors.\n  This plugin is released under the GNU LGPL (see http://www.gnu.org/licenses/lgpl.txt).",
+                    IDC_STATIC,6,23,284,18
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,88,284,23
 END
 
-IDD_PROPGENERAL DIALOG DISCARDABLE  0, 0, 197, 156
-STYLE WS_POPUP | WS_CAPTION
-CAPTION "General"
-FONT 8, "MS Sans Serif"
-BEGIN
-    CONTROL         "8-bit",IDC_QUALITY8,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,147,15,29,10
-    CONTROL         "16-bit",IDC_QUALITY16,"Button",BS_AUTORADIOBUTTON,147,
-                    25,33,12
-    GROUPBOX        "Resolution",IDC_STATIC,145,5,45,35
-    CONTROL         "11025",IDC_RATE1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    147,55,36,10
-    CONTROL         "22050",IDC_RATE2,"Button",BS_AUTORADIOBUTTON,147,65,36,
-                    10
-    CONTROL         "44100",IDC_RATE3,"Button",BS_AUTORADIOBUTTON,147,75,36,
-                    10
-    CONTROL         "48000",IDC_RATE4,"Button",BS_AUTORADIOBUTTON,147,85,36,
-                    10
-    CONTROL         "",IDC_RATE5,"Button",BS_AUTORADIOBUTTON,147,97,9,8
-    GROUPBOX        "Frequency",IDC_STATIC,145,45,45,65
-    EDITTEXT        IDC_CUSTOMRATE,157,95,25,12,ES_NUMBER
-    GROUPBOX        "Hardware",IDC_STATIC,5,5,135,35
-    CONTROL         "Emulated",IDC_HARDWAREEMU,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,10,15,45,10
-    CONTROL         "Real OPL2",IDC_HARDWAREOPL2,"Button",BS_AUTORADIOBUTTON,
-                    10,25,51,10
-    EDITTEXT        IDC_ADLIBPORT,110,20,21,12,ES_UPPERCASE
-    GROUPBOX        "OPL2 Port",IDC_STATIC,99,5,41,35
-    GROUPBOX        "Options",IDC_STATIC,5,45,135,45
-    CONTROL         "Autodetect Songend",IDC_AUTOEND,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,55,100,10
-    CONTROL         "Fast Seeks",IDC_FASTSEEK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,10,65,95,10
-    CONTROL         "Bypass all Hardware Tests",IDC_NOTEST,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,75,100,10
-    GROUPBOX        "Channels",IDC_STATIC,145,115,45,35
-    CONTROL         "Mono",IDC_MONO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    151,126,34,10
-    CONTROL         "Stereo",IDC_STEREO,"Button",BS_AUTORADIOBUTTON,151,135,
-                    37,10
-    GROUPBOX        "Thread priority",IDC_STATIC,5,95,135,40
-    CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,10,105,125,10
-    LTEXT           "Idle",IDC_STATIC,10,119,12,8
-    LTEXT           "Normal",IDC_STATIC,60,120,23,8
-    RTEXT           "Realtime",IDC_STATIC,105,120,28,8
-END
-
-IDD_FILEINFO DIALOGEX 0, 0, 271, 250
-STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "AdPlug Info"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "Close",IDOK,215,230,50,14
-    GROUPBOX        "Instrument Names",IDC_STATIC,5,40,165,75
-    GROUPBOX        "Subsong selection",IDC_STATIC,5,201,170,43
-    CONTROL         "Slider1",IDC_SUBSONGSLIDER,"msctls_trackbar32",
-                    TBS_AUTOTICKS | TBS_TOP | WS_TABSTOP,10,221,158,20
-    LTEXT           "1",IDC_SUBSONGMIN,17,212,18,8
-    RTEXT           "10",IDC_SUBSONGMAX,144,212,17,8
-    CTEXT           "5",IDC_SUBSONGPOS,79,210,18,10,WS_BORDER
-    EDITTEXT        IDC_INSTNAMES,11,50,154,60,ES_MULTILINE | ES_READONLY | 
-                    ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL
-    LTEXT           "Title",IDC_STATIC,10,10,14,8
-    EDITTEXT        IDC_TITLE,29,10,235,12,ES_READONLY
-    LTEXT           "Author",IDC_STATIC,5,25,22,8
-    EDITTEXT        IDC_AUTHOR,29,25,125,12,ES_READONLY
-    LTEXT           "Type",IDC_STATIC,160,25,17,8
-    EDITTEXT        IDC_TYPE,179,25,85,12,ES_READONLY
-    GROUPBOX        "Song Info",IDC_STATIC,175,40,89,75
-    LTEXT           "Position",IDC_STATIC,180,50,26,8
-    LTEXT           "0 / 0",IDC_POSITION,220,50,39,8
-    LTEXT           "Pattern",IDC_STATIC,180,60,24,8
-    LTEXT           "0 / 0",IDC_PATTERN,220,60,39,8
-    LTEXT           "Row",IDC_STATIC,180,69,16,8
-    LTEXT           "0",IDC_ROW,220,70,39,8
-    LTEXT           "Speed",IDC_STATIC,180,79,22,8
-    LTEXT           "0",IDC_SPEED,220,80,39,8
-    LTEXT           "Timer",IDC_STATIC,180,89,18,8
-    LTEXT           "0 Hz",IDC_TIMER,220,90,39,8
-    GROUPBOX        "Song Description",IDC_STATIC,5,120,260,75
-    LTEXT           "Instruments",IDC_STATIC,180,99,37,8
-    LTEXT           "0",IDC_INSTS,220,100,39,8
-    EDITTEXT        IDC_SONGINFO,10,130,250,60,ES_MULTILINE | ES_READONLY | 
-                    ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL
-END
-
-IDD_PROPFMT DIALOG DISCARDABLE  0, 0, 182, 157
+IDD_CFG_FORMATS DIALOG DISCARDABLE  0, 0, 264, 151
 STYLE WS_POPUP | WS_CAPTION
 CAPTION "Formats"
 FONT 8, "MS Sans Serif"
 BEGIN
     LTEXT           "Select the file formats that AdPlug should accept to replay. Deselected items will be ignored by AdPlug to make room for other plugins to play these files.\n\nSometimes, Winamp has to be restarted for the changes to take effect.",
-                    IDC_STATIC,7,7,73,143
-    LISTBOX         IDC_FORMATLIST,90,5,50,143,LBS_MULTIPLESEL | 
+                    IDC_STATIC,7,7,250,35
+    LISTBOX         IDC_FORMATLIST,7,42,250,75,LBS_MULTIPLESEL | 
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Select all",IDC_FTSELALL,145,5,33,33,BS_MULTILINE
-    PUSHBUTTON      "Select none",IDC_FTSELNONE,145,40,33,33,BS_MULTILINE
+    PUSHBUTTON      "Select all",IDC_FTSELALL,7,130,101,14,BS_MULTILINE
+    PUSHBUTTON      "Deselect all",IDC_FTDESELALL,156,130,101,14,
+                    BS_MULTILINE
+END
+
+IDD_CFG_OUTPUT DIALOG DISCARDABLE  0, 0, 264, 151
+STYLE WS_POPUP | WS_CAPTION
+CAPTION "Output"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Emulator 1 (by Tatsuyuki Satoh)",IDC_OUTTS,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,7,7,116,10
+    CONTROL         "Emulator 2 (by Ken Silverman)",IDC_OUTKS,"Button",
+                    BS_AUTORADIOBUTTON | WS_DISABLED,7,17,110,10
+    CONTROL         "OPL2 at port ",IDC_OUTOPL2,"Button",BS_AUTORADIOBUTTON,
+                    7,76,53,8
+    CONTROL         "Disk Writer (RAW format)",IDC_OUTDISK,"Button",
+                    BS_AUTORADIOBUTTON,7,116,95,10
+    CONTROL         "8-bit",IDC_QUALITY8,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,162,40,33,10
+    CONTROL         "16-bit",IDC_QUALITY16,"Button",BS_AUTORADIOBUTTON,162,
+                    50,33,10
+    GROUPBOX        " Resolution ",IDC_STATIC,156,28,48,35,BS_LEFT | 
+                    WS_GROUP
+    CONTROL         "11025",IDC_FREQ1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
+                    25,40,36,10
+    CONTROL         "22050",IDC_FREQ2,"Button",BS_AUTORADIOBUTTON,25,50,36,
+                    10
+    CONTROL         "44100",IDC_FREQ3,"Button",BS_AUTORADIOBUTTON,63,40,36,
+                    10
+    CONTROL         "48000",IDC_FREQ4,"Button",BS_AUTORADIOBUTTON,63,50,36,
+                    10
+    CONTROL         "",IDC_FREQC,"Button",BS_AUTORADIOBUTTON,101,46,11,8
+    EDITTEXT        IDC_FREQC_VALUE,114,44,29,12,ES_UPPERCASE | ES_NUMBER
+    GROUPBOX        " Frequency ",IDC_STATIC,19,28,131,35,BS_LEFT
+    CONTROL         "Mono",IDC_MONO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
+                    215,40,34,10
+    CONTROL         "Stereo",IDC_STEREO,"Button",BS_AUTORADIOBUTTON,215,50,
+                    37,10
+    GROUPBOX        " Channels ",IDC_STATIC,210,28,47,35,BS_LEFT
+    PUSHBUTTON      "C:\\",IDC_DIRECTORY,20,129,237,15,NOT WS_TABSTOP
+    CONTROL         "No OPL2 testing",IDC_NOTEST,"Button",BS_AUTOCHECKBOX,26,
+                    94,68,10
+    GROUPBOX        "",IDC_STATIC,20,85,237,24
+    EDITTEXT        IDC_ADLIBPORT,63,74,21,12,ES_UPPERCASE | ES_NUMBER
+END
+
+IDD_CFG_PLAYBACK DIALOG DISCARDABLE  0, 0, 264, 151
+STYLE WS_POPUP | WS_CAPTION
+CAPTION "Playback"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Autodetect song end",IDC_AUTOEND,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,7,82,10
+    CONTROL         "Fast seek",IDC_FASTSEEK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,37,47,10
+    CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    WS_TABSTOP,12,116,238,11
+    LTEXT           "Idle",IDC_STATIC,12,130,12,8
+    LTEXT           "Normal",IDC_STATIC,119,130,23,8
+    RTEXT           "Realtime",IDC_STATIC,222,130,28,8
+    GROUPBOX        "Thread priority ",IDC_STATIC,7,105,250,39
+    CONTROL         "Standard refresh rate",IDC_STDTIMER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,68,82,10
+    LTEXT           "OPL2:",IDC_STATIC,7,27,21,8
+    LTEXT           "Disk Writer:",IDC_STATIC,7,57,38,8
+END
+
+IDD_FILEINFO DIALOG DISCARDABLE  0, 0, 310, 260
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "AdPlug :: File Info"
+FONT 8, "MS Sans Serif"
+BEGIN
+    RTEXT           "Title",IDC_STATIC,7,7,27,12,SS_CENTERIMAGE
+    RTEXT           "Author",IDC_STATIC,7,21,27,12,SS_CENTERIMAGE
+    LTEXT           " Static",IDC_TITLE,40,7,262,12,SS_CENTERIMAGE | 
+                    SS_SUNKEN
+    LTEXT           " Static",IDC_AUTHOR,40,21,262,12,SS_CENTERIMAGE | 
+                    SS_SUNKEN
+    LTEXT           " Static",IDC_FORMAT,40,35,262,12,SS_CENTERIMAGE | 
+                    SS_SUNKEN
+    RTEXT           "Format",IDC_STATIC,7,35,27,12,SS_CENTERIMAGE
+    GROUPBOX        " Subsong ",IDC_STATIC,7,211,295,41,BS_LEFT
+    CONTROL         "Slider1",IDC_SUBSONGSLIDER,"msctls_trackbar32",
+                    TBS_AUTOTICKS,13,236,283,11
+    GROUPBOX        " Description ",IDC_STATIC,7,128,295,79,BS_LEFT
+    EDITTEXT        IDC_DESCRIPTION,14,137,282,64,ES_MULTILINE | ES_READONLY | 
+                    ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL | NOT 
+                    WS_TABSTOP
+    GROUPBOX        " Instruments ",IDC_STATIC,106,53,196,71
+    EDITTEXT        IDC_INSTLIST,113,62,182,56,ES_MULTILINE | ES_READONLY | 
+                    ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL | NOT 
+                    WS_TABSTOP
+    GROUPBOX        " Info ",IDC_STATIC,7,53,89,71
+    LTEXT           "Order",IDC_STATIC,14,63,18,8
+    LTEXT           "Pattern",IDC_STATIC,13,73,24,8
+    LTEXT           "Row",IDC_STATIC,13,83,16,8
+    LTEXT           "Speed",IDC_STATIC,13,98,22,8
+    LTEXT           "Timer",IDC_STATIC,13,108,18,8
+    RTEXT           "00",IDC_ORDER,39,63,20,8
+    RTEXT           "00",IDC_PATTERN,39,73,20,8
+    RTEXT           "00",IDC_ROW,39,83,20,8
+    RTEXT           "00",IDC_SPEED,39,98,20,8
+    LTEXT           "000.00 hz",IDC_TIMER,51,108,37,8
+    LTEXT           "00",IDC_ORDERS,71,63,20,8
+    LTEXT           "00",IDC_PATTERNS,71,73,20,8
+    CTEXT           "/",IDC_STATIC,59,63,11,8
+    CTEXT           "/",IDC_STATIC,59,73,11,8
+    LTEXT           "00",IDC_SUBSONGMIN,15,224,14,9
+    RTEXT           "00",IDC_SUBSONGMAX,280,224,14,9
+    CTEXT           "00",IDC_SUBSONG,144,221,22,12,SS_CENTERIMAGE | 
+                    SS_SUNKEN
 END
 
 
@@ -150,40 +177,68 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
-    IDD_ABOUTBOX, DIALOG
+    IDD_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 6
-        RIGHTMARGIN, 323
+        RIGHTMARGIN, 290
         TOPMARGIN, 7
-        BOTTOMMARGIN, 96
+        BOTTOMMARGIN, 111
     END
 
-    IDD_PROPGENERAL, DIALOG
+    IDD_CFG_FORMATS, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 190
+        RIGHTMARGIN, 257
         TOPMARGIN, 7
-        BOTTOMMARGIN, 149
+        BOTTOMMARGIN, 144
+    END
+
+    IDD_CFG_OUTPUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 257
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 144
+    END
+
+    IDD_CFG_PLAYBACK, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 257
+        VERTGUIDE, 12
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 144
     END
 
     IDD_FILEINFO, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 264
+        RIGHTMARGIN, 302
         TOPMARGIN, 7
-        BOTTOMMARGIN, 243
-    END
-
-    IDD_PROPFMT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 175
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 150
+        BOTTOMMARGIN, 253
     END
 END
 #endif    // APSTUDIO_INVOKED
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_LOGO                BITMAP  DISCARDABLE     "adplug.bmp"
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -210,14 +265,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_LOGO                BITMAP  DISCARDABLE     "adplug.bmp"
-#endif    // Deutsch (Deutschland) resources
+#endif    // German (Germany) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -1,1109 +1,1609 @@
 /*
- * AdPlug - Winamp input plugin, (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>, et al.
- */
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-#include <fstream.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <conio.h>
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+/*
+  in_adlib.cpp - Winamp2 input plugin, (c) 1999-2002 Simon Peter <dn.tlp@gmx.net>
+*/
+
 #include <windows.h>
 #include <commctrl.h>
 #include <mmsystem.h>
-#include <prsht.h>
+#include <shlobj.h>
+#include <stdio.h>
+#include <string.h>
+
+extern "C"
+{
+  #include "in2.h"
+  #include "frontend.h"
+}
+
+#include "..\adplug-1.2\src\adplug.h"
+#include "..\adplug-1.2\src\emuopl.h"
+//#include "kemuopl.h"
+#include "..\adplug-1.2\src\diskopl.h"
+#include "..\adplug-1.2\src\realopl.h"
+#include "..\adplug-1.2\src\silentopl.h"
+
 #include "resource.h"
 
-#include <adplug/adplug.h>					// AdPlug helper object
-extern "C" {
-#include "in2.h"							// Winamp plugin stuff
-#include "frontend.h"						// Winamp frontend IPC stuff
-}
-
-// OPL devices
-#include <adplug/emuopl.h>					// Tatsuyuki's OPL2 emulator
-#include <adplug/realopl.h>					// hardware OPL2
-#include <adplug/silentopl.h>				// completely silent OPL2
-
-// output IDs (first all emulators, then hardware only, then hardware + emulators in the same order)
-enum outputs {emuks, emuts, opl2, opl2emuks, opl2emuts};
-
-// globals
-#define ADPLUGVERS		"AdPlug Winamp plugin v1.2"	// AdPlug version string
-#define WM_WA_MPEG_EOF	WM_USER+2					// post to Winamp at EOF
-#define WM_AP_UPDATE	WM_USER+100					// post to FileInfoProc to update window
-#define DFLEMU			emuts						// default (safe) emulation mode
-#define BUFSIZE			576							// sound buffer size in samples (vis needs min. 576)
-#define DFLSUBSONG		0							// default subsong to start with
-
-// default configuration
-#define REPLAYFREQ	44100					// default replay frequency
-#define USE16BIT	true					// use 16 bits? 1 = yes, 0 = no
-#define STEREO		false					// enable stereo
-#define USEHARDWARE	opl2emuts				// try AdLib hardware by default
-#define ADLIBPORT	0x388					// standard AdLib base-port
-#define	INFPLAY		false					// let winamp rewind songs
-#define	FASTSEEK	false					// seek and keep instruments intact
-#define NOTEST		false					// test hardware availability
-#define FTIGNORE	";mid;"					// file types to ignore (start list and end all entries with ';' !!)
-#define PRIORITY	4						// decode thread priority (4 = normal)
-
-typedef struct {
-	char *extension;
-	bool ignore;
-} tFiletypes;
-
-tFiletypes alltypes[] = {
-	"a2m\0AdLib Tracker 2 Modules (*.A2M)\0",false,
-	"amd\0AMUSIC Adlib Tracker Modules (*.AMD)\0",false,
-	"bam\0Bob's Adlib Music Format (*.BAM)\0",false,
-	"cmf\0Creative Music Files (*.CMF)\0",false,
-	"d00\0EdLib Modules (*.D00)\0",false,
-	"dfm\0Digital-FM Modules (*.DFM)\0",false,
-	"hsc\0HSC-Tracker Modules (*.HSC)\0",false,
-	"hsp\0Packed HSC-Tracker Modules (*.HSP)\0",false,
-	"imf;wlf\0Apogee IMF Files (*.IMF;*.WLF)\0",false,
-	"ksm\0Ken Silverman's Music Format (*.KSM)\0",false,
-	"laa\0LucasArts AdLib Audio Files (*.LAA)\0",false,
-//	"lds\0LOUDNESS Modules (*.LDS)\0",false,
-	"m\0Ultima 6 Music Format (*.M)\0",false,
-	"mad\0Mlat Adlib Tracker (*.MAD)\0",false,
-	"mid\0MIDI Audio Files (*.MID)\0",true,
-	"mkj\0MKJamz Audio Files (*.MKJ)\0",false,
-	"mtk\0MPU-401 Trakker Modules (*.MTK)\0",false,
-	"rad\0Reality ADlib Tracker Modules (*.RAD)\0",false,
-	"raw\0RdosPlay RAW Files (*.RAW)\0",false,
-	"rol\0Adlib Visual Composer (*.ROL)\0",false,
-	"s3m\0Screamtracker 3 AdLib Modules (*.S3M)\0",false,
-	"sa2\0Surprise! Adlib Tracker 2 Modules (*.SA2)\0",false,
-	"sat\0Surprise! Adlib Tracker Modules (*.SAT)\0",false,
-	"sci\0Sierra AdLib Audio Files (*.SCI)\0",false,
-	"sng\0SNGPlay Files (*.SNG)\0",false,
-	"sng\0Faust Music Creator (*.SNG)\0",false,
-	"xad\0eXotic ADlib Format (*.XAD)\0",false,
-	"xms\0XMS-Tracker (*.XMS)\0",false,
-	NULL
-};
-
-int prioresolve[] = {THREAD_PRIORITY_IDLE, THREAD_PRIORITY_LOWEST, THREAD_PRIORITY_BELOW_NORMAL,
-					THREAD_PRIORITY_NORMAL, THREAD_PRIORITY_ABOVE_NORMAL, THREAD_PRIORITY_HIGHEST,
-					THREAD_PRIORITY_TIME_CRITICAL};
-
-// global variables
-In_Module		mod;								// Winamp input plugin interface
-char			lastfn[MAX_PATH];					// currently playing file
-int				paused;								// pause flag
-CPlayer			*player;							// global replayer
-Copl			*opl;								// global OPL2 chip
-CEmuopl			*emuopl;							// global emulated OPL2
-CRealopl		*realopl=0;							// global real OPL2
-int				killDecodeThread=0;					// kill switch for decode thread
-HANDLE			thread_handle=INVALID_HANDLE_VALUE; // handle to decode thread
-float			decode_pos_ms;						// decode position in ms
-int				currentlength;						// song length cache
-int				seek_needed;						// seek flag
-int				playing;							// currently playing?
-int				bequiet=0;							// should player send output to OPL2?
-HMIDIOUT		adlibmidi;							// Windows MIDI-Out handle
-UINT			timerhandle;						// Windows Multimedia Timer handle
-UINT			timerperiod;						// timer resolution cache
-int				savevol;							// volume cache
-BOOL			isnt;								// 1 = running on Windows NT
-unsigned int	subsong=DFLSUBSONG;					// currently playing subsong
-unsigned int	maxsubsongs=1;						// maximum number of subsongs in current song
-HWND			fidialog=0;							// Handle to File Info modeless Dialog box
-CPlayer			*fidialogp;							// Player for File Info functions
-
-// configuration variables
-int				replayfreq, nextreplayfreq = REPLAYFREQ, priority = PRIORITY;
-bool			use16bit,nextuse16bit = USE16BIT,infplay=INFPLAY,fastseek=FASTSEEK,notest=NOTEST,stereo,nextstereo=STEREO;
-enum outputs	usehardware,nextusehardware = USEHARDWARE;
-unsigned short	adlibport,nextadlibport = ADLIBPORT;
-
-// forward declarations
-DWORD WINAPI __stdcall DecodeThread(void *b); // emulator thread
-void CALLBACK TimerThread(UINT wTimerID,UINT msg,DWORD dwUser,DWORD dw1,DWORD dw2);	// hardware-replay thread
-
-void setvolume(int volume)
-{
-	if(usehardware < opl2)
-		mod.outMod->SetVolume(volume);
-	else
-		if(realopl)
-			realopl->setvolume((int)(63 - volume/(255/63)));
-
-	savevol = (int)(63 - volume/(255/63));
-}
-
-char *upstr(char *str)
-// converts a string to all uppercase letters
-{
-	unsigned int i;
-
-	for(i=0;i<strlen(str);i++)
-		str[i] = toupper(str[i]);
-
-	return str;
-}
-
-bool testignore(char *fn)
-{
-	char *p;
-
-	if(!strrchr(fn,'.'))
-		return false;
-
-	for(int i=0;alltypes[i].extension;i++)
-		for(p=alltypes[i].extension;(p-1);p=strchr(p,';')+1)
-			if(!strnicmp(strrchr(fn,'.')+1,p,strchr(p,';') ? strchr(p,';') - p : strlen(p)))
-				if(alltypes[i].ignore)
-					return true;
-				else
-					return false;
-
-	return false;
-}
-
-// unimplemented plugin functions
-void eq_set(int on, char data[10], int preamp) {}
-void init() { }
-
-// pause/seek/length/pan handling
-void pause() { paused=1; if(usehardware >= opl2) realopl->setquiet(); else mod.outMod->Pause(1); }
-void unpause() { paused=0; if(usehardware >= opl2) realopl->setquiet(false); else mod.outMod->Pause(0); }
-int ispaused() { return paused; }
-int getoutputtime() { if(usehardware < opl2) return mod.outMod->GetOutputTime(); else return (int)decode_pos_ms; }
-void setoutputtime(int time_in_ms) { seek_needed = time_in_ms; }	// hand over to play thread
-void setpan(int pan) { if(usehardware < opl2) mod.outMod->SetPan(pan); }
-int getlength() { return currentlength; }	// return cached length
-
-/* Dialog box functions */
-BOOL APIENTRY AboutBoxProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	PAINTSTRUCT		ps;
-	HDC				wdc,bdc;
-	HANDLE			bm;
-	COLORREF		tp,sp;
-	unsigned int	x,y;
-
-	switch (message) {
-	case WM_INITDIALOG:
-		SetDlgItemText(hwndDlg,IDC_ABOUT,
-		 ADPLUGVERS ", (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>, et al.");
-		return TRUE;
-
-	case WM_PAINT:
-		// draw transparent adplug bitmap
-		wdc = BeginPaint(hwndDlg,&ps);
-		bdc = CreateCompatibleDC(wdc);
-		bm = LoadImage(mod.hDllInstance,MAKEINTRESOURCE(IDB_LOGO),IMAGE_BITMAP,0,0,LR_DEFAULTCOLOR);
-		SelectObject(bdc,bm);
-		tp = GetPixel(bdc,0,0);
-		sp = GetPixel(wdc,12,12);
-		for(x=0;x<69;x++)	// make bitmap transparent
-			for(y=0;y<35;y++)
-				if(GetPixel(bdc,x,y) == tp)
-					SetPixel(bdc,x,y,sp);
-		BitBlt(wdc,12,12,69,35,bdc,0,0,SRCCOPY);
-		DeleteObject(bm);
-		ReleaseDC(hwndDlg,bdc);
-		EndPaint(hwndDlg,&ps);
-		return TRUE;
-
-	case WM_COMMAND:					// commands processing
-		switch(LOWORD(wParam)) {
-		case IDOK:						// OK button pressed?
-			EndDialog(hwndDlg,wParam);	// close Window
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-BOOL APIENTRY FileInfoProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	unsigned int	subsongpos,i,spos=0;		// subsong slider position cache
-	char			tmpstr[10];
-	std::string		str;
-
-	switch (message) {
-	case WM_INITDIALOG:
-		// set title/author/type states
-		SetDlgItemText(hwndDlg,IDC_TITLE,fidialogp->gettitle().c_str());
-		SetDlgItemText(hwndDlg,IDC_AUTHOR,fidialogp->getauthor().c_str());
-		SetDlgItemText(hwndDlg,IDC_TYPE,fidialogp->gettype().c_str());
-
-		// set "song description" state
-		str = fidialogp->getdesc();					// convert ANSI \n to Windows \r\n
-		while((spos = str.find('\n',spos)) != str.npos) {
-			str.insert(spos,"\r");
-			spos += 2;
-		}
-		SetDlgItemText(hwndDlg,IDC_SONGINFO,str.c_str());
-
-		// set "instrument names" state
-		str.erase();
-		for(i=0;i<fidialogp->getinstruments();i++) {
-			if(i < 9)
-				sprintf(tmpstr,"0%u - ",i+1);
-			else
-				sprintf(tmpstr,"%u - ",i+1);
-			str += tmpstr + fidialogp->getinstrument(i);
-			if(i < fidialogp->getinstruments() - 1)
-				str += "\r\n";
-		}
-		SetDlgItemText(hwndDlg,IDC_INSTNAMES,str.c_str());
-
-		// set "subsong selection" state
-		SendDlgItemMessage(hwndDlg,IDC_SUBSONGSLIDER,TBM_SETRANGE,(WPARAM)FALSE,(LPARAM)MAKELONG(1,maxsubsongs));
-		SendDlgItemMessage(hwndDlg,IDC_SUBSONGSLIDER,TBM_SETPOS,(WPARAM)TRUE,(LPARAM)(LONG)subsong + 1);
-		SetDlgItemInt(hwndDlg,IDC_SUBSONGMIN,1,FALSE);
-		SetDlgItemInt(hwndDlg,IDC_SUBSONGMAX,maxsubsongs,FALSE);
-		SetDlgItemInt(hwndDlg,IDC_SUBSONGPOS,subsong + 1,FALSE);
-
-		// set "song info" state
-		SetDlgItemInt(hwndDlg,IDC_INSTS,fidialogp->getinstruments(),FALSE);
-		// fall through...
-
-	case WM_AP_UPDATE:
-		// update "song info" state
-		sprintf(tmpstr,"%u / %u",fidialogp->getorder(),fidialogp->getorders()); SetDlgItemText(hwndDlg,IDC_POSITION,tmpstr);
-		sprintf(tmpstr,"%u / %u",fidialogp->getpattern(),fidialogp->getpatterns()); SetDlgItemText(hwndDlg,IDC_PATTERN,tmpstr);
-		SetDlgItemInt(hwndDlg,IDC_ROW,fidialogp->getrow(),FALSE);
-		SetDlgItemInt(hwndDlg,IDC_SPEED,fidialogp->getspeed(),FALSE);
-		sprintf(tmpstr,"%.2f Hz",fidialogp->getrefresh()); SetDlgItemText(hwndDlg,IDC_TIMER,tmpstr);
-		return TRUE;
-
-	case WM_COMMAND:
-		switch(LOWORD(wParam)) {
-		case IDOK:						// OK button pressed?
-		case IDCANCEL:					// Close button pressed?
-			DestroyWindow(hwndDlg);		// close Window
-			fidialog = 0;
-			if(!playing)
-				delete fidialogp;
-			return TRUE;
-		}
-
-	case WM_HSCROLL:
-		switch(GetDlgCtrlID((HWND)lParam)) {
-		case IDC_SUBSONGSLIDER:
-			subsongpos = (unsigned int)SendDlgItemMessage(hwndDlg,IDC_SUBSONGSLIDER,TBM_GETPOS,0,0);
-			if(subsongpos - 1 != subsong) {	// new subsong?
-				SetDlgItemInt(hwndDlg,IDC_SUBSONGPOS,subsongpos,FALSE);	// update subsong number display
-				subsong = subsongpos - 1;	// set new subsong
-				SendMessage(mod.hMainWindow,WM_COMMAND,WINAMP_BUTTON2,0);	// trick to make winamp read the new songlength
-			}
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-BOOL APIENTRY GeneralConfigProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	char bufstr[5];
-	unsigned long buf;
-	// mirror config vars
-	static int mnextreplayfreq,mpriority;
-	static bool mnextuse16bit,minfplay,mfastseek,mnotest,mnextstereo;
-	static unsigned short mnextadlibport;
-	static enum outputs mnextusehardware;
-
-	switch (message) {
-	case WM_NOTIFY:
-		switch(((NMHDR FAR *) lParam)->code) {
-		case PSN_KILLACTIVE:
-			// check "resolution"
-			if(IsDlgButtonChecked(hwndDlg,IDC_QUALITY8) == BST_CHECKED) mnextuse16bit = false;
-			if(IsDlgButtonChecked(hwndDlg,IDC_QUALITY16) == BST_CHECKED) mnextuse16bit = true;
-
-			// check "frequency"
-			if(IsDlgButtonChecked(hwndDlg,IDC_RATE1) == BST_CHECKED) mnextreplayfreq = 11025;
-			if(IsDlgButtonChecked(hwndDlg,IDC_RATE2) == BST_CHECKED) mnextreplayfreq = 22050;
-			if(IsDlgButtonChecked(hwndDlg,IDC_RATE3) == BST_CHECKED) mnextreplayfreq = 44100;
-			if(IsDlgButtonChecked(hwndDlg,IDC_RATE4) == BST_CHECKED) mnextreplayfreq = 48000;
-			if(IsDlgButtonChecked(hwndDlg,IDC_RATE5) == BST_CHECKED)
-				mnextreplayfreq = GetDlgItemInt(hwndDlg,IDC_CUSTOMRATE,NULL,FALSE);
-
-			// check "hardware"
-			if(IsDlgButtonChecked(hwndDlg,IDC_HARDWAREEMU) == BST_CHECKED) mnextusehardware = emuts;
-			if(IsDlgButtonChecked(hwndDlg,IDC_HARDWAREOPL2) == BST_CHECKED) mnextusehardware = opl2;
-
-			// check "OPL2 Port"
-			GetDlgItemText(hwndDlg,IDC_ADLIBPORT,bufstr,5);
-			sscanf(bufstr,"%x",&buf);
-			mnextadlibport = (unsigned short)buf;
-
-			// check "options"
-			if(IsDlgButtonChecked(hwndDlg,IDC_AUTOEND) == BST_CHECKED) minfplay = false; else minfplay = true;
-			if(IsDlgButtonChecked(hwndDlg,IDC_FASTSEEK) == BST_CHECKED) mfastseek = true; else mfastseek = false;
-			if(IsDlgButtonChecked(hwndDlg,IDC_NOTEST) == BST_CHECKED) mnotest = true; else mnotest = false;
-
-			// check "channels"
-			if(IsDlgButtonChecked(hwndDlg,IDC_MONO) == BST_CHECKED) mnextstereo = false;
-			if(IsDlgButtonChecked(hwndDlg,IDC_STEREO) == BST_CHECKED) mnextstereo = true;
-
-			// check "priority"
-			mpriority = (int)SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_GETPOS,0,0);
-
-			return TRUE;
-
-		case PSN_APPLY:
-			// apply mirror vars
-			nextuse16bit = mnextuse16bit;
-			nextreplayfreq = mnextreplayfreq;
-			infplay = minfplay;
-			fastseek = mfastseek;
-			notest = mnotest;
-			nextadlibport = mnextadlibport;
-			nextusehardware = mnextusehardware;
-			nextstereo = mnextstereo;
-			priority = mpriority;
-			return TRUE;
-
-		case PSN_SETACTIVE:
-			if(mnextuse16bit)			// set "resolution" state
-				CheckRadioButton(hwndDlg,IDC_QUALITY8,IDC_QUALITY16,IDC_QUALITY16);
-			else
-				CheckRadioButton(hwndDlg,IDC_QUALITY8,IDC_QUALITY16,IDC_QUALITY8);
-
-			switch(mnextreplayfreq) {	// set "frequency" state
-			case 11025: CheckRadioButton(hwndDlg,IDC_RATE1,IDC_RATE5,IDC_RATE1); break;
-			case 22050: CheckRadioButton(hwndDlg,IDC_RATE1,IDC_RATE5,IDC_RATE2); break;
-			case 44100: CheckRadioButton(hwndDlg,IDC_RATE1,IDC_RATE5,IDC_RATE3); break;
-			case 48000: CheckRadioButton(hwndDlg,IDC_RATE1,IDC_RATE4,IDC_RATE4); break;
-			default: CheckRadioButton(hwndDlg,IDC_RATE1,IDC_RATE5,IDC_RATE5);
-					 SetDlgItemInt(hwndDlg,IDC_CUSTOMRATE,mnextreplayfreq,FALSE);
-			}
-
-			switch(mnextusehardware) {		// set "hardware" state
-			case emuts: CheckRadioButton(hwndDlg,IDC_HARDWAREEMU,IDC_HARDWAREOPL2,IDC_HARDWAREEMU); break;
-			case opl2: CheckRadioButton(hwndDlg,IDC_HARDWAREEMU,IDC_HARDWAREOPL2,IDC_HARDWAREOPL2); break;
-			}
-
-			SetDlgItemText(hwndDlg,IDC_ADLIBPORT,_itoa(mnextadlibport,bufstr,16));	// set "OPL2 Port" state
-
-			// set "options" state
-			if(!minfplay) CheckDlgButton(hwndDlg,IDC_AUTOEND,BST_CHECKED);
-			if(mfastseek) CheckDlgButton(hwndDlg,IDC_FASTSEEK,BST_CHECKED);
-			if(mnotest) CheckDlgButton(hwndDlg,IDC_NOTEST,BST_CHECKED);
-
-			// set "channels" state
-			switch(mnextstereo) {
-			case 0: CheckRadioButton(hwndDlg,IDC_MONO,IDC_STEREO,IDC_MONO); break;
-			case 1: CheckRadioButton(hwndDlg,IDC_MONO,IDC_STEREO,IDC_STEREO); break;
-			}
-
-			// set "priority" state
-			SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_SETRANGE,(WPARAM)FALSE,(LPARAM)MAKELONG(1,7));
-			SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_SETPOS,(WPARAM)TRUE,(LPARAM)(LONG)mpriority);
-
-			return TRUE;
-		}
-
-	case WM_INITDIALOG:
-		// init mirror vars
-		mnextuse16bit = nextuse16bit;
-		mnextreplayfreq = nextreplayfreq;
-		minfplay = infplay;
-		mfastseek = fastseek;
-		mnotest = notest;
-		mnextadlibport = nextadlibport;
-		mnextusehardware = nextusehardware;
-		mnextstereo = nextstereo;
-		mpriority = priority;
-		return TRUE;
-	}
-	return FALSE;
-}
-
-BOOL APIENTRY FormatConfigProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	static	tFiletypes *mft;
-	int		i;
-
-	switch (message) {
-	case WM_NOTIFY:
-		switch(((NMHDR FAR *) lParam)->code) {
-		case PSN_KILLACTIVE:
-			// get dialog controls
-			for(i=0;i<SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_GETCOUNT,0,0);i++)
-				if(SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_GETSEL,i,0))
-					mft[i].ignore = false;
-				else
-					mft[i].ignore = true;
-
-			SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_RESETCONTENT,0,0);	// clear Listbox
-			return TRUE;
-
-		case PSN_APPLY:
-			// apply mirror vars
-			memcpy(alltypes,mft,sizeof(alltypes));
-			free(mft);
-			return TRUE;
-
-		case PSN_SETACTIVE:
-			// set dialog controls
-			for(i=0;alltypes[i].extension;i++)
-					SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_SETSEL,(BOOL)!mft[i].ignore,
-						SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_ADDSTRING,0,(LPARAM)mft[i].extension));
-			return TRUE;
-		}
-
-	case WM_INITDIALOG:
-		// init mirror vars
-		mft = (tFiletypes *)malloc(sizeof(alltypes));
-		memcpy(mft,alltypes,sizeof(alltypes));
-		return TRUE;
-
-	case WM_COMMAND:
-		switch(LOWORD(wParam)) {
-		case IDC_FTSELALL:	// select all items
-			SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_SETSEL,TRUE,-1);
-			return TRUE;
-		case IDC_FTSELNONE:	// select no items
-			SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_SETSEL,FALSE,-1);
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
-
-/**************/
-
-void config(HWND hwndParent)
-{
-	PROPSHEETPAGE	psp[2];
-	PROPSHEETHEADER	psh;
-
-	psp[0].dwSize = sizeof(PROPSHEETPAGE);
-	psp[0].dwFlags = PSP_DEFAULT;
-	psp[0].hInstance = mod.hDllInstance;
-	psp[0].pszTemplate = MAKEINTRESOURCE(IDD_PROPGENERAL);
-	psp[0].pfnDlgProc = (DLGPROC)GeneralConfigProc;
-
-	psp[1].dwSize = sizeof(PROPSHEETPAGE);
-	psp[1].dwFlags = PSP_DEFAULT;
-	psp[1].hInstance = mod.hDllInstance;
-	psp[1].pszTemplate = MAKEINTRESOURCE(IDD_PROPFMT);
-	psp[1].pfnDlgProc = (DLGPROC)FormatConfigProc;
-
-	psh.dwSize = sizeof(PROPSHEETHEADER);
-	psh.dwFlags = PSH_NOAPPLYNOW | PSH_PROPSHEETPAGE;
-	psh.hwndParent = hwndParent;
-	psh.pszCaption = (LPSTR) ADPLUGVERS " Configuration";
-	psh.nPages = sizeof(psp) / sizeof(PROPSHEETPAGE);
-	psh.nStartPage = 0;
-	psh.ppsp = psp;
-
-	PropertySheet(&psh);
-
-	if(nextadlibport != adlibport || (nextusehardware > usehardware && nextusehardware >= opl2))
-		if(isnt && !notest) {
-			nextusehardware = DFLEMU;
-			MessageBox(hwndParent,"OPL2 Hardware replay is disabled under Windows NT!\n\nSwitching to emulation mode.",ADPLUGVERS,
-				MB_OK | MB_ICONERROR);
-		} else {
-			CRealopl	tmpadl(nextadlibport);
-			if(!tmpadl.detect() && !notest) {
-				nextusehardware = DFLEMU;
-				MessageBox(hwndParent,"No OPL2 detected on specified port!\n\nSwitching to emulation mode.",ADPLUGVERS,
-					MB_OK | MB_ICONERROR);
-			}
-		}
-		if((nextusehardware < opl2 && usehardware >= opl2) || (nextusehardware >= opl2 && usehardware < opl2))
-			MessageBox(hwndParent,"Switching between emulated and hardware replay requires Winamp to be restarted before "
-				"the changes take effect.",ADPLUGVERS,MB_OK | MB_ICONWARNING);
-}
-
-void about(HWND hwndParent)
-{ DialogBox(mod.hDllInstance,MAKEINTRESOURCE(IDD_ABOUTBOX),hwndParent,(DLGPROC)AboutBoxProc); }
-
-int infoDlg(char *fn, HWND hwnd)
-{
-	if(fidialog)
-		return 0;
-
-	CSilentopl	sopl;
-
-	if (playing && !strcmp(fn,lastfn))
-		fidialogp = player;
-	else
-		fidialogp = CAdPlug::factory(fn,&sopl);
-
-	if (fidialogp)
-		fidialog = CreateDialogParam(mod.hDllInstance,MAKEINTRESOURCE(IDD_FILEINFO),hwnd,(DLGPROC)FileInfoProc,NULL);
-
-	return 0;
-}
-
-char *getsongtitle(char *title,char *filename)
-{
-	CSilentopl	sopl;
-	CPlayer *p = CAdPlug::factory(filename,&sopl);
-
-	strcpy(title,strrchr(filename,'\\')+1);
-	if(!p) return title;
-	if(!p->gettitle().empty()) strcpy(title,p->gettitle().c_str());
-	delete p;
-	return title;
-}
-
-int getsonglength(char *filename, int subsng)
-{
-	int slen;
-
-	CSilentopl	sopl;
-	CPlayer *p = CAdPlug::factory(filename,&sopl);
-	if(!p) return 0;
-	slen = CAdPlug::songlength(p,subsng);	// get songlength
-	delete p;
-	return slen;
-}
-
-void getfileinfo(char *filename, char *title, int *length_in_ms)
-{
-	if (!filename || !*filename) {	// currently playing file
-		if (length_in_ms)
-			*length_in_ms = getlength();
-		if (title)
-			if(playing) {			// are we playing right now?
-				if(!player->gettitle().empty())
-					strcpy(title,player->gettitle().c_str());
-				else
-					strcpy(title,strrchr(lastfn,'\\')+1);
-			} else
-				title = getsongtitle(title,filename);
-	} else {						// some other file
-		if (length_in_ms)
-			*length_in_ms = getsonglength(filename,DFLSUBSONG);
-		if (title)
-			title = getsongtitle(title,filename);
-	}
-}
-
-int isourfile(char *fn)
-{
-	if(!strcmp(fn,"hi.mp3"))
-		return 0;
-
-	if(testignore(fn))
-		return 0;
-
-	CSilentopl	sopl;
-	CPlayer *p = CAdPlug::factory(fn,&sopl);
-	if(p) {
-		delete p;
-		return 1;
-	} else
-		return 0;
-}
-
-void getinifilename(char *inifile,int len)
-{
-	GetModuleFileName(GetModuleHandle("in_adlib"),inifile,len);
-	inifile[strrchr(inifile,'\\') - inifile] = '\0';
-	strcat(inifile,"\\plugin.ini");
-}
-
-void quit()
-{
-	char	*bufstr,*ftignore;	// buffer string, file type ignoration list
-	char	inifile[MAX_PATH];	// path to plugin.ini
-	int		i,ftsize=0;
-
-	bufstr = (char *) malloc(10);
-	// store configuration
-	getinifilename(inifile,MAX_PATH);	// retrieve full path to ini-file
-	WritePrivateProfileString("AdPlug","ReplayFreq",_itoa(nextreplayfreq,bufstr,10),inifile);
-	WritePrivateProfileString("AdPlug","Use16Bit",_itoa(nextuse16bit,bufstr,10),inifile);
-	WritePrivateProfileString("AdPlug","UseHardware",_itoa(nextusehardware,bufstr,10),inifile);
-	WritePrivateProfileString("AdPlug","AdlibPort",_itoa(nextadlibport,bufstr,16),inifile);
-	WritePrivateProfileString("AdPlug","AutoRewind",_itoa(infplay,bufstr,10),inifile);
-	WritePrivateProfileString("AdPlug","FastSeek",_itoa(fastseek,bufstr,10),inifile);
-	WritePrivateProfileString("AdPlug","NoTest",_itoa(notest,bufstr,10),inifile);
-	WritePrivateProfileString("AdPlug","Stereo",_itoa(nextstereo,bufstr,10),inifile);
-	WritePrivateProfileString("AdPlug","Priority",_itoa(priority,bufstr,10),inifile);
-
-	// build up file type ignoration list
-	for(i=0;alltypes[i].extension;i++)
-		if(alltypes[i].ignore)
-			ftsize += strlen(alltypes[i].extension)+2;
-	ftignore = (char *)malloc(++ftsize); strcpy(ftignore,";");
-
-	for(i=0;alltypes[i].extension;i++)
-		if(alltypes[i].ignore) {
-			strcat(ftignore,alltypes[i].extension);
-			strcat(ftignore,";");
-		}
-	WritePrivateProfileString("AdPlug","Ignore",ftignore,inifile);
-
-	free(ftignore);
-	free(bufstr);
-	free(mod.FileExtensions);	// free supported file types list
-}
-
-int play(char *fn)
-{
-	int				maxlatency;
-	unsigned long	tmp;
-	unsigned int	i;
-	LPMIDIOUTCAPS	midicaps;
-	LPTIMECAPS		timecaps;
-
-	// init main replay variables
-	if(strcmp(fn,lastfn)) {	// new file?
-		subsong = DFLSUBSONG;	// start with default subsong
-		if(fidialog) {	// close File Info Box, if open
-			DestroyWindow(fidialog);
-			fidialog = 0;
-		}
-	}
-	currentlength = getsonglength(fn,subsong);	// get song length
-	replayfreq = nextreplayfreq; use16bit = nextuse16bit; stereo = nextstereo;
-	if((usehardware >= opl2 && nextusehardware >= opl2) || (usehardware < opl2 && nextusehardware < opl2)) {
-		usehardware = nextusehardware;
-		adlibport = nextadlibport;
-	}
-	strcpy(lastfn,fn);							// remember filename
-	paused=0;									// not paused
-	decode_pos_ms=0.0f;							// begin at 0ms
-	seek_needed = -1;							// no seek needed
-
-	// if the OPL is also used for MIDI, check if it is available
-	if(usehardware >= opl2 && !notest) {
-		adlibmidi = NULL;
-		midicaps = (LPMIDIOUTCAPS) malloc(sizeof(MIDIOUTCAPS));
-		for(i=0;i<midiOutGetNumDevs();i++)
-			if(midiOutGetDevCaps(i,midicaps,sizeof(MIDIOUTCAPS)) == MMSYSERR_NOERROR)
-				if(midicaps->wTechnology == MOD_FMSYNTH)
-					if(midiOutOpen(&adlibmidi,i,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR) {
-						MessageBox(mod.hMainWindow,"The OPL2 chip is already in use by the MIDI sequencer!\n\n"
-						"Please quit all running MIDI applications before going on.",ADPLUGVERS,MB_OK | MB_ICONERROR);
-						free(midicaps);
-						return 1;	// don't play now
-					} else
-						break;		// we found it
-		free(midicaps);
-	}
-
-	// init OPL2 output
-	switch(usehardware) {
-	case emuts: opl = emuopl = new CEmuopl(replayfreq,use16bit,stereo); break;
-	case opl2: opl = realopl = new CRealopl(adlibport); realopl->setvolume(savevol); break;
-	}
-
-	// init file player
-	if(!(player = CAdPlug::factory(fn,opl))) {
-		// error! deinit everything
-		delete opl;
-		if(usehardware >= opl2 && adlibmidi)
-			midiOutClose(adlibmidi);
-		return 1;	// don't play now
-	}
-	maxsubsongs = player->getsubsongs();
-	player->rewind(subsong);	// rewind player to right subsong
-
-	// init Winamp
-	if(usehardware < opl2) {
-		if((maxlatency = mod.outMod->Open(replayfreq,stereo ? 2 : 1,use16bit ? 16 : 8, -1,-1)) < 0) {
-			// error! deinit everything
-			delete player;
-			delete opl;
-			if(usehardware >= opl2 && adlibmidi)	// deinit MIDI, if needed
-				midiOutClose(adlibmidi);
-			return 1;	// don't play now
-		}
-		mod.outMod->SetVolume(-666);
-	} else
-		maxlatency = 0;		// hardware-replay has no latency
-	mod.SetInfo(9*10000,(int)replayfreq/1000,stereo ? 2 : 1,1);
-
-	if(usehardware != opl2) {	// init vis
-		mod.SAVSAInit(maxlatency,replayfreq);
-		mod.VSASetInfo(stereo ? 2 : 1,replayfreq);
-	};
-
-	if(usehardware < opl2) {
-		killDecodeThread = 0;
-		timerhandle = 0;
-		thread_handle = (HANDLE)CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)DecodeThread,(void *)&killDecodeThread,0,&tmp);
-		SetThreadPriority(thread_handle,prioresolve[priority]);
-	} else {			// hardware replay uses timer
-		timecaps = (LPTIMECAPS) malloc(sizeof(TIMECAPS));
-		timeGetDevCaps(timecaps,sizeof(TIMECAPS));
-		timerperiod = timecaps->wPeriodMin;
-		free(timecaps);
-		timeBeginPeriod(timerperiod);
-		timerhandle = timeSetEvent((int)(1000/player->getrefresh()),0,TimerThread,0,TIME_PERIODIC);
-	}
-	playing = 1;	// starting to play
-	return 0;
-}
-
-void stop() {
-	if(usehardware < opl2 && thread_handle != INVALID_HANDLE_VALUE) {	// stop player thread
-		killDecodeThread=1;
-		if(WaitForSingleObject(thread_handle,INFINITE) == WAIT_TIMEOUT) {
-			MessageBox(mod.hMainWindow,"Error terminating player thread!",ADPLUGVERS,MB_OK | MB_ICONERROR);
-			TerminateThread(thread_handle,0);
-		}
-		CloseHandle(thread_handle);
-		thread_handle = INVALID_HANDLE_VALUE;
-	}
-
-	if(usehardware >= opl2 && timerhandle) {	// stop timer thread
-		timeKillEvent(timerhandle);
-		timeEndPeriod(timerperiod);
-		timerhandle = 0;
-	}
-
-	playing = 0;						// not playing anymore
-	delete player;						// kill player
-	if(usehardware != opl2)
-		mod.SAVSADeInit();				// deinit vis stuff
-	if(usehardware < opl2)
-		mod.outMod->Close();			// close output module
-	else
-		setvolume(0);
-	delete opl;							// kill OPL chip
-	if(usehardware >= opl2) realopl = 0;
-	if(usehardware >= opl2 && adlibmidi && !notest)	// deinit MIDI, if needed
-		midiOutClose(adlibmidi);
-}
-
-void CALLBACK TimerThread(UINT wTimerID,UINT msg,DWORD dwUser,DWORD dw1,DWORD dw2)
-{
-//	int				buffersize;		// size of vis buffer
-	static float	oldrefresh;		// caches old refresh value
-
-	if(wTimerID != timerhandle || paused)
-		return;
-
-	if(!decode_pos_ms)
-		oldrefresh = 0;
-
-	if(seek_needed != -1) {			// is seek needed?
-		if(seek_needed < decode_pos_ms) {
-			player->rewind(subsong);	// rewind module
-			decode_pos_ms = 0.0f;
-		}
-		// seek to specified position
-		realopl->setquiet();
-		if(fastseek) realopl->setnowrite();
-		while(decode_pos_ms < seek_needed && player->update())
-			decode_pos_ms += 1000/player->getrefresh();
-		if(fastseek) realopl->setnowrite(false);
-		realopl->setquiet(false);
-		seek_needed = -1;	// reset seek flag
-	}
-
-	if(!player->update() && !infplay) {	// update replayer
-		PostMessage(mod.hMainWindow,WM_WA_MPEG_EOF,0,0);
-		return;
-	}
-
-	if(oldrefresh != player->getrefresh()) {	// adjust timer frequency
-		timeKillEvent(timerhandle);
-		timerhandle = timeSetEvent((int)(1000/player->getrefresh()),0,TimerThread,0,TIME_PERIODIC);
-		oldrefresh = player->getrefresh();
-	}
-
-	if(fidialog && (fidialogp == player)) // update file info box, if displayed
-		PostMessage(fidialog,WM_AP_UPDATE,0,0);
-
-/*	if(usehardware > opl2) {	// update vis
-		buffersize = (int)(replayfreq/player->getrefresh());
-		if(use16bit) buffersize *= 2;
-		tempbuf = (char *) realloc(tempbuf,buffersize);
-		emuopl->update(tempbuf,buffersize);
-		mod.SAAddPCMData(tempbuf,1,use16bit ? 16 : 8,(int)decode_pos_ms);
-		mod.VSAAddPCMData(tempbuf,1,use16bit ? 16 : 8,(int)decode_pos_ms);
-	} */
-	decode_pos_ms += 1000/player->getrefresh();
-}
-
-/*
- * old DecodeThread()
-
-DWORD WINAPI __stdcall DecodeThread(void *b)
-{
-	short	*tempbuf=NULL;				// our handover buffer
-	int		towrite,written,cw,size;	// write buffer sizes
-
-	while (!*(int *)b) {			// kill switch
-		if(seek_needed != -1) {			// seek needed?
-			if(seek_needed < decode_pos_ms) {	// seek backwards?
-				player->rewind(subsong);	// rewind module
-				decode_pos_ms = 0.0f;
-			}
-			// seek to new position
-			while(decode_pos_ms < seek_needed && player->update())
-				decode_pos_ms += 1000/player->getrefresh();
-			mod.outMod->Flush((int)decode_pos_ms);	// tell new position
-			seek_needed = -1;						// reset seek flag
-		}
-
-		if(!player->update() && !infplay)	// update replayer
-			if (!mod.outMod->IsPlaying()) {	// sound ended?
-				PostMessage(mod.hMainWindow,WM_WA_MPEG_EOF,0,0);
-				break;
-			} else {
-				Sleep(10);
-				continue;
-			}
-
-		// do some output
-		towrite = (int)(replayfreq/player->getrefresh());	// how much to write?
-		if(use16bit) size = towrite*2; else size = towrite; if(stereo) size *= 2; if(mod.dsp_isactive()) size *= 2;
-		tempbuf = (short *)realloc(tempbuf,size);
-		switch(usehardware) {
-		case emuts:
-			emuopl->update(tempbuf,towrite);
-			break;
-		}
-		towrite = mod.dsp_dosamples(tempbuf,towrite,use16bit ? 16 : 8,stereo ? 2 : 1,replayfreq);	// update dsp
-		if(use16bit) towrite *= 2; if(stereo) towrite *= 2;
-		written = towrite;
-
-		while(written) {
-			while(!(cw = mod.outMod->CanWrite()))
-				Sleep(10);
-			if(cw > written) cw = written;	// just write the rest
-			if(cw > 8192) cw = 8192;		// doesn't accept more than 8192 bytes
-			mod.outMod->Write((char *)tempbuf+(towrite-written),cw);
-			written -= cw;
-			if(*(int *)b || seek_needed != -1)
-				break;
-		}
-		if(towrite > (use16bit ? 576 * 2 : 576)) {	// update vis
-			mod.SAAddPCMData(tempbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
-			mod.VSAAddPCMData(tempbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
-		}
-		decode_pos_ms += 1000/player->getrefresh();
-
-		if(fidialog) // update file info box, if displayed
-			PostMessage(fidialog,WM_AP_UPDATE,0,0);
-	}
-	free(tempbuf);					// free buffer
-	return 0;
-}
-*/
-
-DWORD WINAPI __stdcall DecodeThread(void *b)
-{
-	char	*pos,*sndbuf;			// the sample buffer
-	int		sampsize = 1;			// sample size
-	long	i,towrite,minicnt=0;
-	bool	playing=true;
-
-	if(use16bit) sampsize *= 2; if(stereo) sampsize *= 2;
-	sndbuf = (char *)malloc(BUFSIZE*sampsize*2);	// need twice the size for DSP
-	while (!*(int *)b) {			// kill switch
-		if(seek_needed != -1) {			// seek needed?
-			if(seek_needed < decode_pos_ms) {	// seek backwards?
-				player->rewind(subsong);	// rewind module
-				decode_pos_ms = 0.0f;
-			}
-			// seek to new position
-			while(decode_pos_ms < seek_needed && player->update())
-				decode_pos_ms += 1000/player->getrefresh();
-			mod.outMod->Flush((int)decode_pos_ms);	// tell new position
-			seek_needed = -1;						// reset seek flag
-		}
-
-		if(!playing && !infplay)	// update replayer
-			if (!mod.outMod->IsPlaying()) {	// sound ended?
-				PostMessage(mod.hMainWindow,WM_WA_MPEG_EOF,0,0);
-				break;
-			} else {
-				Sleep(10);
-				continue;
-			}
-
-		// do some output
-		towrite = BUFSIZE; pos = sndbuf;
-		while(towrite > 0)
-		{
-			while(minicnt < 0)
-			{
-				minicnt += replayfreq;
-				playing = player->update();
-				decode_pos_ms += 1000/player->getrefresh();
-			}
-			i = min(towrite,(long)(minicnt/player->getrefresh()+4)&~3);
-			switch(usehardware) {
-			case emuts:
-				emuopl->update((short *)pos,i);
-				break;
-			}
-			pos += i * sampsize; towrite -= i;
-			minicnt -= player->getrefresh()*i;
-		}
-		towrite = mod.dsp_dosamples((short *)sndbuf,BUFSIZE,use16bit ? 16 : 8,stereo ? 2 : 1,replayfreq) * sampsize;	// update dsp
-		while(mod.outMod->CanWrite() < towrite) Sleep(10);	// wait for output plugin
-		mod.outMod->Write(sndbuf,towrite);
-		mod.SAAddPCMData(sndbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
-		mod.VSAAddPCMData(sndbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
-
-		if(fidialog && (fidialogp == player)) // update file info box, if displayed
-			PostMessage(fidialog,WM_AP_UPDATE,0,0);
-	}
-	free(sndbuf);
-	return 0;
-}
-
-extern "C" In_Module mod = {
-	IN_VER,								// version identifier
-	ADPLUGVERS							// plugin name
-#ifdef __alpha
-	" (AXP)"
-#else
-	" (x86)"
+#ifdef _DEBUG
+  #include "debug.h"
 #endif
-	,0,									// hMainWindow
-	0,									// hDllInstance
-	NULL,								// Registered filetypes
-	1,									// is_seekable
-	1,									// uses output plugins
-	config,								// function pointers...
-	about,
-	init,
-	quit,
-	getfileinfo,
-	infoDlg,
-	isourfile,
-	play,
-	pause,
-	unpause,
-	ispaused,
-	stop,
-	getlength,
-	getoutputtime,
-	setoutputtime,
-	setvolume,
-	setpan,								// ...end
-	0,0,0,0,0,0,0,0,0,					// vis stuff
-	0,0,								// dsp
-	eq_set,								// function pointer
-	NULL,								// setinfo
-	0									// out_mod
+
+        /* outputs */
+
+enum    output              {emuts, emuks, disk, opl2};
+
+        /* constants */
+
+#define PLUGINVER           "Winamp2 OPL2 plugin v1.25"
+//
+#define SNDBUFSIZE          576
+//
+#define DFL_EMU             emuts
+#define DFL_REPLAYFREQ      44100
+#define DFL_USE16BIT        true
+#define DFL_STEREO          false
+#define DFL_USEOUTPUT       DFL_EMU
+#define DFL_TESTOPL2        true
+#define DFL_DISKDIR         "C:\\"
+#define DFL_AUTOEND         true
+#define DFL_FASTSEEK        false
+#define DFL_PRIORITY        4
+#define DFL_STDTIMER        true
+#define DFL_SUBSONG         0
+//
+#define WM_WA_MPEG_EOF      WM_USER+2
+#define WM_AP_UPDATE        WM_USER+100
+#define WM_AP_UPDATE_ALL	WM_USER+101
+
+        /* supported filetypes */
+
+struct
+{
+        char            extension[12];
+        char            description[80];
+        bool            ignore;
+} filetypes[] = {
+        "a2m\0",        "Adlib Tracker 2 Modules (*.A2M)\0",                false,
+        "amd\0",        "AMUSIC Adlib Tracker Modules (*.AMD)\0",           false,
+        "bam\0",        "Bob's Adlib Music Format (*.BAM)\0",               false,
+        "cmf\0",        "Creative Music Files (*.CMF)\0",                   false,
+        "d00\0",        "EdLib Modules (*.D00)\0",                          false,
+        "dfm\0",        "Digital-FM Modules (*.DFM)\0",                     false,
+        "hsc\0",        "HSC-Tracker Modules (*.HSC)\0",                    false,
+        "hsp\0",        "Packed HSC-Tracker Modules (*.HSP)\0",             false,
+        "imf;wlf\0",    "Apogee IMF Files (*.IMF;*.WLF)\0",                 false,
+        "ksm\0",        "Ken Silverman's Music Format (*.KSM)\0",           false,
+        "laa\0",        "LucasArts Adlib Audio Files (*.LAA)\0",            false,
+//      "lds\0",        "LOUDNESS Modules (*.LDS)\0",                       false,
+        "m\0",          "Ultima 6 Music Format (*.M)\0",                    false,
+        "mad\0",        "Mlat Adlib Tracker Modules (*.MAD)\0",             false,
+        "mid\0",        "MIDI Audio Files (*.MID)\0",                       false,
+        "mkj\0",        "MKJamz Audio Files (*.MKJ)\0",                     false,
+        "mtk\0",        "MPU-401 Trakker Modules (*.MTK)\0",                false,
+        "rad\0",        "Reality Adlib Tracker Modules (*.RAD)\0",          false,
+        "raw\0",        "RdosPlay RAW Files (*.RAW)\0",                     false,
+        "rol\0",        "Adlib Visual Composer (*.ROL)\0",                  false,
+        "s3m\0",        "Screamtracker 3 Adlib Modules (*.S3M)\0",          false,
+        "sa2\0",        "Surprise! Adlib Tracker 2 Modules (*.SA2)\0",      false,
+        "sat\0",        "Surprise! Adlib Tracker Modules (*.SAT)\0",        false,
+        "sci\0",        "Sierra Adlib Audio Files (*.SCI)\0",               false,
+        "sng\0",        "SNGPlay Files (*.SNG)\0",                          false,
+        "sng\0",        "Faust Music Creator Modules (*.SNG)\0",            false,
+        "xad\0",        "Exotic Adlib Music Format (*.XAD)\0",              false,
+        "xms\0",        "XMS-Tracker (*.XMS)\0",                            false
 };
 
-bool is_xmplay()
+#define FTIGNORE     ";mid;"
+#define FTSIZE       sizeof(filetypes)
+#define FTELEMCOUNT  sizeof(filetypes)/sizeof(filetypes[0])
+
+        /* thread priority */
+
+int thread_priority[] =
+{
+        THREAD_PRIORITY_IDLE,
+        THREAD_PRIORITY_LOWEST,
+        THREAD_PRIORITY_BELOW_NORMAL,
+        THREAD_PRIORITY_NORMAL,
+        THREAD_PRIORITY_ABOVE_NORMAL,
+        THREAD_PRIORITY_HIGHEST,
+        THREAD_PRIORITY_TIME_CRITICAL
+};
+
+        /* variables */
+
+In_Module       mod;
+//
+struct
+{
+        int             replayfreq, nextreplayfreq;
+        bool            use16bit,   nextuse16bit;
+        bool            stereo,     nextstereo;
+        enum output     useoutput,  nextuseoutput;
+        unsigned short  adlibport,  nextadlibport;
+        bool            testopl2,   nexttestopl2;
+        bool            testloop,   nexttestloop;
+        bool            fastseek,   nextfastseek;
+        int             priority,   nextpriority;
+        int             stdtimer,   nextstdtimer;
+        char            *diskdir,   *nextdiskdir;
+        int                         nextuseoutputplug;
+} cfg;
+//
+struct
+{
+        CEmuopl         *emu;
+        CDiskopl        *disk;
+        CRealopl        *real;
+        CSilentopl      *silent;
+} out;
+//
+struct
+{
+        char            file[_MAX_PATH];                // current file name
+        int             playing;                        // is playing ?
+        int             paused;                         // is paused ?
+        unsigned int    subsong;                        // current subsong
+        unsigned int    maxsubsong;                     // how many subsongs in current file
+        float           outtime;                        // played time in msec.
+        unsigned long   fulltime;                       // (sub)song length in msec.
+        int             seek;                           // seek value (-1 if no seek needed)
+        int             volume;                         // current volume
+        union
+        {
+                HANDLE          emuts;
+                UINT            opl2;
+                HANDLE          disk;
+        } thread;
+} plr;
+//
+char            cfgfile[_MAX_PATH];
+CPlayer         *player = NULL;
+char            *diskfile = NULL;
+MIDIOUTCAPS     mc;
+TIMECAPS        tc;
+HMIDIOUT        midiout;
+CPlayer         *FileInfoPlayer;
+char            FileInfoFile[_MAX_PATH];
+HWND            FileInfoWnd = NULL;
+
+        /* private functions */
+
+char *lowstring(char *s)
+{
+  char *lps = s;
+
+  while (*lps)
+    *lps++ = tolower(*lps);
+
+  return s;
+}
+
+bool test_opl2()
+{
+  CRealopl temp_adlib(cfg.nextadlibport);
+
+  return temp_adlib.detect();
+}
+
+bool test_os()
+{
+  OSVERSIONINFO ver;
+
+  ver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+  GetVersionEx(&ver);
+
+  if(ver.dwPlatformId == VER_PLATFORM_WIN32_NT)
+    return true;
+
+  return false;
+}
+
+bool test_xmplay()
+{
+  return GetModuleHandle("xmplay.exe") ? true : false;
+}
+
+void config_test()
+{
+  if ((cfg.nextuseoutput == emuts) || (cfg.nextuseoutput == emuks))
+    cfg.nextuseoutputplug = 1;
+  else
+    cfg.nextuseoutputplug = 0;
+
+  // XMPlay ?
+  if (!cfg.nextuseoutputplug && test_xmplay())
+  {
+    cfg.nextuseoutput = DFL_EMU;
+    cfg.nextuseoutputplug = 1;
+
+    MessageBox(mod.hMainWindow, "Using own output is impossible under XMPLAY!\n"
+                     "\n"
+                     "Switching to emulation mode.","AdPlug :: Error",MB_OK | MB_ICONERROR);
+  }
+
+  // WinNT ?
+  if ((cfg.nextuseoutput == opl2) && test_os())
+  {
+    cfg.nextuseoutput = DFL_EMU;
+
+    MessageBox(mod.hMainWindow, "OPL2 hardware replay is forbidden under your OS!\n"
+                     "\n"
+                     "Switching to emulation mode.","AdPlug :: Error",MB_OK | MB_ICONERROR);
+  }
+
+  // No OPL ?
+  if ((cfg.nextuseoutput == opl2) && cfg.nexttestopl2 && !test_opl2())
+  {
+    cfg.nextuseoutput = DFL_EMU;
+
+    MessageBox(mod.hMainWindow, "OPL2 chip not detected!\n"
+                     "\n"
+                     "Switching to emulation mode.","AdPlug :: Error",MB_OK | MB_ICONERROR);
+  }
+
+  // Non-standard timer and No loop detection ?
+  if ((cfg.nextuseoutput == disk) && !cfg.nextstdtimer && !cfg.nexttestloop)
+    MessageBox(mod.hMainWindow, "HYPERSPEED ENDLESS Disk Writing mode selected!","AdPlug :: Warning", MB_OK | MB_ICONWARNING);
+
+  // Own -> Standard output switching ?
+  if (cfg.nextuseoutputplug > mod.UsesOutputPlug)
+    MessageBox(mod.hMainWindow,"Switching from own to standart output detected.\n"
+                     "\n"
+                     "Winamp must be restarted.","AdPlug :: Warning",MB_OK | MB_ICONWARNING);
+}
+
+void config_apply(bool to)
+{
+  cfg.replayfreq = cfg.nextreplayfreq;
+  cfg.use16bit   = cfg.nextuse16bit;
+  cfg.stereo     = cfg.nextstereo;
+  cfg.adlibport  = cfg.nextadlibport;
+  cfg.testopl2   = cfg.nexttestopl2;
+  cfg.testloop   = cfg.nexttestloop;
+  cfg.fastseek   = cfg.nextfastseek;
+  cfg.priority   = cfg.nextpriority;
+  cfg.stdtimer   = cfg.nextstdtimer;
+  cfg.diskdir    = cfg.nextdiskdir;
+
+  if (!to || (cfg.nextuseoutputplug <= mod.UsesOutputPlug))
+  {
+    cfg.useoutput      = cfg.nextuseoutput;
+    mod.UsesOutputPlug = cfg.nextuseoutputplug;
+  }
+}
+
+bool test_filetype(char *fn)
+{
+  char *p = strrchr(fn,'.');
+  if (!p)
+    return false;
+  p++;
+
+  for (int i=0;i<FTELEMCOUNT;i++)
+  {
+    char *ext = filetypes[i].extension;
+    char *str = strstr(ext,lowstring(p));
+
+    if (str)
+    {
+      // for "aaa;bbb;ccc" and "ccc"
+      if (strlen(p) == strlen(str))
+        return true;
+      if (str[strlen(p)] == ';')
+      {
+        // for "aaa;bbb;ccc" and "aaa"
+        if (ext == str)
+          return true;
+
+        // for "aaa;bbb;ccc" and "bbb"
+        if (ext[str-ext-1] == ';')
+          return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+char *build_raw_name(char *fn)
+{
+  char bufstr[11];
+
+  // free diskfile
+  if (diskfile)
+    free(diskfile);
+
+  diskfile = (char *)malloc(strlen(cfg.diskdir) + strlen(strrchr(fn,'\\')) + 16);
+
+  // diskfile = "(&diskdir)\(&fn).(&subsong).raw"
+  strcpy(diskfile,cfg.diskdir);
+  strcat(diskfile,strrchr(fn,'\\'));
+  if (plr.subsong > 0)
+  {
+    strcat(diskfile,".");
+    _itoa(plr.subsong,bufstr,10);
+    strcat(diskfile,bufstr);
+  }
+  strcat(diskfile,".raw");
+
+#ifdef _DEBUG
+  printf("Disk Writer output file = %s\n",diskfile);
+#endif
+
+  return diskfile;
+}
+
+int get_song_length(char *fn, int subsong)
+{
+  unsigned long sl = 0;
+
+  CPlayer *p = CAdPlug::factory(fn,out.silent);
+  if (p)
+  {
+    sl = CAdPlug::songlength(p,subsong);
+    delete p;
+  }
+
+  return sl;
+}
+
+Copl *opl_init()
+{
+  Copl *opl;
+
+  if (cfg.useoutput == emuts)
+    opl = out.emu = new CEmuopl(cfg.replayfreq,cfg.use16bit,cfg.stereo);
+  if (cfg.useoutput == opl2)
+    opl = out.real = new CRealopl(cfg.adlibport);
+  if (cfg.useoutput == disk)
+    opl = out.disk = new CDiskopl(build_raw_name(plr.file));
+
+  return opl;
+}
+
+void opl_done()
+{
+  if (cfg.useoutput == emuts)
+    delete out.emu;
+  if (cfg.useoutput == opl2)
+    delete out.real;
+  if (cfg.useoutput == disk)
+    delete out.disk;
+}
+
+/* -------- window procedures ----------------------------- */
+
+BOOL APIENTRY AboutDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  PAINTSTRUCT  ps;
+  HDC          wdc,bdc;
+  HANDLE       bm;
+  COLORREF     tp,sp;
+  unsigned int x,y;
+
+  switch (message)
+  {
+    case WM_INITDIALOG:
+      return TRUE;
+
+
+    case WM_PAINT:
+
+      // draw adplug bitmap
+      wdc = BeginPaint(hwndDlg,&ps);
+      bdc = CreateCompatibleDC(wdc);
+      bm = LoadImage(mod.hDllInstance,MAKEINTRESOURCE(IDB_LOGO),IMAGE_BITMAP,0,0,LR_DEFAULTCOLOR);
+      SelectObject(bdc,bm);
+      tp = GetPixel(bdc,0,0);
+      sp = GetPixel(wdc,12,12);
+
+      // make bitmap transparent
+      for (x=0;x<69;x++)
+        for (y=0;y<35;y++)
+          if (GetPixel(bdc,x,y) == tp)
+            SetPixel(bdc,x,y,sp);
+
+      BitBlt(wdc,18,108,75,131,bdc,0,0,SRCCOPY);
+      DeleteObject(bm);
+      ReleaseDC(hwndDlg,bdc);
+      EndPaint(hwndDlg,&ps);
+      return TRUE;
+
+
+    case WM_COMMAND:
+      switch (LOWORD(wParam))
+      {
+        case IDCANCEL:
+          EndDialog(hwndDlg,wParam);
+            return TRUE;
+      }
+  }
+
+  return FALSE;
+}
+
+BOOL APIENTRY ConfigOutputDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  unsigned long buf;
+  char bufstr[5];
+
+  switch (message)
+  {
+    case WM_INITDIALOG:
+      return TRUE;
+
+
+    case WM_NOTIFY:
+      switch (((NMHDR FAR *)lParam)->code)
+      {
+        case PSN_SETACTIVE:
+
+          // set "output"
+          switch (cfg.nextuseoutput)
+          {
+            case emuts:
+              CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTOPL2,IDC_OUTTS);
+              break;
+            case emuks:
+              CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTOPL2,IDC_OUTKS);
+              break;
+            case opl2:
+              CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTOPL2,IDC_OUTOPL2);
+              break;
+            case disk:
+              CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTOPL2,IDC_OUTDISK);
+              break;
+          }
+
+          // set "frequency"
+          switch (cfg.nextreplayfreq)
+          {
+            case 11025:
+              CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ1);
+              break;
+            case 22050:
+              CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ2);
+              break;
+            case 44100:
+              CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ3);
+              break;
+            case 48000:
+              CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ4);
+              break;
+            default:
+              CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQC);
+              SetDlgItemInt(hwndDlg,IDC_FREQC_VALUE,cfg.nextreplayfreq,FALSE);
+          }
+
+          // set "resolution"
+          if (cfg.nextuse16bit)
+            CheckRadioButton(hwndDlg,IDC_QUALITY8,IDC_QUALITY16,IDC_QUALITY16);
+          else
+            CheckRadioButton(hwndDlg,IDC_QUALITY8,IDC_QUALITY16,IDC_QUALITY8);
+
+          // set "channels"
+          if (cfg.nextstereo)
+            CheckRadioButton(hwndDlg,IDC_MONO,IDC_STEREO,IDC_STEREO);
+          else
+            CheckRadioButton(hwndDlg,IDC_MONO,IDC_STEREO,IDC_MONO);
+
+          // set "port"
+          SetDlgItemText(hwndDlg,IDC_ADLIBPORT,_itoa(cfg.nextadlibport,bufstr,16));
+
+          // set "options"
+          if (!cfg.nexttestopl2)
+            CheckDlgButton(hwndDlg,IDC_NOTEST,BST_CHECKED);
+
+          // set "directory"
+          SetDlgItemText(hwndDlg,IDC_DIRECTORY,cfg.nextdiskdir);
+
+          return TRUE;
+
+        case PSN_KILLACTIVE:
+
+          // check "frequency"
+          if (IsDlgButtonChecked(hwndDlg,IDC_FREQ1) == BST_CHECKED)
+            cfg.nextreplayfreq = 11025;
+          if (IsDlgButtonChecked(hwndDlg,IDC_FREQ2) == BST_CHECKED)
+            cfg.nextreplayfreq = 22050;
+          if (IsDlgButtonChecked(hwndDlg,IDC_FREQ3) == BST_CHECKED)
+            cfg.nextreplayfreq = 44100;
+          if (IsDlgButtonChecked(hwndDlg,IDC_FREQ4) == BST_CHECKED)
+            cfg.nextreplayfreq = 48000;
+          if (IsDlgButtonChecked(hwndDlg,IDC_FREQC) == BST_CHECKED)
+            cfg.nextreplayfreq = GetDlgItemInt(hwndDlg,IDC_FREQC_VALUE,NULL,FALSE);
+
+          // check "resolution"
+          if (IsDlgButtonChecked(hwndDlg,IDC_QUALITY16) == BST_CHECKED)
+            cfg.nextuse16bit = true;
+          if (IsDlgButtonChecked(hwndDlg,IDC_QUALITY8) == BST_CHECKED)
+            cfg.nextuse16bit = false;
+
+          // check " channels"
+          if (IsDlgButtonChecked(hwndDlg,IDC_STEREO) == BST_CHECKED)
+            cfg.nextstereo = true;
+          if (IsDlgButtonChecked(hwndDlg,IDC_MONO) == BST_CHECKED)
+            cfg.nextstereo = false;
+
+          // check "output"
+          if (IsDlgButtonChecked(hwndDlg,IDC_OUTTS) == BST_CHECKED)
+            cfg.nextuseoutput = emuts;
+          if (IsDlgButtonChecked(hwndDlg,IDC_OUTKS) == BST_CHECKED)
+            cfg.nextuseoutput = emuks;
+          if (IsDlgButtonChecked(hwndDlg,IDC_OUTOPL2) == BST_CHECKED)
+            cfg.nextuseoutput = opl2;
+          if (IsDlgButtonChecked(hwndDlg,IDC_OUTDISK) == BST_CHECKED)
+            cfg.nextuseoutput = disk;
+
+          // check "port"
+          GetDlgItemText(hwndDlg,IDC_ADLIBPORT,bufstr,5);
+          sscanf(bufstr,"%x",&buf);
+          cfg.nextadlibport = (unsigned short)buf;
+
+          // check "options"
+          cfg.nexttestopl2 = !(IsDlgButtonChecked(hwndDlg,IDC_NOTEST) == BST_CHECKED);
+
+          // check "directory"
+          GetDlgItemText(hwndDlg,IDC_DIRECTORY,cfg.nextdiskdir,_MAX_PATH);
+
+          return TRUE;
+
+        case PSN_APPLY:
+          return TRUE;
+      }
+
+
+    case WM_COMMAND:
+      switch(LOWORD(wParam))
+      {
+        case IDC_DIRECTORY:
+
+          // display folder selection dialog
+          char shd[_MAX_PATH];
+
+          BROWSEINFO bi;
+
+          bi.hwndOwner = hwndDlg;
+          bi.pidlRoot = NULL;
+          bi.pszDisplayName = shd;
+          bi.lpszTitle = "Select output path for Disk Writer:";
+          bi.ulFlags = BIF_RETURNONLYFSDIRS;
+          bi.lpfn = NULL;
+          bi.lParam = 0;
+          bi.iImage = 0;
+
+          if (SHGetPathFromIDList(SHBrowseForFolder(&bi),shd))
+            SetDlgItemText(hwndDlg,IDC_DIRECTORY,shd);
+
+          return TRUE;
+      }
+  }
+
+  return FALSE;
+}
+
+BOOL APIENTRY ConfigPlaybackDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  switch (message)
+  {
+    case WM_INITDIALOG:
+      return TRUE;
+
+
+    case WM_NOTIFY:
+      switch (((NMHDR FAR *)lParam)->code)
+      {
+        case PSN_SETACTIVE:
+
+          // set "options"
+          if (cfg.nexttestloop)
+            CheckDlgButton(hwndDlg,IDC_AUTOEND,BST_CHECKED);
+          if (cfg.nextfastseek)
+            CheckDlgButton(hwndDlg,IDC_FASTSEEK,BST_CHECKED);
+          if (cfg.nextstdtimer)
+            CheckDlgButton(hwndDlg,IDC_STDTIMER,BST_CHECKED);
+
+          // set "priority"
+          SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_SETRANGE,(WPARAM)FALSE,(LPARAM)MAKELONG(1,7));
+          SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_SETPOS,(WPARAM)TRUE,(LPARAM)(LONG)cfg.nextpriority);
+
+          return TRUE;
+
+        case PSN_KILLACTIVE:
+
+          // check "options"
+          cfg.nexttestloop = (IsDlgButtonChecked(hwndDlg,IDC_AUTOEND) == BST_CHECKED);
+          cfg.nextfastseek = (IsDlgButtonChecked(hwndDlg,IDC_FASTSEEK) == BST_CHECKED);
+          cfg.nextstdtimer = (IsDlgButtonChecked(hwndDlg,IDC_STDTIMER) == BST_CHECKED);
+
+          // check "priority"
+          cfg.nextpriority = (int)SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_GETPOS,0,0);
+
+          return TRUE;
+
+        case PSN_APPLY:
+          return TRUE;
+      }
+  }
+
+  return FALSE;
+}
+
+BOOL APIENTRY ConfigFormatsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
   int i;
-  char pe[256];
 
-  // copy command line
-  strncpy(pe,GetCommandLine(),256); pe[255]=0;
+  switch (message)
+  {
+    case WM_INITDIALOG:
+      return TRUE;
 
-  // get exec's full name
-  i=1;
-  while (pe[i] != 34)
-    pe[i-1]=pe[i++];
-  pe[--i]=0;
 
-  // find exec's short name
-  while (pe[i-1] != 92)
-	i--;
+    case WM_NOTIFY:
+      switch (((NMHDR FAR *) lParam)->code)
+      {
+        case PSN_SETACTIVE:
 
-  // is it 'xmplay.exe' ?
-  return (strnicmp(&pe[i],"XMPLAY.EXE",10)) ? false : true;
+          // set dialog controls
+          for (i=0;i<FTELEMCOUNT;i++)
+            SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_SETSEL,(BOOL)!filetypes[i].ignore,
+              SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_ADDSTRING,0,(LPARAM)filetypes[i].description));
+
+          return TRUE;
+
+        case PSN_KILLACTIVE:
+
+          // get dialog controls
+          for (i=0;i<FTELEMCOUNT;i++)
+            filetypes[i].ignore = (SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_GETSEL,i,0)) ? false : true;
+
+          // clear listbox
+          SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_RESETCONTENT,0,0);
+          return TRUE;
+
+        case PSN_APPLY:
+          return TRUE;
+      }
+
+
+    case WM_COMMAND:
+      switch(LOWORD(wParam))
+      {
+        case IDC_FTSELALL:
+
+          // select all
+          SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_SETSEL,TRUE,-1);
+          return TRUE;
+
+        case IDC_FTDESELALL:
+
+          // deselect all
+          SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_SETSEL,FALSE,-1);
+          return TRUE;
+      }
+  }
+
+  return FALSE;
 }
+
+BOOL APIENTRY FileInfoDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  int i,spos = 0;
+  char bufstr[10];
+  std::string str;
+
+  switch (message)
+  {
+	case WM_INITDIALOG:
+    case WM_AP_UPDATE_ALL:
+
+      // set "title"/"author"/"type"
+      SetDlgItemText(hwndDlg,IDC_TITLE,FileInfoPlayer->gettitle().insert(0," ").c_str());
+      SetDlgItemText(hwndDlg,IDC_AUTHOR,FileInfoPlayer->getauthor().insert(0," ").c_str());
+      SetDlgItemText(hwndDlg,IDC_FORMAT,FileInfoPlayer->gettype().insert(0," ").c_str());
+
+      // set "instruments"
+      str.erase();
+	  for (i=0;i<FileInfoPlayer->getinstruments();i++)
+	  {
+		if (i < 9)
+	      sprintf(bufstr,"0%u - ",i+1);
+		else
+		  sprintf(bufstr,"%u - ",i+1);
+
+        str += bufstr + FileInfoPlayer->getinstrument(i);
+
+		if (i < FileInfoPlayer->getinstruments() - 1)
+          str += "\r\n";
+	  }
+	  SetDlgItemText(hwndDlg,IDC_INSTLIST,str.c_str());
+
+  	  // set "description" (ANSI "\n" to Windows "\r\n")
+      str = FileInfoPlayer->getdesc();
+      while ((spos = str.find('\n',spos)) != str.npos)
+	  {
+	    str.insert(spos,"\r");
+		spos += 2;
+	  }
+	  SetDlgItemText(hwndDlg,IDC_DESCRIPTION,str.c_str());
+
+	  // set "subsong" slider
+      if (FileInfoPlayer == player)
+      {
+ 	    SendDlgItemMessage(hwndDlg,IDC_SUBSONGSLIDER,TBM_SETRANGE,(WPARAM)FALSE,(LPARAM)MAKELONG(1,plr.maxsubsong));
+	    SendDlgItemMessage(hwndDlg,IDC_SUBSONGSLIDER,TBM_SETPOS,(WPARAM)TRUE,(LPARAM)(plr.subsong + 1));
+      }
+      else
+	  {
+ 	    SendDlgItemMessage(hwndDlg,IDC_SUBSONGSLIDER,TBM_SETRANGE,(WPARAM)FALSE,(LPARAM)MAKELONG(1,FileInfoPlayer->getsubsongs()));
+	    SendDlgItemMessage(hwndDlg,IDC_SUBSONGSLIDER,TBM_SETPOS,(WPARAM)TRUE,(LPARAM)(DFL_SUBSONG + 1));
+      }
+
+
+    case WM_AP_UPDATE:
+
+	  // update "subsong" info and slider
+      SetDlgItemInt(hwndDlg,IDC_SUBSONGMIN,1,FALSE);
+      if (FileInfoPlayer == player)
+      {
+        SetDlgItemInt(hwndDlg,IDC_SUBSONG,plr.subsong + 1,FALSE);
+	    SetDlgItemInt(hwndDlg,IDC_SUBSONGMAX,plr.maxsubsong,FALSE);
+      }
+      else
+	  {
+	    SetDlgItemText(hwndDlg,IDC_SUBSONG,"--");
+	    SetDlgItemInt(hwndDlg,IDC_SUBSONGMAX,FileInfoPlayer->getsubsongs(),FALSE);
+      }
+
+      // update "info"
+	  SetDlgItemInt(hwndDlg,IDC_ORDER,FileInfoPlayer->getorder(),FALSE);
+	  SetDlgItemInt(hwndDlg,IDC_ORDERS,FileInfoPlayer->getorders(),FALSE);
+	  SetDlgItemInt(hwndDlg,IDC_PATTERN,FileInfoPlayer->getpattern(),FALSE);
+	  SetDlgItemInt(hwndDlg,IDC_PATTERNS,FileInfoPlayer->getpatterns(),FALSE);
+	  SetDlgItemInt(hwndDlg,IDC_ROW,FileInfoPlayer->getrow(),FALSE);
+	  SetDlgItemInt(hwndDlg,IDC_SPEED,FileInfoPlayer->getspeed(),FALSE);
+	  sprintf(bufstr,"%.2f hz",FileInfoPlayer->getrefresh());
+	  SetDlgItemText(hwndDlg,IDC_TIMER,bufstr);
+
+	  return TRUE;
+
+
+    case WM_COMMAND:
+      switch(LOWORD(wParam))
+	  {
+		case IDCANCEL:
+
+          // close window
+          if (FileInfoPlayer != player)
+            delete FileInfoPlayer;
+
+          DestroyWindow(hwndDlg);
+          FileInfoWnd = NULL;
+
+          return TRUE;
+	  }
+
+
+	case WM_HSCROLL:
+      switch(GetDlgCtrlID((HWND)lParam))
+	  {
+		case IDC_SUBSONGSLIDER:
+
+          // subsong changing
+          if (FileInfoPlayer == player)
+		  {
+            int newsubsong = SendDlgItemMessage(hwndDlg,IDC_SUBSONGSLIDER,TBM_GETPOS,0,0);
+
+            if ((newsubsong - 1) != plr.subsong)
+			{
+              plr.subsong = newsubsong - 1;
+
+              SendMessage(mod.hMainWindow,WM_COMMAND,WINAMP_BUTTON2,0);
+
+              SetDlgItemInt(hwndDlg,IDC_SUBSONG,newsubsong,FALSE);
+			}
+		  }
+
+          return TRUE;
+	  }
+
+
+  } // switch (message)
+
+  return FALSE;
+}
+
+/* -------- playing threads ------------------------------- */
+
+DWORD WINAPI thread_emuts(void *status)
+{
+  long toadd = 0;
+  bool stopped = false;
+
+  // allocate sound buffer (double size for dsp)
+  int sampsize = 1;
+  if (cfg.use16bit)
+    sampsize *= 2;
+  if (cfg.stereo)
+    sampsize *= 2;
+  char *sndbuf = (char *)malloc(SNDBUFSIZE*sampsize*2);
+
+/* ! */
+
+  while (*(int *)status)
+  {
+    // seek requested ?
+    if (plr.seek != -1)
+    {
+      // backward seek ?
+      if (plr.seek < plr.outtime)
+      {
+        player->rewind(plr.subsong);
+        plr.outtime = 0.0f;
+      }
+
+      // seek to needed position
+      while ((plr.outtime < plr.seek) && player->update())
+        plr.outtime += 1000/player->getrefresh();
+
+      mod.outMod->Flush((int)plr.outtime);
+
+      plr.seek = -1;
+    }
+
+    // update replayer
+    if (stopped && cfg.testloop)
+    {
+      if (!mod.outMod->IsPlaying())
+      {
+        PostMessage(mod.hMainWindow,WM_WA_MPEG_EOF,0,0);
+        break;
+      }
+   
+      Sleep(10);
+      continue;
+    }
+
+    // fill sound buffer
+    long towrite = SNDBUFSIZE;
+    char *sndbufpos = sndbuf;
+    while (towrite > 0)
+    {
+      while (toadd < 0)
+      {
+        toadd += cfg.replayfreq;
+        stopped = !player->update();
+        plr.outtime += 1000/player->getrefresh();
+      }
+      long i = min(towrite,(long)(toadd/player->getrefresh()+4)&~3);
+      out.emu->update((short *)sndbufpos,i);
+      sndbufpos += i * sampsize;
+      towrite -= i;
+      toadd -= i * player->getrefresh();
+    }
+
+    // update dsp
+    towrite = mod.dsp_dosamples((short *)sndbuf,SNDBUFSIZE,(cfg.use16bit ? 16 : 8),(cfg.stereo ? 2 : 1),cfg.replayfreq);
+    towrite *= sampsize;
+
+    // wait for output plugin
+    while (mod.outMod->CanWrite() < towrite)
+      Sleep(10);
+
+    // write sound buffer
+    mod.outMod->Write(sndbuf,towrite);
+
+    // vis
+    mod.SAAddPCMData(sndbuf,(cfg.stereo ? 2 : 1),(cfg.use16bit ? 16 : 8),mod.outMod->GetWrittenTime());
+    mod.VSAAddPCMData(sndbuf,(cfg.stereo ? 2 : 1),(cfg.use16bit ? 16 : 8),mod.outMod->GetWrittenTime());
+
+    // update FileInfo, if needed
+    if (FileInfoWnd && (FileInfoPlayer == player))
+      PostMessage(FileInfoWnd,WM_AP_UPDATE,0,0);
+  }
+
+  free(sndbuf);
+
+  return 0;
+}
+
+void CALLBACK thread_opl2(UINT wTimerID,UINT msg,DWORD dwUser,DWORD dw1,DWORD dw2)
+{
+  static float refresh = (!plr.outtime) ? 0 : refresh; // :)
+
+  // paused ?
+  if (plr.paused)
+    return;
+
+  // seek requested ?
+  if (plr.seek != -1)
+  {
+    // backward seek ?
+    if (plr.seek < plr.outtime)
+    {
+      player->rewind(plr.subsong);
+      plr.outtime = 0.0f;
+    }
+
+    // seek to needed position
+    out.real->setquiet();
+    if (cfg.fastseek)
+      out.real->setnowrite();
+    while ((plr.outtime < plr.seek) && player->update())
+      plr.outtime += 1000/player->getrefresh();
+    if (cfg.fastseek)
+      out.real->setnowrite(false);
+    out.real->setquiet(false);
+
+    plr.seek = -1;
+  }
+
+  // update replayer
+  if (!player->update() && cfg.testloop)
+  {
+    PostMessage(mod.hMainWindow,WM_WA_MPEG_EOF,0,0);
+    return;
+  }
+
+  // refresh rate changed ?
+  if (refresh != player->getrefresh())
+  {
+    refresh = player->getrefresh();
+
+    timeKillEvent(plr.thread.opl2);
+    plr.thread.opl2 = timeSetEvent(UINT(1000/player->getrefresh()),0,thread_opl2,0,TIME_PERIODIC);
+  }
+
+  // update FileInfo, if needed
+  if (FileInfoWnd && (FileInfoPlayer == player))
+    PostMessage(FileInfoWnd,WM_AP_UPDATE,0,0);
+
+  plr.outtime += 1000/player->getrefresh();
+}
+
+DWORD WINAPI thread_disk(void *status)
+{
+  while (*(int *)status)
+    if (!plr.paused)
+    {
+      // seek requested ?
+      if (plr.seek != -1)
+      {
+        // backward seek ?
+        if (plr.seek < plr.outtime)
+        {
+          player->rewind(plr.subsong);
+          plr.outtime = 0.0f;
+        }
+
+        // seek to needed position
+        out.disk->setnowrite();
+        while ((plr.outtime < plr.seek) && player->update())
+          plr.outtime += 1000/player->getrefresh();
+        out.disk->setnowrite(false);
+
+        plr.seek = -1;
+      }
+
+      // update disk writer
+      out.disk->update(player);
+
+      // update replayer
+      if (!player->update() && cfg.testloop)
+      {
+        PostMessage(mod.hMainWindow,WM_WA_MPEG_EOF,0,0);
+        break;
+      }
+
+      plr.outtime += 1000/player->getrefresh();
+
+      // delay, if normal timing
+      if (cfg.stdtimer)
+      {
+        // update FileInfo, if needed
+        if (FileInfoWnd && (FileInfoPlayer == player))
+          PostMessage(FileInfoWnd,WM_AP_UPDATE,0,0);
+
+        Sleep((DWORD)(1000/player->getrefresh()));
+      }
+  }
+
+  return 0;
+}
+
+/* -------- winamp2 plugin functions ---------------------- */
+
+void wa2_Config(HWND hwndParent)
+{
+  PROPSHEETPAGE   psp[3];
+  PROPSHEETHEADER psh;
+
+  // "Output" page
+  psp[0].dwSize = sizeof(PROPSHEETPAGE);
+  psp[0].dwFlags = PSP_DEFAULT;
+  psp[0].hInstance = mod.hDllInstance;
+  psp[0].pszTemplate = MAKEINTRESOURCE(IDD_CFG_OUTPUT);
+  psp[0].pfnDlgProc = (DLGPROC)ConfigOutputDlgProc;
+
+  // "Playback" page
+  psp[1].dwSize = sizeof(PROPSHEETPAGE);
+  psp[1].dwFlags = PSP_DEFAULT;
+  psp[1].hInstance = mod.hDllInstance;
+  psp[1].pszTemplate = MAKEINTRESOURCE(IDD_CFG_PLAYBACK);
+  psp[1].pfnDlgProc = (DLGPROC)ConfigPlaybackDlgProc;
+
+  // "Formats" page
+  psp[2].dwSize = sizeof(PROPSHEETPAGE);
+  psp[2].dwFlags = PSP_DEFAULT;
+  psp[2].hInstance = mod.hDllInstance;
+  psp[2].pszTemplate = MAKEINTRESOURCE(IDD_CFG_FORMATS);
+  psp[2].pfnDlgProc = (DLGPROC)ConfigFormatsDlgProc;
+
+  // header
+  psh.dwSize = sizeof(PROPSHEETHEADER);
+  psh.dwFlags = PSH_NOAPPLYNOW | PSH_PROPSHEETPAGE;
+  psh.hwndParent = hwndParent;
+  psh.pszCaption = (LPSTR)"AdPlug :: Configuration";
+  psh.nPages = sizeof(psp) / sizeof(PROPSHEETPAGE);
+  psh.nStartPage = 0;
+  psh.ppsp = psp;
+
+  // display sheet
+  PropertySheet(&psh);
+
+  // test config
+  config_test();
+}
+
+void wa2_About(HWND hwndParent)
+{
+  DialogBox(mod.hDllInstance,MAKEINTRESOURCE(IDD_ABOUT),hwndParent,(DLGPROC)AboutDlgProc);
+}
+
+void wa2_GetFileInfo(char *file, char *title, int *length_in_ms)
+{
+  // info for current file ?
+  if ((!file) || (!*file))
+    file = plr.file;
+
+  // set default info
+  if (title)
+    strcpy(title,strrchr(file,'\\')+1);
+  if (length_in_ms)
+    *length_in_ms = 0;
+
+  // try to get real info
+  CPlayer *p = CAdPlug::factory(file,out.silent);
+  if (p)
+  {
+    if (title)
+      if (!p->gettitle().empty())
+        strcpy(title,p->gettitle().c_str());
+    if (length_in_ms)
+      *length_in_ms = CAdPlug::songlength(p,((file) ? plr.subsong : DFL_SUBSONG));
+    delete p;
+  }
+}
+
+int wa2_InfoBox(char *file, HWND hwndParent)
+{
+  // already displayed ?
+  if (FileInfoWnd)
+  {
+    // same file ?
+    if (!strcmp(FileInfoFile,file))
+      return 0;
+
+    // destroy player, if needed
+	if (FileInfoPlayer != player)
+      delete FileInfoPlayer;
+  }
+
+  // use new player
+  if (plr.playing && !strcmp(file,plr.file))
+	FileInfoPlayer = player;
+  else
+	FileInfoPlayer = CAdPlug::factory(file,out.silent);
+
+  // return, if error
+  if (!FileInfoPlayer)
+  {
+    if (FileInfoWnd)
+    {
+      DestroyWindow(FileInfoWnd);
+      FileInfoWnd = NULL;
+	}
+	return 0;
+  }
+
+  // create or refresh ?
+  if (FileInfoWnd)
+    PostMessage(FileInfoWnd,WM_AP_UPDATE_ALL,0,0);
+  else
+    FileInfoWnd = CreateDialogParam(mod.hDllInstance,MAKEINTRESOURCE(IDD_FILEINFO),hwndParent,(DLGPROC)FileInfoDlgProc,NULL);
+
+  // save file name
+  strcpy(FileInfoFile,file);
+
+  return 0;
+}
+
+int wa2_IsOurFile(char *fn)
+{
+  // is that filetype ignored ?
+  if (test_filetype(fn))
+    return 0;
+
+  // try to init player
+  CPlayer *p = CAdPlug::factory(fn,out.silent);
+  if (p)
+  {
+    delete p;
+    return 1;
+  }
+
+  return 0;
+}
+
+int wa2_Play(char *fn)
+{
+  int maxlatency;
+  DWORD tmpd;
+
+  // apply config
+  config_apply(true);
+
+  // new file ?
+  if (strcmp(fn,plr.file))
+  {
+    plr.subsong = DFL_SUBSONG;
+
+    strcpy(plr.file,fn);
+  }
+
+  // init MIDI, if opl2 used
+  midiout = NULL;
+  if (cfg.useoutput == opl2)
+    for (int i=0;i<midiOutGetNumDevs();i++)
+      if (midiOutGetDevCaps(i,&mc,sizeof(MIDIOUTCAPS)) == MMSYSERR_NOERROR)
+        if (mc.wTechnology == MOD_FMSYNTH)
+          if (midiOutOpen(&midiout,i,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR)
+          {
+            MessageBox(mod.hMainWindow,"The OPL2 chip is already in use by the MIDI sequencer!\n"
+                             "\n"
+                             "Please quit all running MIDI applications before going on.","AdPlug :: Error",MB_OK | MB_ICONERROR);
+            return 1;
+          }
+          else
+            break;
+
+  // init opl & player
+  player = CAdPlug::factory(plr.file,opl_init());
+  if (!player)
+  {
+    opl_done();
+    return 1;
+  }
+
+  // init player data
+  plr.paused = 0;
+  plr.maxsubsong = player->getsubsongs();
+  plr.outtime = 0.0f;
+  plr.fulltime = get_song_length(plr.file,plr.subsong);
+  plr.seek = -1;
+
+  maxlatency = 0;
+
+  // init output
+  switch (cfg.useoutput)
+  {
+    case emuts:
+//  case emuks:
+      maxlatency = mod.outMod->Open(cfg.replayfreq,(cfg.stereo ? 2 : 1),(cfg.use16bit ? 16 : 8),-1,-1);
+      if (maxlatency < 0)
+      {
+        delete player;
+        opl_done();
+        return 1;
+      }
+      mod.outMod->SetVolume(-666);
+      mod.SAVSAInit(maxlatency,cfg.replayfreq);
+      mod.VSASetInfo((cfg.stereo ? 2 : 1),cfg.replayfreq);
+      break;
+    case opl2:
+      out.real->setvolume(plr.volume);
+      break;
+  }
+
+  // send to winamp some info
+  mod.SetInfo(120000,(int)(cfg.replayfreq/1000),(cfg.stereo ? 2 : 1),1);
+
+  // rewind song
+  player->rewind(plr.subsong);
+
+  // init playing thread
+  switch (cfg.useoutput)
+  {
+    case emuts:
+      plr.thread.emuts = (HANDLE)CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)thread_emuts,(void *)&plr.playing,0,&tmpd);
+      SetThreadPriority(plr.thread.emuts,thread_priority[cfg.priority]);
+      break;
+//  case emuks:
+    case opl2:
+      timeGetDevCaps(&tc,sizeof(TIMECAPS));
+      timeBeginPeriod(tc.wPeriodMin);
+      plr.thread.opl2 = timeSetEvent((UINT)(1000/player->getrefresh()),0,thread_opl2,0,TIME_PERIODIC);
+      break;
+    case disk:
+      plr.thread.disk = (HANDLE)CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)thread_disk,(void *)&plr.playing,0,&tmpd);
+      SetThreadPriority(plr.thread.disk,thread_priority[cfg.priority]);
+      break;
+  }
+
+  // update FileInfoPlayer, if needed
+  if (FileInfoWnd && !strcmp(FileInfoFile,plr.file))
+  {
+    delete FileInfoPlayer;
+    FileInfoPlayer = player;
+  }
+
+  plr.playing = 1;
+
+  return 0;
+}
+
+void wa2_Pause()
+{
+  plr.paused = 1;
+}
+
+void wa2_UnPause()
+{
+  plr.paused = 0;
+}
+
+int wa2_IsPaused()
+{
+  return plr.paused;
+}
+
+void wa2_Stop()
+{
+  if (!plr.playing)
+    return;
+
+  plr.playing = 0;
+
+  // free playing thread
+  switch (cfg.useoutput)
+  {
+    case emuts:
+      if (WaitForSingleObject(plr.thread.emuts,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)
+        TerminateThread(plr.thread.emuts,0);
+      CloseHandle(plr.thread.emuts);
+      break;
+//  case emuks:
+    case opl2:
+      timeKillEvent(plr.thread.opl2);
+      timeEndPeriod(tc.wPeriodMin);
+      break;
+    case disk:
+      if (WaitForSingleObject(plr.thread.disk,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)
+        TerminateThread(plr.thread.disk,0);
+      CloseHandle(plr.thread.disk);
+      break;
+  }
+
+  // update FileInfoPlayer, if needed
+  if (FileInfoWnd && (FileInfoPlayer == player))
+  {
+	FileInfoPlayer = CAdPlug::factory(plr.file,out.silent);
+    if (!FileInfoPlayer)
+    {
+      DestroyWindow(FileInfoWnd);
+      FileInfoWnd = NULL;
+    }
+    else
+      PostMessage(FileInfoWnd,WM_AP_UPDATE,0,0);
+  }
+
+  // free output
+  switch (cfg.useoutput)
+  {
+    case emuts:
+//  case emuks:
+      mod.SAVSADeInit();
+      mod.outMod->Close();
+      break;
+    case opl2:
+      out.real->setvolume(63);
+      break;
+  }
+
+  // free player
+  delete player;
+
+  // free opl
+  opl_done();
+
+  // free MIDI, if was used
+  if (midiout)
+    midiOutClose(midiout);
+}
+
+int wa2_GetLength()
+{
+  return plr.fulltime;
+}
+
+int wa2_GetOutputTime()
+{
+  int outtime = 0;
+
+  switch (cfg.useoutput)
+  {
+    case emuts:
+//  case emuks:
+      outtime = mod.outMod->GetOutputTime();
+      break;
+    case opl2:
+    case disk:
+      outtime = plr.outtime;
+      break;
+  }
+
+  return outtime;
+}
+
+void wa2_SetOutputTime(int time_in_ms)
+{
+  plr.seek = time_in_ms;
+}
+
+void wa2_SetVolume(int volume)
+{
+  plr.volume = (int)(63 - volume/(255/63));
+
+  switch (cfg.useoutput)
+  {
+    case emuts:
+//  case emuks:
+      mod.outMod->SetVolume(volume);
+      break;
+    case opl2:
+      if (plr.playing)
+        out.real->setvolume(plr.volume);
+      break;
+  }
+}
+
+void wa2_SetPan(int pan)
+{
+  switch (cfg.useoutput)
+  {
+    case emuts:
+//  case emuks:
+      mod.outMod->SetPan(pan);
+      break;
+  }
+}
+
+void wa2_EQSet(int on, char data[10], int preamp)
+{
+}
+
+void wa2_Init()
+{
+#ifdef _DEBUG
+  debug_init();
+#endif
+
+  // init opls
+  out.silent = new CSilentopl;
+
+  // clear player data
+  memset(&plr,0,sizeof(plr));
+
+  // test & apply config
+  config_test();
+  config_apply(false);
+}
+
+void wa2_Quit()
+{
+  // free diskfile
+  if (diskfile)
+    free(diskfile);
+
+  // free opls
+  delete out.silent;
+
+  // save configuration
+  char bufstr[11];
+
+  WritePrivateProfileString("in_adlib","Frequency",_itoa(cfg.nextreplayfreq,bufstr,10),cfgfile);
+  WritePrivateProfileString("in_adlib","Resolution",_itoa(cfg.nextuse16bit,bufstr,10),cfgfile);
+  WritePrivateProfileString("in_adlib","Stereo",_itoa(cfg.nextstereo,bufstr,10),cfgfile);
+  WritePrivateProfileString("in_adlib","Output",_itoa(cfg.nextuseoutput,bufstr,10),cfgfile);
+  WritePrivateProfileString("in_adlib","Port",_itoa(cfg.nextadlibport,bufstr,16),cfgfile);
+  WritePrivateProfileString("in_adlib","Test",_itoa(cfg.nexttestopl2,bufstr,10),cfgfile);
+  WritePrivateProfileString("in_adlib","Directory",cfg.nextdiskdir,cfgfile);
+  WritePrivateProfileString("in_adlib","AutoEnd",_itoa(cfg.nexttestloop,bufstr,10),cfgfile);
+  WritePrivateProfileString("in_adlib","FastSeek",_itoa(cfg.nextfastseek,bufstr,10),cfgfile);
+  WritePrivateProfileString("in_adlib","Timer",_itoa(cfg.nextstdtimer,bufstr,10),cfgfile);
+  WritePrivateProfileString("in_adlib","Priority",_itoa(cfg.nextpriority,bufstr,10),cfgfile);
+
+  // save list of ignored filetypes
+  char *bufptr = (char *)malloc(FTSIZE);
+
+  memset(bufptr,0,FTSIZE);
+
+  strcat(bufptr,";");
+
+  for (int i=0;i<FTELEMCOUNT;i++)
+    if (filetypes[i].ignore)
+    {
+      strcat(bufptr,filetypes[i].extension);
+      strcat(bufptr,";");
+    }
+
+  WritePrivateProfileString("in_adlib","Ignore",bufptr,cfgfile);
+
+  // free exported list of filetypes
+  free(mod.FileExtensions);
+
+  // free diskdir
+  free(cfg.nextdiskdir);
+}
+
+extern "C" In_Module mod =
+{
+        IN_VER,
+        PLUGINVER,
+        0,
+        0,
+        NULL,
+        1,
+        1,
+        wa2_Config,
+        wa2_About,
+        wa2_Init,
+        wa2_Quit,
+        wa2_GetFileInfo,
+        wa2_InfoBox,
+        wa2_IsOurFile,
+        wa2_Play,
+        wa2_Pause,
+        wa2_UnPause,
+        wa2_IsPaused,
+        wa2_Stop,
+        wa2_GetLength,
+        wa2_GetOutputTime,
+        wa2_SetOutputTime,
+        wa2_SetVolume,
+        wa2_SetPan,
+        0,0,0,0,0,0,0,0,0,
+        0,0,
+        wa2_EQSet,
+        NULL,
+        0
+};
 
 extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 {
-	int				bufvalue;			// buffered value
-	char			inifile[MAX_PATH];	// path to plugin.ini
-	char			bufstring[5];		// small string buffer
-	LPOSVERSIONINFO	vers;				// os version information
-	unsigned int	i,extptr=0;			// indices
-	char			*strptr;			// pointer inside extensions string
-	char			*ftignore;			// file type ignoration list
+  int i;
 
-	// load configuration
-	getinifilename(inifile,MAX_PATH);	// retrieve full path to ini-file
-	if((bufvalue = GetPrivateProfileInt("AdPlug","ReplayFreq",0,inifile))) nextreplayfreq = bufvalue;
-	if((bufvalue = GetPrivateProfileInt("AdPlug","Use16Bit",-1,inifile)) != -1) nextuse16bit = bufvalue ? true : false;
-	if((bufvalue = GetPrivateProfileInt("AdPlug","UseHardware",-1,inifile)) != -1) nextusehardware = (enum outputs)bufvalue;
-	GetPrivateProfileString("AdPlug","AdlibPort","0",bufstring,5,inifile);
-	if(strcmp(bufstring,"0")) sscanf(bufstring,"%x",&nextadlibport);
-	if((bufvalue = GetPrivateProfileInt("AdPlug","AutoRewind",-1,inifile)) != -1) infplay = bufvalue ? true : false;
-	if((bufvalue = GetPrivateProfileInt("AdPlug","FastSeek",-1,inifile)) != -1) fastseek = bufvalue ? true : false;
-	if((bufvalue = GetPrivateProfileInt("AdPlug","NoTest",-1,inifile)) != -1) notest = bufvalue ? true : false;
-	if((bufvalue = GetPrivateProfileInt("AdPlug","Stereo",-1,inifile)) != -1) nextstereo = bufvalue ? true : false;
-	if((bufvalue = GetPrivateProfileInt("AdPlug","Priority",-1,inifile)) != -1) priority = bufvalue;
-	ftignore = (char *)malloc(i=strlen(FTIGNORE)+1);
-	while(GetPrivateProfileString("AdPlug","Ignore",FTIGNORE,ftignore,i,inifile) == i - 1)
-		ftignore = (char *)realloc(ftignore,++i);
+  // retrieve full path to config file
+  GetModuleFileName(GetModuleHandle("in_adlib"),cfgfile,MAX_PATH);
 
-	// parse file type ignoration list
-	for(i=0;alltypes[i].extension;i++) {
-		strptr = (char *)malloc(strlen(alltypes[i].extension)+3);
-		strcpy(strptr,";"); strcat(strptr,alltypes[i].extension); strcat(strptr,";");
-		if(strstr(upstr(ftignore),upstr(strptr)))
-			alltypes[i].ignore = true;
-		else
-			alltypes[i].ignore = false;
-		free(strptr);
-	}
-	free(ftignore);
+  memcpy(strrchr(cfgfile,'\\')+1,"plugin.ini\0",11);
 
-	// build up exported file types list
-	for(i=0;alltypes[i].extension;i++)	// determine string size
-		for(strptr = alltypes[i].extension;*strptr;strptr += strlen(strptr) + 1)
-			if(!alltypes[i].ignore)
-				extptr += strlen(strptr) + 1;
-			else
-				strptr += strlen(strptr) + 1;
-	mod.FileExtensions = (char *) malloc(extptr+1); extptr = 0;
-	for(i=0;alltypes[i].extension;i++)	// fill string
-		for(strptr = alltypes[i].extension;*strptr;strptr += strlen(strptr) + 1)
-			if(!alltypes[i].ignore) {
-				memcpy(mod.FileExtensions+extptr,strptr,strlen(strptr) + 1);
-				extptr += strlen(strptr) + 1;
-			} else
-				strptr += strlen(strptr) + 1;
-	mod.FileExtensions[extptr] = '\0';
+  // load configuration
+  char bufstr[11];
+  int  bufvalue;
 
-	// check platform
-	vers = (LPOSVERSIONINFO) malloc(sizeof(OSVERSIONINFO));
-	vers->dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(vers);
-	if(vers->dwPlatformId != VER_PLATFORM_WIN32_NT)
-		isnt = FALSE;
-	else {
-		isnt = TRUE;
-		nextusehardware = DFLEMU;	// never use hardware on NT
-	}
-	free(vers);
+  bufvalue = GetPrivateProfileInt("in_adlib","Frequency",DFL_REPLAYFREQ,cfgfile);
+  if (bufvalue != -1)
+    cfg.nextreplayfreq = bufvalue;
 
-	// detect adlib
-	if(nextusehardware >= opl2 && !notest) {
-		CRealopl	tmpadl(nextadlibport);
-		if(!tmpadl.detect())
-			nextusehardware = DFLEMU;
-		else
-			mod.UsesOutputPlug = 0;
-	}
+  bufvalue = GetPrivateProfileInt("in_adlib","Resolution",DFL_USE16BIT,cfgfile);
+  if (bufvalue != -1)
+    cfg.nextuse16bit = (bufvalue) ? true : false;
 
-    // detect xmplay
-	if (is_xmplay())
-      if (nextusehardware >= opl2)
-	  {
-        nextusehardware = DFLEMU;
-        mod.UsesOutputPlug = 1;
-        MessageBox(NULL,"OPL2 hardware replay is impossible under XMPLAY!\n\nSwitching to emulation mode.",ADPLUGVERS,MB_OK | MB_ICONERROR);
-	  }
+  bufvalue = GetPrivateProfileInt("in_adlib","Stereo",DFL_STEREO,cfgfile);
+  if (bufvalue != -1)
+    cfg.nextstereo = (bufvalue) ? true : false;
 
-	// set default values
-	replayfreq = nextreplayfreq;
-	usehardware = nextusehardware;
-	use16bit = nextuse16bit;
-	adlibport = nextadlibport;
-	stereo = nextstereo;
+  bufvalue = GetPrivateProfileInt("in_adlib","Output",DFL_USEOUTPUT,cfgfile);
+  if (bufvalue != -1)
+    cfg.nextuseoutput = (enum output)bufvalue;
 
-	return &mod;
+  GetPrivateProfileString("in_adlib","Port","0",bufstr,5,cfgfile);
+  if (strcmp(bufstr,"0"))
+    sscanf(bufstr,"%x",&cfg.nextadlibport);
+  else
+    cfg.nextadlibport = DFL_ADLIBPORT;
+
+  bufvalue = GetPrivateProfileInt("in_adlib","Test",DFL_TESTOPL2,cfgfile);
+  if (bufvalue != -1)
+    cfg.nexttestopl2 = (bufvalue) ? true : false;
+
+  cfg.nextdiskdir = (char *)malloc(_MAX_PATH);
+  GetPrivateProfileString("in_adlib","Directory",DFL_DISKDIR,cfg.nextdiskdir,_MAX_PATH,cfgfile);
+  if (!cfg.nextdiskdir[0] || !SetCurrentDirectory(cfg.nextdiskdir))
+    strcpy(cfg.nextdiskdir,DFL_DISKDIR);
+
+  bufvalue = GetPrivateProfileInt("in_adlib","AutoEnd",DFL_AUTOEND,cfgfile);
+  if (bufvalue != -1)
+	  cfg.nexttestloop = (bufvalue) ? true : false;
+
+  bufvalue = GetPrivateProfileInt("in_adlib","FastSeek",DFL_FASTSEEK,cfgfile);
+  if (bufvalue != -1)
+    cfg.nextfastseek = (bufvalue) ? true : false;
+
+  bufvalue = GetPrivateProfileInt("in_adlib","Timer",DFL_STDTIMER,cfgfile);
+  if (bufvalue != -1)
+    cfg.nextstdtimer = (bufvalue) ? true : false;
+
+  bufvalue = GetPrivateProfileInt("in_adlib","Priority",DFL_PRIORITY,cfgfile);
+  if (bufvalue != -1)
+    cfg.nextpriority = bufvalue;
+
+  // process list of ignored filetypes
+  char *bufptr = (char *)malloc(FTSIZE);
+
+  GetPrivateProfileString("in_adlib","Ignore",FTIGNORE,bufptr,FTSIZE,cfgfile);
+
+  bufptr = lowstring(bufptr);
+
+  for (i=0;i<FTELEMCOUNT;i++)
+  {
+    char chkext[sizeof(filetypes[0].extension)+2];
+
+    strcpy(chkext,";");
+    strcat(chkext,filetypes[i].extension);
+    strcat(chkext,";");
+
+    if (strstr(bufptr,chkext))
+      filetypes[i].ignore = true;
+  }
+
+  // build exported list of filetypes
+  unsigned int bufcpylen;
+
+  memset(bufptr,0,FTSIZE);
+
+  mod.FileExtensions = bufptr;
+
+  for (i=0;i<FTELEMCOUNT;i++)
+    if (!filetypes[i].ignore)
+    {
+      bufcpylen = strlen(filetypes[i].extension) + 1;
+      memcpy(bufptr,filetypes[i].extension,bufcpylen);
+      bufptr += bufcpylen;
+
+      bufcpylen = strlen(filetypes[i].description) + 1;
+      memcpy(bufptr,filetypes[i].description,bufcpylen);
+      bufptr += bufcpylen;
+    }
+
+  return &mod;
 }
