@@ -104,12 +104,8 @@ issue.
 
 Legal:
 ------
-AdPlug may not be sold, or sold as part of a commercial package without the
-express written permission of the author - Simon Peter (dn.tlp@gmx.net). This
-includes shareware. However, you may copy this plugin freely as long as no fee
-is charged and no modifications are made to the plugin itself or this readme
-file. For distribution on mass storage media, such as CD-ROM's, please contact
-me first.
+AdPlug is released under the terms and conditions of the LGPL. A recent copy
+of the LGPL can be found at http://www.gnu.org/copyleft/lesser.html.
 
 Release History:
 ----------------
