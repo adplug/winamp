@@ -92,7 +92,6 @@ class MyPlayer
 		CPlayer *				player;
 
 		HMIDIOUT				midiout;
-		int						mididev;
 
 		TIMECAPS				tc;
 		int						maxlatency;

@@ -174,7 +174,7 @@ void Config::check()
 	if (next.useoutput == opl2)
 		if (test_winnt())
 			if (!test_porttalk())
-				if(next.testopl2)
+				if (next.testopl2)
 				{
 					next.useoutput = DFL_EMU;
 					next.useoutputplug = true;
@@ -184,12 +184,13 @@ void Config::check()
 
 	if (next.useoutput == opl2)
 		if (next.testopl2)
-		{
-			next.useoutput = DFL_EMU;
-			next.useoutputplug = true;
+			if (!test_opl2())
+			{
+				next.useoutput = DFL_EMU;
+				next.useoutputplug = true;
 
-			MessageBox(NULL,MSGE_OPL2,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
-		}
+				MessageBox(NULL,MSGE_OPL2,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
+			}
 
 	if (next.useoutput == disk)
 		if (!next.stdtimer)
@@ -199,7 +200,7 @@ void Config::check()
 	if (next.useoutputplug > useoutputplug)
 		MessageBox(NULL,MSGA_WINAMP,"AdPlug :: Attention",MB_ICONINFORMATION | MB_TASKMODAL);
 
-	if(!use_database())
+	if (!use_database())
 		MessageBox(NULL,MSGC_DATABASE,"AdPlug :: Caution",MB_ICONWARNING | MB_TASKMODAL);
 }
 

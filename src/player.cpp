@@ -19,8 +19,8 @@
 
 #include "plugin.h"
 
-#define MSGE_MIDIBUSY "MIDI synthesizer already in use." "\n\n" \
-                      "Finish all MIDI applications, please."
+#define MSGE_MIDIBUSY "The OPL2 chip is already in use by the MIDI sequencer!\n\n" \
+                      "Please quit all running MIDI applications."
 
 extern HWND *myWindow;
 extern In_Module mod;
@@ -57,16 +57,19 @@ int MyPlayer::play(const char *fname)
 		MIDIOUTCAPS moc;
 
 		midiout = NULL;
-		mididev = -1;
+
+		printf("MyPlayer::play(): Number of MIDI devices: %d\n", midiOutGetNumDevs());
 
 		for (int i=0;i<midiOutGetNumDevs();i++)
 			if (midiOutGetDevCaps(i,&moc,sizeof(moc)) == MMSYSERR_NOERROR)
-				if (moc.wTechnology == MOD_FMSYNTH)
-					if (midiOutOpen(&midiout,mididev,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR)
+				if (moc.wTechnology == MOD_FMSYNTH) {
+					printf("MyPlayer::play(): FM Synth found! Device ID: %d Name: %s\n", i, moc.szPname);
+					if (midiOutOpen(&midiout,i,NULL,0,CALLBACK_NULL) != MMSYSERR_NOERROR && work.testopl2)
 					{
 						MessageBox(NULL,MSGE_MIDIBUSY,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
 						return 1;
 					}
+				}
 	}
 
     // init opl
@@ -147,10 +150,12 @@ int MyPlayer::is_playing()
 void MyPlayer::pause()
 {
 	plr.paused = 1;
+	if(work.useoutput == opl2) output.real->setquiet();
 }
 
 void MyPlayer::unpause()
 {
+	if(work.useoutput == opl2) output.real->setquiet(false);
 	plr.paused = 0;
 }
 
