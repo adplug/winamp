@@ -1,7 +1,7 @@
 AdPlug Winamp2 plugin v1.3
 Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>, et al.
 
-Website: http://adplug.sourceforge.net/winamp.shtml
+Website: http://adplug.sourceforge.net
 Module Archive: http://www.chiptune.de
 
 Description:
@@ -17,7 +17,14 @@ If you got the PiMPed version, everything should already be in place.
 
 For the classic zipped version, you need to extract the file "in_adlib.dll"
 from the archive to your Winamp plugin directory (on most machines this will
-be Winamp\Plugins).
+be C:\Program Files\Winamp\Plugins).
+
+If, after installation, the plugin won't show up in Winamp's input plugin
+dialog, and you know you installed it to the right place, your system maybe
+doesn't fulfill AdPlug's library requirements. You need at least the files
+MSVCRT.DLL, MSVCIRT.DLL and MSVCP60.DLL in your WINDOWS\SYSTEM directory. If
+you are missing one of these, you can find them on the Internet. Just start
+your favorite search engine to find them.
 
 Usage:
 ------
@@ -29,25 +36,51 @@ Configuration:
 --------------
 Configure AdPlug by doubleclicking on it in the
 Options|Preferences|Plug-ins|Input dialog (press Ctrl+P to go to the
-preferences dialog). The configuration should be a breeze, but there are
-some options that i need to explain further.
+preferences dialog).
 
-In the "Options" group, there are 3 options to set:
-"Autodetect Songend": Turning off this option makes the songs play endlessly -
-preserving the original loop points - just like the old modplayers did. Note
-that you can obviously forget about using playlists when this feature is
-turned off.
+Output Tab:
+-----------
+In the "Output" Tab, you can select between three different output methods.
+First, there is the emulated output (Ken Silverman's emulator is permanently
+disabled at the moment due to platform incompatibilities), with output options
+attached. If you got an OPL2 compatible soundcard, you can select the second
+option to utilize it, giving the OPL2 port as parameter. If you have problems
+with this setting, you can try to enable "No OPL2 testing" to bypass the
+hardware checks. At last, there's a Disk Writer that produces .RAW files
+that can also be played back by AdPlug. Underneath this setting, you can
+select the output path, all .RAW files will be written to. This setting is
+not to be confused with the .WAV Writer output plugin of Winamp itself. If
+you want .WAV files, use their output plugin with the Emulator setting instead.
 
-"Fast Seeks": This is only needed for hardware OPL2 replay. If seeking takes
+Playback Tab:
+-------------
+Here are 4 options to be set:
+"Autodetect song end": Turning off this option makes the songs play endlessly
+(preserving the original loop points), just like the old modplayers did. Note
+that you can obviously forget about using playlists when doing this.
+
+"Fast seek": This is only needed for hardware OPL2 replay. If seeking takes
 too long on your machine, you can turn on this option to make it significantly
 faster. The drawback with it is that the replayer won't preserve the module
 commands that would normally have been played in the time you skipped and the
 module may sound a bit wrong shortly after the seek.
 
-"Bypass all Hardware Tests": With this option turned on, the plugin won't
-complain about a nonexistant or already in use OPL2 board anymore. This can be
-useful to force the hardware replay on soundcards for which the OPL2
-autodetection fails.
+"Standard refresh rate": This is only needed for .RAW Disk Writer output. If
+this option is enabled, AdPlug will write the output to disk, but in the speed
+it would have played it, would a real output be in use. So this takes
+significantly longer.
+
+"Thread Priority": This can be used to make AdPlug a more or lesser important
+task in your system. Depending on your needs, this could be useful.
+
+Formats tab:
+------------
+In here, you can select all formats AdPlug should readily accept to replay.
+If you got other plugins to handle some of AdPlug's normally supported file
+types (MIDI is probably the best example), deselect the file types in here
+and AdPlug won't ever again try to play back these files, until you re-select
+the file types, of course. Remember to restart Winamp after you made changes,
+since this is sometimes necessary.
 
 Known Problems:
 ---------------
@@ -62,6 +95,8 @@ sound, when the emulator is used.
 
 Credits:
 --------
+The AdPlug Winamp2 plugin is created by the following people:
+
 Simon Peter <dn.tlp@gmx.net>
 Nikita V. Kalaganov <riven@ok.ru>
 
@@ -82,7 +117,7 @@ which is located at http://www.gnu.org.
 
 Release History:
 ----------------
-- v1.3 (2002-05-09)
+- v1.3 (2002-06-25)
   - OPL Disk Writer support
   - Completely new appearance
 - v1.2 (2002-03-28)
