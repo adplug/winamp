@@ -97,7 +97,7 @@ int				bequiet=0;							// should player send output to OPL2?
 HMIDIOUT		adlibmidi;							// Windows MIDI-Out handle
 UINT			timerhandle;						// Windows Multimedia Timer handle
 UINT			timerperiod;						// timer resolution cache
-int				volcache;							// volume cache for pause
+int				savevol;							// volume cache
 BOOL			isnt;								// 1 = running on Windows NT
 unsigned int	subsong=DFLSUBSONG;					// currently playing subsong
 unsigned int	maxsubsongs=1;						// maximum number of subsongs in current song
@@ -119,6 +119,8 @@ void setvolume(int volume)
 	else
 		if(realopl)
 			realopl->setvolume((int)(63 - volume/(255/63)));
+
+	savevol = (int)(63 - volume/(255/63));
 }
 
 char *upstr(char *str)
@@ -686,7 +688,7 @@ int play(char *fn)
 	switch(usehardware) {
 	case emuks: opl = kemuopl = new CKemuopl(replayfreq,use16bit,stereo); break;
 	case emuts: opl = emuopl = new CEmuopl(replayfreq,use16bit,stereo); break;
-	case opl2: opl = realopl = new CRealopl(adlibport); break;
+	case opl2: opl = realopl = new CRealopl(adlibport); realopl->setvolume(savevol); break;
 	}
 
 	// init file player
