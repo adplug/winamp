@@ -18,7 +18,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(1251)
+#pragma code_page(1252)
 #endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
@@ -36,12 +36,10 @@ BEGIN
     LTEXT           "AdPlug official website:\thttp://adplug.sourceforge.net\nGet modules at:\t\thttp://www.chiptune.de",
                     IDC_STATIC,12,91,272,16
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,66,284,22
-    LTEXT           "  This plugin is frontend for AdPlug, free OPL2 sound playing library:",
-                    IDC_STATIC,6,54,284,11,SS_CENTERIMAGE | SS_SUNKEN
-    CTEXT           "Winamp2 OPL2 input plugin v1.25, (c) 1999-2002 Simon Peter <dn.tlp@gmx.net>",
-                    IDC_STATIC,6,7,284,15,SS_CENTERIMAGE | SS_SUNKEN
-    LTEXT           "  Look in the file AUTHORS to see additional authors.\n  This plugin is released under the GNU LGPL (see http://www.gnu.org/licenses/lgpl.txt).",
-                    IDC_STATIC,6,23,284,18
+    LTEXT           "  This plugin is released under the GNU LGPL (see http://www.gnu.org/licenses/lgpl.txt).\n  This plugin is a frontend for AdPlug, a free OPL2 sound playing library:",
+                    IDC_STATIC,6,46,284,19,SS_SUNKEN
+    CTEXT           "AdPlug Winamp2 Plugin v1.3\n\nCopyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>\nCopyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>",
+                    IDC_STATIC,6,7,284,38,SS_SUNKEN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,88,284,23
 END
 
@@ -232,7 +230,7 @@ IDB_LOGO                BITMAP  DISCARDABLE     "adplug.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
-// German (Germany) resources
+// Deutsch (Deutschland) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
 #ifdef _WIN32
@@ -265,7 +263,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // German (Germany) resources
+#endif    // Deutsch (Deutschland) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

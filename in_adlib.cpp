@@ -12,10 +12,10 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
 
-/*
-  in_adlib.cpp - Winamp2 input plugin, (c) 1999-2002 Simon Peter <dn.tlp@gmx.net>
+  in_adlib.cpp - AdPlug Winamp2 input plugin
+  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c)	2002 Nikita V. Kalaganov <riven@ok.ru>
 */
 
 #include <windows.h>
@@ -31,12 +31,12 @@ extern "C"
   #include "frontend.h"
 }
 
-#include "..\adplug-1.2\src\adplug.h"
-#include "..\adplug-1.2\src\emuopl.h"
-//#include "kemuopl.h"
-#include "..\adplug-1.2\src\diskopl.h"
-#include "..\adplug-1.2\src\realopl.h"
-#include "..\adplug-1.2\src\silentopl.h"
+#include <adplug/adplug.h>
+#include <adplug/emuopl.h>
+//#include <adplug/kemuopl.h>
+#include <adplug/diskopl.h>
+#include <adplug/realopl.h>
+#include <adplug/silentopl.h>
 
 #include "resource.h"
 
@@ -50,7 +50,7 @@ enum    output              {emuts, emuks, disk, opl2};
 
         /* constants */
 
-#define PLUGINVER           "Winamp2 OPL2 plugin v1.25"
+#define PLUGINVER           "AdPlug Winamp2 Plugin v1.3"
 //
 #define SNDBUFSIZE          576
 //
@@ -1209,6 +1209,7 @@ int wa2_Play(char *fn)
   plr.outtime = 0.0f;
   plr.fulltime = get_song_length(plr.file,plr.subsong);
   plr.seek = -1;
+  plr.playing = 1;
 
   maxlatency = 0;
 
@@ -1264,8 +1265,6 @@ int wa2_Play(char *fn)
     delete FileInfoPlayer;
     FileInfoPlayer = player;
   }
-
-  plr.playing = 1;
 
   return 0;
 }
@@ -1412,10 +1411,6 @@ void wa2_EQSet(int on, char data[10], int preamp)
 
 void wa2_Init()
 {
-#ifdef _DEBUG
-  debug_init();
-#endif
-
   // init opls
   out.silent = new CSilentopl;
 
@@ -1510,6 +1505,10 @@ extern "C" In_Module mod =
 extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 {
   int i;
+
+#ifdef _DEBUG
+  debug_init();
+#endif
 
   // retrieve full path to config file
   GetModuleFileName(GetModuleHandle("in_adlib"),cfgfile,MAX_PATH);
