@@ -194,7 +194,7 @@ int MyPlayer::get_length(const char *fname, int subsong)
 	if (!p)
 		return 0;
 
-	int fulltime = CAdPlug::songlength(p,subsong);
+	int fulltime = p->songlength(subsong);
 
 	delete p;
 

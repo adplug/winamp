@@ -120,10 +120,10 @@ bool FileTypes::grata(const char *fname)
 	return true;
 }
 
-void FileTypes::set_ignore_list(const char *list)
+void FileTypes::set_ignore_list(const char *ignore_list)
 {
 	char *str,*spos;
-	str = spos = (char *)list;
+	str = spos = (char *)ignore_list;
 
 	while (*str)
 	{

@@ -222,9 +222,9 @@ const char *Config::get_ignored()
 	return work.ignored.c_str();
 }
 
-void Config::set_ignored(const char *list)
+void Config::set_ignored(const char *ignore_list)
 {
-	next.ignored = list;
+	next.ignored = ignore_list;
 }
 
 bool Config::test_opl2()

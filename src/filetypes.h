@@ -33,7 +33,7 @@ class FileTypes
 		void				set_ignore(int i, bool val);
 
 		const char *		get_ignore_list();
-		void				set_ignore_list(const char *list);
+		void				set_ignore_list(const char *ignore_list);
 
 		const char *		get_name(int i);
 

@@ -17,6 +17,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#include <string>
+
 #define DFL_SUBSONG 0
 #define DFL_SNDBUFSIZE 576
 
@@ -58,7 +60,7 @@ class Config
 		void			set(t_config_data *cfg);
 
 		const char *	get_ignored();
-		void			set_ignored(const char *list);
+		void			set_ignored(const char *ignore_list);
 
 		bool			useoutputplug;
 
