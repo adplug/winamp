@@ -17,6 +17,9 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+// Get rid of VC compiler limitation warnings
+#pragma warning(disable: 4786)
+
 // windows
 #include <windows.h>
 #include <windowsx.h>
