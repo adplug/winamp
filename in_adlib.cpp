@@ -70,6 +70,7 @@ tFiletypes alltypes[] = {
 	"sng\0SNGPlay Files (*.SNG)\0",false,
 	"ksm\0Ken Silverman's Music Format (*.KSM)\0",false,
 	"m\0Ultima 6 Music Format (*.M)\0",false,
+	"mkj\0MKJamz Audio Files (*.MKJ)\0",false,
 	NULL
 };
 

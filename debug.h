@@ -6,7 +6,7 @@
  * debug_init() opens a console window and initializes console output.
  */
 
-//#include <stdio.h>
+#include <stdio.h>
 #include <io.h>
 #include <windows.h>
 #include <fcntl.h>

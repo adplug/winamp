@@ -195,6 +195,10 @@ SOURCE=..\adplug\players\mid.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\adplug\players\mkj.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\adplug\players\mtk.cpp
 # End Source File
 # Begin Source File
@@ -320,6 +324,10 @@ SOURCE=..\adplug\players\mid.h
 # Begin Source File
 
 SOURCE=..\adplug\players\mididata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\adplug\players\mkj.h
 # End Source File
 # Begin Source File
 
