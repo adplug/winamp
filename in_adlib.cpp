@@ -420,20 +420,43 @@ void opl_done()
 
 BOOL APIENTRY AboutTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-/*
-  // riven-mage: uncomment this, if you need bitmap transparency
-
   BYTE *logo = (BYTE *)LockResource(LoadResource(mod.hDllInstance,FindResource(mod.hDllInstance,MAKEINTRESOURCE(IDB_LOGO),RT_BITMAP)));
 
   int x,y;
   BYTE bmobc;
   BYTE *bmptr;
-*/
 
   char url1[50],url2[50];
 
+#ifdef _DEBUG
+  printf("AboutTabDlgProc(): Message 0x%08X received.\n",message);
+#endif
+
   switch (message)
   {
+    case WM_SETFONT:
+
+      // apply transparency to logo
+      if (AboutTabIndex == 0)
+	  {
+        *(DWORD *)&logo[0x424] = GetSysColor(COLOR_BTNFACE);
+
+        bmptr = &logo[0x428];
+        bmobc = *bmptr;
+
+        for(x=0;x<(*(WORD *)&logo[4]);x++)
+          for(y=0;y<(*(WORD *)&logo[8]);y++)
+		  {
+            if (*bmptr == bmobc)
+              *bmptr = 0xff;
+
+            bmptr++;
+          }
+      }
+
+      return TRUE;
+
+
     case WM_INITDIALOG:
 
       // move tab content on top
@@ -464,27 +487,6 @@ BOOL APIENTRY AboutTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM 
           return TRUE;
       }
   }
-
-/*
-  // riven-mage: uncomment this, if you need bitmap transparency
-
-  if (AboutTabIndex == 0)
-  {
-    *(DWORD *)&logo[0x424] = GetSysColor(COLOR_BTNFACE);
-
-    bmptr = &logo[0x428];
-    bmobc = *bmptr;
-
-    for(x=0;x<(*(WORD *)&logo[4]);x++)
-      for(y=0;y<(*(WORD *)&logo[8]);y++)
-      {
-        if (*bmptr == bmobc)
-          *bmptr = 0xff;
-
-        bmptr++;
-      }
-  }
-*/
 
   return FALSE;
 }
