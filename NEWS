@@ -1,0 +1,119 @@
+Changes for version 1.4 (2002-mm-dd)
+   - Major cosmetic liftoff :)
+   - Config data moved to player's .ini
+   - Smarter fileinfo :)
+   - Support for the PortTalk device driver to enable hardware replay on
+     Windows NT/2000/XP.
+
+   * Using AdPlug library v1.3:
+      - New or corrected IMF timer rates for the following games:
+         - Duke Nukem 2
+      - New format support:
+         - SNG: Adlib Tracker 1.0
+         - CFF: BoomTracker 4.0
+         - DTM: Defy Adlib Tracker
+         - DMO: Twin TrackPlayer
+
+Changes for version 1.3 (2002-06-25)
+   - OPL Disk Writer support
+   - Completely new appearance
+
+Changes for version 1.2 (2002-03-28)
+   - Fixed file info box on other files, while playing
+   - Some cosmetic fixes
+   - XMPlay compatibility fixes
+
+   * Using AdPlug library v1.2:
+      - Added a whole bunch of new players: SAT, ROL, SNG, XAD, XMS, MAD
+      - SA2 player now handles version 7 files.
+      - New OPL disk writer that creates RdosPlay RAW files.
+
+Changes for version 1.1 (2001-10-26)
+   - Fixed vis with high timer rates
+   - No more messing in Winamp's own memory
+
+   * Using AdPlug library v1.1:
+      - Added MKJ, DFM and BAM players.
+      - Removed Ken Silverman's YM3812 emulator due to portability issues.
+      - Fixed memory leak in SNG player.
+
+Changes for version 1.0 (2001-07-08)
+   - AdPlug is open-source now!
+   - Some small fixes
+
+Changes for version 0.10 (2001-05-25)
+   - Fixes to severe bugs in v0.9, i apologize for that
+   - Inverted usage of "Formats" configuration tab to conform to the usual
+     practice of selecting file types in Winamp input plugins
+   - Added another new emulator
+
+Changes for version 0.9 (2001-05-19)
+   - Support for KSM & M file formats
+   - Support for alternate IMF format
+   - Now detecting IMF timer rates on the fly
+   - Support for new A2M file versions 4, 5 & 8 + additional fixes
+   - New file info box
+
+Changes for version 0.8 (2000-12-24)
+   - Support for IMF & SNG file formats
+   - Player system generalized and completely rewritten in C++
+   - Thread priority is selectable now
+   - Stereo support
+   - Removed OPL2+vis feature
+
+Changes for version 0.7 (2000-08-21)
+   - Support for A2M, HSP, CMF, MID, LAA & SCI file formats
+   - Removed the old emulator, the new one just sounds so much better
+   - Updates to the D00 player, including support for rare v0.10 files
+   - Revamped the whole config dialog box and added file formats
+     management
+   - Fixes to the new OPL2 emulator. The sound should now be pretty
+     original
+   - Miscellaneous fixups, like DSP support, URL handling and more
+
+Changes for version 0.6 (2000-07-14)
+   - Support for AMD, D00 & RAD modules
+   - Added "Bypass all hardware tests" option to the config dialog
+   - Improved HSC, S3M & SA2 replayers
+   - Many internal rewrites & speed-ups
+   - Added a whole new OPL2 emulator and further improved the old one
+
+Changes for version 0.5 (2000-05-08)
+   - Support for RAW & MTK file formats
+   - Fixed hardware volume control
+   - Fixed bug that caused noise when generating big playlists while
+     playing
+   - Fixed some replay bugs in OPL2 emulator & added drum samples
+   - Added HSC Composer v3.0 features to HSC replay
+   - Fixed WinNT/Win2000 compatibility
+
+Changes for version 0.4 (2000-03-16)
+   - Support for SAdT2 modules
+   - Fixed numerous hardware replay problems and improved player
+     significantly
+   - Fixed most HSC & S3M replay errors
+   - Added "Autodetect Songend" and "Fast Seeks" options to the config
+     dialog
+   - Plus the usual minor fixes'n'improvements
+
+Changes for version 0.3 (2000-02-11)
+   - Preliminary support for S3M AdLib modules
+   - OPL2 hardware support
+   - Lots of fixes + many small new features
+
+Changes for version 0.2 (2000-01-03)
+   - First release in the new millennium, and it still works! ;)
+   - Added a whopping new About box
+   - Configuration is supported now, incl. saving to plugin.ini (tough job
+     getting around with those old INI files)
+   - Added th File-Info box with future support for subsongs
+
+Changes for version 0.1 (1999-12-18)
+   - Seeking is supported now, and i fixed some annoying bugs
+   - Rewrote the HSC player a bit, it now supports file length detection
+     and can rewind it's modules
+
+Changes for version 0.0 (1999-12-12)
+   - First Release
+   - Some poor support for HSC modules. At least, it should play all the
+     files
