@@ -1185,9 +1185,10 @@ int wa2_Play(char *fn)
     for (int i=0;i<midiOutGetNumDevs();i++)
       if (midiOutGetDevCaps(i,&mc,sizeof(MIDIOUTCAPS)) == MMSYSERR_NOERROR)
         if (mc.wTechnology == MOD_FMSYNTH)
-          if (midiOutOpen(&midiout,i,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR)
-          {
-            MessageBox(mod.hMainWindow,"The OPL2 chip is already in use by the MIDI sequencer!\n"
+		  if(cfg.testopl2)
+            if (midiOutOpen(&midiout,i,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR)
+			{
+              MessageBox(mod.hMainWindow,"The OPL2 chip is already in use by the MIDI sequencer!\n"
                              "\n"
                              "Please quit all running MIDI applications before going on.","AdPlug :: Error",MB_OK | MB_ICONERROR);
             return 1;
