@@ -1,9 +1,4 @@
-AdPlug v1.1 by Simon Peter (dn.tlp@gmx.net)
-  - YM3812 emulator by Tatsuyuki Satoh (tatuyuki@tky.3web.ne.jp)
-  - Second YM3812 emulator by Ken Silverman (kjs@lems.brown.edu)
-  - MID, CMF, LAA & SCI replayer by Phil Hassey (philhassey@hotmail.com)
-  - Ultima 6 Music replayer by Marc Winterrowd (nodling@yahoo.com)
-  - many file format docs supplied by Death Adder (death-adder@juno.com)
+AdPlug Winamp plugin v1.1, (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>
 
 Website       : http://adplug.sourceforge.net
 Module Archive: http://www.chiptune.de
@@ -14,42 +9,6 @@ AdPlug is a Winamp input plugin. Winamp is a fast, high-fidelity audio player
 for Windows (get it at www.winamp.com). AdPlug plays music, originally
 composed for the AdLib (OPL2) audio board, on top of an OPL2 emulator or by
 using the real hardware. No OPL chip is required for playback.
-
-Supported formats:
-------------------
-AdPlug implements unique file replayers for each supported format in order to
-achieve the best possible replay quality. Below is a list of all currently
-supported file formats along with information about possible replay issues.
-
-- A2M: AdLib Tracker 2 by subz3ro
-  - Unimplemented commands (version 1-4): FF1 - FF9, FAx - FEx
-  - Unimplemented commands (version 5-8): Gxy, Hxy, Kxy - &xy
-  - In version 5-8 files, instrument panning & the flags byte is ignored
-  - Only SixPack or uncompressed files are supported
-- AMD: AMUSIC Adlib Tracker by Elyssis
-- CMF: Creative Music File Format by Creative Technology
-  - Unimplemented: AdLib rhythm mode
-- D00: EdLib by Vibrants
-  - Bugs: Hard restart SR sometimes sound wrong
-- HSC: HSC Adlib Composer by Hannes Seifert, HSC-Tracker by Electronic Rats
-- HSP: HSC Packed by Number Six / Aegis Corp.
-- IMF: Apogee IMF File Format
-- KSM: Ken Silverman's Music Format
-- LAA: LucasArts AdLib Audio File Format by LucasArts
-  - Bugs: Some volumes are a bit off
-- M: Ultima 6 Music Format
-- MID: MIDI Audio File Format
-- MTK: MPU-401 Trakker by SuBZeR0
-- S3M: Screamtracker 3 by Future Crew
-  - Bugs: Extra Fine Slides (EEx, FEx) & Fine Vibrato (Uxy) are inaccurate
-- SCI: Sierra's AdLib Audio File Format
-  - Bugs: Some instruments are messed up
-- SNG: SNGPlay by BUGSY of OBSESSION
-- RAD: Reality ADlib Tracker by Reality
-- RAW: RdosPlay RAW file format by RDOS
-  - Unimplemented: OPL3 register writes (not possible with AdLib)
-- SA2: Surprise! Adlib Tracker 2 by Surprise! Productions
-  - Unimplemented: Version 7 files (i don't have any)
 
 Installation:
 -------------
@@ -102,15 +61,11 @@ a well-known "problem" with software mixing, hearable when the composer plays
 the same sound on multiple channels. Hardware mixing is unaffected by this
 issue.
 
-Legal:
-------
-AdPlug is released under the terms and conditions of the LGPL. A recent copy
-of the LGPL can be found at http://www.gnu.org/copyleft/lesser.html.
-
 Release History:
 ----------------
-- v1.1 (2001-09-26)
+- v1.1 (2001-10-17)
   - Fixed vis with high timer rates
+  - No more messing in Winamp's own memory
 - v1.0 (2001-07-08)
   - AdPlug is open-source now!
   - Some small fixes
