@@ -1,4 +1,4 @@
-AdPlug Winamp plugin v1.5
+AdPlug Winamp plugin v1.6
 
 Copyright (c) 1999 - 2004 Simon Peter <dn.tlp@gmx.net>
 Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
@@ -113,3 +113,16 @@ driver can be downloaded from http://www.beyondlogic.org/porttalk/porttalk.htm.
 After downloading the driver, please read the enclosed PDF file for
 installation instructions. I strongly recommend the manual installation method,
 using the registry file!
+
+The emulator license issue:
+---------------------------
+AdPlug uses MAME's fmopl OPL2 emulator. While this official distribution
+includes an old LGPL'd version of the emulator, which was developed by
+Tatsuyuki Satoh alone, who relicensed this version under the LGPL, there is
+a patch available at:
+
+http://www.informatik.uni-oldenburg.de/~dyna/adplug/
+
+that replaces the old version by the latest version from the MAME source
+distribution. The new version features improved emulation quality, but is
+licensed under the MAME license, which restricts commercial redistribution.

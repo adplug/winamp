@@ -213,7 +213,7 @@ int MyPlayer::get_position()
 	switch (work.useoutput)
 	{
 		case emuts:
-//		case emuks:
+		case emuks:
 			outtime = mod.outMod->GetOutputTime();
 			break;
 		case opl2:
@@ -240,7 +240,7 @@ void MyPlayer::set_volume(int vol)
 	switch (work.useoutput)
 	{
 		case emuts:
-//		case emuks:
+		case emuks:
 			mod.outMod->SetVolume(vol);
 			break;
 		case opl2:
@@ -258,7 +258,7 @@ void MyPlayer::set_panning(int pan)
 	switch (work.useoutput)
 	{
 		case emuts:
-//		case emuks:
+		case emuks:
 			mod.outMod->SetPan(pan);
 			break;
 	}
@@ -270,6 +270,8 @@ Copl *MyPlayer::opl_init()
 
 	if (work.useoutput == emuts)
 		opl = output.emu = new CEmuopl(work.replayfreq,work.use16bit,work.stereo);
+	if (work.useoutput == emuks)
+		opl = output.emu = new CKemuopl(work.replayfreq,work.use16bit,work.stereo);
 	if (work.useoutput == opl2)
 		opl = output.real = new CRealopl(work.adlibport);
 	if (work.useoutput == disk)
@@ -282,6 +284,8 @@ void MyPlayer::opl_done()
 {
 	if (work.useoutput == emuts)
 		delete output.emu;
+	if (work.useoutput == emuks)
+		delete output.emu;
 	if (work.useoutput == opl2)
 		delete output.real;
 	if (work.useoutput == disk)
@@ -293,7 +297,7 @@ bool MyPlayer::output_init()
 	switch (work.useoutput)
 	{
 		case emuts:
-//		case emuks:
+		case emuks:
 			maxlatency = mod.outMod->Open(work.replayfreq,(work.stereo ? 2 : 1),(work.use16bit ? 16 : 8),-1,-1);
 			if (maxlatency < 0)
 				return false;
@@ -314,7 +318,7 @@ void MyPlayer::output_done()
 	switch (work.useoutput)
 	{
 		case emuts:
-//		case emuks:
+		case emuks:
 			mod.SAVSADeInit();
 			mod.outMod->Close();
 			break;
@@ -331,12 +335,12 @@ bool MyPlayer::thread_init()
 	switch (work.useoutput)
 	{
 		case emuts:
+		case emuks:
 			thread.emuts = (HANDLE)CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)callback_emuts,(void *)this,0,&tmpdword);
 			if (!thread.emuts)
 				return false;
 			SetThreadPriority(thread.emuts,thread_priority[work.priority]);
 			break;
-//		case emuks:
 		case opl2:
 			timeGetDevCaps(&tc,sizeof(tc));
 			timeBeginPeriod(tc.wPeriodMin);
@@ -360,11 +364,11 @@ void MyPlayer::thread_done()
 	switch (work.useoutput)
 	{
 		case emuts:
+		case emuks:
 			if (WaitForSingleObject(thread.emuts,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)
 				TerminateThread(thread.emuts,0);
 			CloseHandle(thread.emuts);
 			break;
-//		case emuks:
 		case opl2:
 			timeKillEvent(thread.opl2);
 			timeEndPeriod(tc.wPeriodMin);

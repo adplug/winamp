@@ -95,8 +95,7 @@ BEGIN
     CONTROL         "Emulator 1 (by &Tatsuyuki Satoh)",IDC_OUTTS,"Button",
                     BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,7,116,10
     CONTROL         "Emulator 2 (by &Ken Silverman)",IDC_OUTKS,"Button",
-                    BS_AUTORADIOBUTTON | WS_DISABLED | WS_TABSTOP,7,17,110,
-                    10
+                    BS_AUTORADIOBUTTON | WS_TABSTOP,7,17,110,10
     CONTROL         "&OPL2 at port ",IDC_OUTOPL2,"Button",BS_AUTORADIOBUTTON | 
                     WS_TABSTOP,7,76,53,8
     CONTROL         "&Disk Writer (RAW format)",IDC_OUTDISK,"Button",

@@ -28,12 +28,12 @@
 #include <winioctl.h>
 
 // adplug
-#include <adplug\adplug.h>
-#include <adplug\diskopl.h>
-#include <adplug\emuopl.h>
-//#include <adplug/kemuopl.h>
-#include <adplug\realopl.h>
-#include <adplug\silentopl.h>
+#include <adplug/adplug.h>
+#include <adplug/diskopl.h>
+#include <adplug/emuopl.h>
+#include <adplug/kemuopl.h>
+#include <adplug/realopl.h>
+#include <adplug/silentopl.h>
 
 // stl
 #include <string>
@@ -57,9 +57,9 @@ using namespace std;
 #include "gui_link.h"
 #include "gui_tip.h"
 
-#include "rsrc\resource.h"
+#include "rsrc/resource.h"
 
-#define PLUGIN_VER "AdPlug/Winamp v1.5"
+#define PLUGIN_VER "AdPlug/Winamp v1.6"
 
 #define WM_UPDATE     WM_USER+1
 #define WM_UPDATE_ALL WM_USER+2
