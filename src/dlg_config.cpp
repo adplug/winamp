@@ -425,8 +425,9 @@ BOOL APIENTRY GuiDlgConfig::FormatsTabDlgProc(HWND hwndDlg, UINT message, WPARAM
 
 			// add tooltips
 			tooltip->add(GetDlgItem(hwndDlg,IDC_FORMATLIST),"formatlist","All supported formats are listed here\r\nDeselected formats will be ignored by AdPlug to make room for other plugins to play these.");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FTWORKAROUND),"ftworkaround","Enable this if you can't play any sample based S3M files with Nullsoft's Module Decoder plugin anymore");
 			tooltip->add(GetDlgItem(hwndDlg,IDC_FTSELALL),  "ftselall",  "Select all formats");
-			tooltip->add(GetDlgItem(hwndDlg,IDC_FTDESELALL),"ftdeselall","Deselect all formats");
+			tooltip->add(GetDlgItem(hwndDlg,IDC_FTDESELALL),  "ftdeselall",  "Deselect all formats");
 
 			// fill listbox
 			for (i=0;i<filetypes.get_size();i++)
@@ -434,6 +435,10 @@ BOOL APIENTRY GuiDlgConfig::FormatsTabDlgProc(HWND hwndDlg, UINT message, WPARAM
 				SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_ADDSTRING,0,(LPARAM)filetypes.get_name(i));
 				SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_SETSEL,(WPARAM)!filetypes.get_ignore(i),i);
 			}
+
+			// set checkboxes
+			if(next.s3m_workaround)
+				CheckDlgButton(hwndDlg, IDC_FTWORKAROUND, BST_CHECKED);
 
 			// move tab content on top
 			SetWindowPos(hwndDlg,HWND_TOP,3,22,0,0,SWP_NOSIZE);
@@ -449,6 +454,9 @@ BOOL APIENTRY GuiDlgConfig::FormatsTabDlgProc(HWND hwndDlg, UINT message, WPARAM
 			// read listbox
 			for (i=0;i<filetypes.get_size();i++)
 				filetypes.set_ignore(i,SendDlgItemMessage(hwndDlg,IDC_FORMATLIST,LB_GETSEL,i,0) ? false : true);
+
+			// get checkboxes
+			next.s3m_workaround = (IsDlgButtonChecked(hwndDlg,IDC_FTWORKAROUND) == BST_CHECKED);
 
 			return 0;
 

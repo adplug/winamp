@@ -46,13 +46,6 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Cursor
-//
-
-IDC_HAND2               CURSOR  DISCARDABLE     "hand.cur"
 #endif    // Russisch resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -85,11 +78,14 @@ IDD_CFG_FORMATS DIALOG DISCARDABLE  0, 0, 264, 151
 STYLE WS_CHILD | WS_VISIBLE
 FONT 8, "MS Sans Serif"
 BEGIN
-    LISTBOX         IDC_FORMATLIST,7,7,250,121,LBS_MULTIPLESEL | WS_VSCROLL | 
+    LISTBOX         IDC_FORMATLIST,7,7,250,108,LBS_MULTIPLESEL | WS_VSCROLL | 
                     WS_TABSTOP
     PUSHBUTTON      "&Select all",IDC_FTSELALL,7,130,101,14,BS_MULTILINE
     PUSHBUTTON      "&Deselect all",IDC_FTDESELALL,156,130,101,14,
                     BS_MULTILINE
+    CONTROL         "S3M File workaround for Nullsoft Module Decoder Plugin",
+                    IDC_FTWORKAROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    10,115,194,10
 END
 
 IDD_CFG_OUTPUT DIALOG DISCARDABLE  0, 0, 264, 151
@@ -391,6 +387,13 @@ BEGIN
 END
 
 IDR_TEXT_HISTORY        TEXT    DISCARDABLE     "..\\..\\news"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_HAND2               CURSOR  DISCARDABLE     "hand.cur"
 #endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 

@@ -214,10 +214,13 @@ extern In_Module mod =
 
 extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 {
+	t_config_data	cfg;
+
 #ifdef _DEBUG
 	debug_init();
 #endif
 	config.load();
+	config.get(&cfg);
 
 	mod.UsesOutputPlug = config.useoutputplug;
 
@@ -244,7 +247,8 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 	filetypes.add("rad",    "Reality Adlib Tracker Modules (*.RAD)");
 	filetypes.add("raw",    "Rdos RAW Files (*.RAW)");
 	filetypes.add("rol",    "Adlib Visual Composer Modules (*.ROL)");
-	filetypes.add("s3m",    "Scream Tracker 3 Modules (*.S3M)");
+	if(!cfg.s3m_workaround)
+		filetypes.add("s3m",    "Scream Tracker 3 Modules (*.S3M)");
 	filetypes.add("sat",    "Surprise! Adlib Tracker Modules (*.SAT)");
 	filetypes.add("sa2",    "Surprise! Adlib Tracker 2 Modules (*.SA2)");
 	filetypes.add("sci",    "Sierra Adlib Audio Files (*.SCI)");

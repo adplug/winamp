@@ -47,6 +47,7 @@ struct t_config_data
 	bool           useoutputplug;
 	string         db_file;
 	bool           usedb;
+	bool           s3m_workaround;
 };
 
 class Config

@@ -31,21 +31,22 @@
 #define MSGE_XMPLAY    "You can't use own output under XMPlay." "\n\n" \
                        "Emulated output forced."
 
-#define DFL_EMU        emuts
-#define DFL_REPLAYFREQ 44100
-#define DFL_USE16BIT   true
-#define DFL_STEREO     false
-#define DFL_USEOUTPUT  DFL_EMU
-#define DFL_ADLIBPORT  0x388
-#define DFL_TESTOPL2   true
-#define DFL_TESTLOOP   true
-#define DFL_FASTSEEK   false
-#define DFL_PRIORITY   4
-#define DFL_STDTIMER   true
-#define DFL_DISKDIR    "C:\\"
-#define DFL_IGNORED    "17;"
-#define DFL_DBFILE     "adplug.db"
-#define DFL_USEDB      true
+#define DFL_EMU				emuts
+#define DFL_REPLAYFREQ		44100
+#define DFL_USE16BIT		true
+#define DFL_STEREO			false
+#define DFL_USEOUTPUT		DFL_EMU
+#define DFL_ADLIBPORT		0x388
+#define DFL_TESTOPL2		true
+#define DFL_TESTLOOP		true
+#define DFL_FASTSEEK		false
+#define DFL_PRIORITY		4
+#define DFL_STDTIMER		true
+#define DFL_DISKDIR			"C:\\"
+#define DFL_IGNORED			"17;"
+#define DFL_DBFILE			"adplug.db"
+#define DFL_USEDB			true
+#define DFL_S3M_WORKAROUND	true
 
 CAdPlugDatabase *Config::mydb = 0;
 
@@ -132,6 +133,9 @@ void Config::load()
 	if (bufval != -1)
 		next.usedb = bufval ? true : false;
 
+	bufval = GetPrivateProfileInt("in_adlib","s3mworkaround",DFL_S3M_WORKAROUND,fname.c_str());
+	if (bufval != -1) next.s3m_workaround = bufval ? true : false;
+
 	apply(false);
 }
 
@@ -153,6 +157,7 @@ void Config::save()
 	WritePrivateProfileString("in_adlib","ignored",next.ignored.c_str(),fname.c_str());
 	WritePrivateProfileString("in_adlib","database",next.db_file.c_str(),fname.c_str());
 	WritePrivateProfileString("in_adlib","usedb",_itoa(next.usedb,bufstr,10),fname.c_str());
+	WritePrivateProfileString("in_adlib","s3mworkaround",_itoa(next.s3m_workaround,bufstr,10),fname.c_str());
 }
 
 void Config::check()
@@ -208,19 +213,20 @@ void Config::apply(bool testout)
 {
 	check();
 
-	work.replayfreq = next.replayfreq;
-	work.use16bit   = next.use16bit;
-	work.stereo     = next.stereo;
-	work.adlibport  = next.adlibport;
-	work.testopl2   = next.testopl2;
-	work.testloop   = next.testloop;
-	work.fastseek   = next.fastseek;
-	work.priority   = next.priority;
-	work.stdtimer   = next.stdtimer;
-	work.diskdir    = next.diskdir;
-	work.ignored    = next.ignored;
-	work.db_file	= next.db_file;
-	work.usedb		= next.usedb;
+	work.replayfreq		= next.replayfreq;
+	work.use16bit		= next.use16bit;
+	work.stereo			= next.stereo;
+	work.adlibport		= next.adlibport;
+	work.testopl2		= next.testopl2;
+	work.testloop		= next.testloop;
+	work.fastseek		= next.fastseek;
+	work.priority		= next.priority;
+	work.stdtimer		= next.stdtimer;
+	work.diskdir		= next.diskdir;
+	work.ignored		= next.ignored;
+	work.db_file		= next.db_file;
+	work.usedb			= next.usedb;
+	work.s3m_workaround	= next.s3m_workaround;
 
 	if (!testout || (next.useoutputplug <= useoutputplug))
 	{
