@@ -1,5 +1,5 @@
 /*
- * AdPlug - Winamp input plugin, (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+ * AdPlug - Winamp input plugin, (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>, et al.
  */
 
 #include <fstream.h>
@@ -13,16 +13,16 @@
 #include <prsht.h>
 #include "resource.h"
 
-#include "adplug.h"							// AdPlug helper object
+#include <adplug/adplug.h>					// AdPlug helper object
 extern "C" {
 #include "in2.h"							// Winamp plugin stuff
 #include "frontend.h"						// Winamp frontend IPC stuff
 }
 
 // OPL devices
-#include "emuopl.h"							// Tatsuyuki's OPL2 emulator
-#include "realopl.h"						// hardware OPL2
-#include "silentopl.h"						// completely silent OPL2
+#include <adplug/emuopl.h>					// Tatsuyuki's OPL2 emulator
+#include <adplug/realopl.h>					// hardware OPL2
+#include <adplug/silentopl.h>				// completely silent OPL2
 
 // output IDs (first all emulators, then hardware only, then hardware + emulators in the same order)
 enum outputs {emuks, emuts, opl2, opl2emuks, opl2emuts};
@@ -53,30 +53,34 @@ typedef struct {
 } tFiletypes;
 
 tFiletypes alltypes[] = {
-	"laa\0LucasArts AdLib Audio Files (*.LAA)\0",false,
-	"mid\0MIDI Audio Files (*.MID)\0",true,
-	"cmf\0Creative Music Files (*.CMF)\0",false,
-	"sci\0Sierra AdLib Audio Files (*.SCI)\0",false,
-	"d00\0EdLib Modules (*.D00)\0",false,
-	"s3m\0Screamtracker 3 AdLib Modules (*.S3M)\0",false,
-	"sat\0Surprise! Adlib Tracker Modules (*.SAT)\0",false,
-	"sa2\0Surprise! Adlib Tracker 2 Modules (*.SA2)\0",false,
-	"raw\0RdosPlay RAW Files (*.RAW)\0",false,
-	"mtk\0MPU-401 Trakker Modules (*.MTK)\0",false,
-	"amd\0AMUSIC Adlib Tracker Modules (*.AMD)\0",false,
-	"rad\0Reality ADlib Tracker Modules (*.RAD)\0",false,
 	"a2m\0AdLib Tracker 2 Modules (*.A2M)\0",false,
-	"hsp\0Packed HSC-Tracker Modules (*.HSP)\0",false,
-	"hsc\0HSC-Tracker Modules (*.HSC)\0",false,
-	"imf;wlf\0Apogee IMF Files (*.IMF;*.WLF)\0",false,
-	"sng\0SNGPlay Files (*.SNG)\0",false,
-	"ksm\0Ken Silverman's Music Format (*.KSM)\0",false,
-	"m\0Ultima 6 Music Format (*.M)\0",false,
-	"mkj\0MKJamz Audio Files (*.MKJ)\0",false,
-	"dfm\0Digital-FM Modules (*.DFM)\0",false,
-	"lds\0LOUDNESS Modules (*.LDS)\0",false,
+	"amd\0AMUSIC Adlib Tracker Modules (*.AMD)\0",false,
 	"bam\0Bob's Adlib Music Format (*.BAM)\0",false,
+	"cmf\0Creative Music Files (*.CMF)\0",false,
+	"d00\0EdLib Modules (*.D00)\0",false,
+	"dfm\0Digital-FM Modules (*.DFM)\0",false,
+	"hsc\0HSC-Tracker Modules (*.HSC)\0",false,
+	"hsp\0Packed HSC-Tracker Modules (*.HSP)\0",false,
+	"imf;wlf\0Apogee IMF Files (*.IMF;*.WLF)\0",false,
+	"ksm\0Ken Silverman's Music Format (*.KSM)\0",false,
+	"laa\0LucasArts AdLib Audio Files (*.LAA)\0",false,
+//	"lds\0LOUDNESS Modules (*.LDS)\0",false,
+	"m\0Ultima 6 Music Format (*.M)\0",false,
+	"mad\0Mlat Adlib Tracker (*.MAD)\0",false,
+	"mid\0MIDI Audio Files (*.MID)\0",true,
+	"mkj\0MKJamz Audio Files (*.MKJ)\0",false,
+	"mtk\0MPU-401 Trakker Modules (*.MTK)\0",false,
+	"rad\0Reality ADlib Tracker Modules (*.RAD)\0",false,
+	"raw\0RdosPlay RAW Files (*.RAW)\0",false,
 	"rol\0Adlib Visual Composer (*.ROL)\0",false,
+	"s3m\0Screamtracker 3 AdLib Modules (*.S3M)\0",false,
+	"sa2\0Surprise! Adlib Tracker 2 Modules (*.SA2)\0",false,
+	"sat\0Surprise! Adlib Tracker Modules (*.SAT)\0",false,
+	"sci\0Sierra AdLib Audio Files (*.SCI)\0",false,
+	"sng\0SNGPlay Files (*.SNG)\0",false,
+	"sng\0Faust Music Creator (*.SNG)\0",false,
+	"xad\0eXotic ADlib Format (*.XAD)\0",false,
+	"xms\0XMS-Tracker (*.XMS)\0",false,
 	NULL
 };
 
@@ -107,6 +111,7 @@ BOOL			isnt;								// 1 = running on Windows NT
 unsigned int	subsong=DFLSUBSONG;					// currently playing subsong
 unsigned int	maxsubsongs=1;						// maximum number of subsongs in current song
 HWND			fidialog=0;							// Handle to File Info modeless Dialog box
+CPlayer			*fidialogp;							// Player for File Info functions
 
 // configuration variables
 int				replayfreq, nextreplayfreq = REPLAYFREQ, priority = PRIORITY;
@@ -183,7 +188,7 @@ BOOL APIENTRY AboutBoxProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 	switch (message) {
 	case WM_INITDIALOG:
 		SetDlgItemText(hwndDlg,IDC_ABOUT,
-		 ADPLUGVERS ", (c) 1999 - 2001 Simon Peter <dn.tlp@gmx.net>");
+		 ADPLUGVERS ", (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>, et al.");
 		return TRUE;
 
 	case WM_PAINT:
@@ -217,20 +222,18 @@ BOOL APIENTRY AboutBoxProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 BOOL APIENTRY FileInfoProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	unsigned int	subsongpos,i,spos=0;		// subsong slider position cache
-	static CPlayer	*p;
 	char			tmpstr[10];
 	std::string		str;
 
 	switch (message) {
 	case WM_INITDIALOG:
-		p = (CPlayer *)lParam;	// get player
 		// set title/author/type states
-		SetDlgItemText(hwndDlg,IDC_TITLE,p->gettitle().c_str());
-		SetDlgItemText(hwndDlg,IDC_AUTHOR,p->getauthor().c_str());
-		SetDlgItemText(hwndDlg,IDC_TYPE,p->gettype().c_str());
+		SetDlgItemText(hwndDlg,IDC_TITLE,fidialogp->gettitle().c_str());
+		SetDlgItemText(hwndDlg,IDC_AUTHOR,fidialogp->getauthor().c_str());
+		SetDlgItemText(hwndDlg,IDC_TYPE,fidialogp->gettype().c_str());
 
 		// set "song description" state
-		str = p->getdesc();					// convert ANSI \n to Windows \r\n
+		str = fidialogp->getdesc();					// convert ANSI \n to Windows \r\n
 		while((spos = str.find('\n',spos)) != str.npos) {
 			str.insert(spos,"\r");
 			spos += 2;
@@ -239,13 +242,13 @@ BOOL APIENTRY FileInfoProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 
 		// set "instrument names" state
 		str.erase();
-		for(i=0;i<p->getinstruments();i++) {
+		for(i=0;i<fidialogp->getinstruments();i++) {
 			if(i < 9)
 				sprintf(tmpstr,"0%u - ",i+1);
 			else
 				sprintf(tmpstr,"%u - ",i+1);
-			str += tmpstr + p->getinstrument(i);
-			if(i < p->getinstruments() - 1)
+			str += tmpstr + fidialogp->getinstrument(i);
+			if(i < fidialogp->getinstruments() - 1)
 				str += "\r\n";
 		}
 		SetDlgItemText(hwndDlg,IDC_INSTNAMES,str.c_str());
@@ -258,16 +261,16 @@ BOOL APIENTRY FileInfoProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 		SetDlgItemInt(hwndDlg,IDC_SUBSONGPOS,subsong + 1,FALSE);
 
 		// set "song info" state
-		SetDlgItemInt(hwndDlg,IDC_INSTS,p->getinstruments(),FALSE);
+		SetDlgItemInt(hwndDlg,IDC_INSTS,fidialogp->getinstruments(),FALSE);
 		// fall through...
 
 	case WM_AP_UPDATE:
 		// update "song info" state
-		sprintf(tmpstr,"%u / %u",p->getorder(),p->getorders()); SetDlgItemText(hwndDlg,IDC_POSITION,tmpstr);
-		sprintf(tmpstr,"%u / %u",p->getpattern(),p->getpatterns()); SetDlgItemText(hwndDlg,IDC_PATTERN,tmpstr);
-		SetDlgItemInt(hwndDlg,IDC_ROW,p->getrow(),FALSE);
-		SetDlgItemInt(hwndDlg,IDC_SPEED,p->getspeed(),FALSE);
-		sprintf(tmpstr,"%.2f Hz",p->getrefresh()); SetDlgItemText(hwndDlg,IDC_TIMER,tmpstr);
+		sprintf(tmpstr,"%u / %u",fidialogp->getorder(),fidialogp->getorders()); SetDlgItemText(hwndDlg,IDC_POSITION,tmpstr);
+		sprintf(tmpstr,"%u / %u",fidialogp->getpattern(),fidialogp->getpatterns()); SetDlgItemText(hwndDlg,IDC_PATTERN,tmpstr);
+		SetDlgItemInt(hwndDlg,IDC_ROW,fidialogp->getrow(),FALSE);
+		SetDlgItemInt(hwndDlg,IDC_SPEED,fidialogp->getspeed(),FALSE);
+		sprintf(tmpstr,"%.2f Hz",fidialogp->getrefresh()); SetDlgItemText(hwndDlg,IDC_TIMER,tmpstr);
 		return TRUE;
 
 	case WM_COMMAND:
@@ -276,6 +279,8 @@ BOOL APIENTRY FileInfoProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPa
 		case IDCANCEL:					// Close button pressed?
 			DestroyWindow(hwndDlg);		// close Window
 			fidialog = 0;
+			if(!playing)
+				delete fidialogp;
 			return TRUE;
 		}
 
@@ -497,13 +502,13 @@ void config(HWND hwndParent)
 	if(nextadlibport != adlibport || (nextusehardware > usehardware && nextusehardware >= opl2))
 		if(isnt && !notest) {
 			nextusehardware = DFLEMU;
-			MessageBox(hwndParent,"OPL2 Hardware replay is disabled under Windows NT! Switching to emulation mode.",ADPLUGVERS,
+			MessageBox(hwndParent,"OPL2 Hardware replay is disabled under Windows NT!\n\nSwitching to emulation mode.",ADPLUGVERS,
 				MB_OK | MB_ICONERROR);
 		} else {
 			CRealopl	tmpadl(nextadlibport);
 			if(!tmpadl.detect() && !notest) {
 				nextusehardware = DFLEMU;
-				MessageBox(hwndParent,"No OPL2 detected on specified port! Switching to emulation mode.",ADPLUGVERS,
+				MessageBox(hwndParent,"No OPL2 detected on specified port!\n\nSwitching to emulation mode.",ADPLUGVERS,
 					MB_OK | MB_ICONERROR);
 			}
 		}
@@ -520,16 +525,15 @@ int infoDlg(char *fn, HWND hwnd)
 	if(fidialog)
 		return 0;
 
-	if(playing && !strcmp(fn,lastfn))
-		fidialog = CreateDialogParam(mod.hDllInstance,MAKEINTRESOURCE(IDD_FILEINFO),hwnd,(DLGPROC)FileInfoProc,(LPARAM)player);
-	else {
-		CSilentopl	sopl;
-		CPlayer		*p = CAdPlug::factory(fn,&sopl);
-		if(p) {
-			fidialog = CreateDialogParam(mod.hDllInstance,MAKEINTRESOURCE(IDD_FILEINFO),hwnd,(DLGPROC)FileInfoProc,(LPARAM)p);
-			delete p;
-		}
-	}
+	CSilentopl	sopl;
+
+	if (playing && !strcmp(fn,lastfn))
+		fidialogp = player;
+	else
+		fidialogp = CAdPlug::factory(fn,&sopl);
+
+	if (fidialogp)
+		fidialog = CreateDialogParam(mod.hDllInstance,MAKEINTRESOURCE(IDD_FILEINFO),hwnd,(DLGPROC)FileInfoProc,NULL);
 
 	return 0;
 }
@@ -675,7 +679,7 @@ int play(char *fn)
 			if(midiOutGetDevCaps(i,midicaps,sizeof(MIDIOUTCAPS)) == MMSYSERR_NOERROR)
 				if(midicaps->wTechnology == MOD_FMSYNTH)
 					if(midiOutOpen(&adlibmidi,i,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR) {
-						MessageBox(mod.hMainWindow,"The OPL2 chip is already in use by the MIDI sequencer!\n"
+						MessageBox(mod.hMainWindow,"The OPL2 chip is already in use by the MIDI sequencer!\n\n"
 						"Please quit all running MIDI applications before going on.",ADPLUGVERS,MB_OK | MB_ICONERROR);
 						free(midicaps);
 						return 1;	// don't play now
@@ -742,7 +746,7 @@ void stop() {
 	if(usehardware < opl2 && thread_handle != INVALID_HANDLE_VALUE) {	// stop player thread
 		killDecodeThread=1;
 		if(WaitForSingleObject(thread_handle,INFINITE) == WAIT_TIMEOUT) {
-			MessageBox(mod.hMainWindow,"Error terminating player thread!",ADPLUGVERS,MB_OK);
+			MessageBox(mod.hMainWindow,"Error terminating player thread!",ADPLUGVERS,MB_OK | MB_ICONERROR);
 			TerminateThread(thread_handle,0);
 		}
 		CloseHandle(thread_handle);
@@ -806,7 +810,7 @@ void CALLBACK TimerThread(UINT wTimerID,UINT msg,DWORD dwUser,DWORD dw1,DWORD dw
 		oldrefresh = player->getrefresh();
 	}
 
-	if(fidialog) // update file info box, if displayed
+	if(fidialog && (fidialogp == player)) // update file info box, if displayed
 		PostMessage(fidialog,WM_AP_UPDATE,0,0);
 
 /*	if(usehardware > opl2) {	// update vis
@@ -943,7 +947,7 @@ DWORD WINAPI __stdcall DecodeThread(void *b)
 		mod.SAAddPCMData(sndbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
 		mod.VSAAddPCMData(sndbuf,stereo ? 2 : 1,use16bit ? 16 : 8,mod.outMod->GetWrittenTime());
 
-		if(fidialog) // update file info box, if displayed
+		if(fidialog && (fidialogp == player)) // update file info box, if displayed
 			PostMessage(fidialog,WM_AP_UPDATE,0,0);
 	}
 	free(sndbuf);
@@ -986,6 +990,28 @@ extern "C" In_Module mod = {
 	NULL,								// setinfo
 	0									// out_mod
 };
+
+bool is_xmplay()
+{
+  int i;
+  char pe[256];
+
+  // copy command line
+  strncpy(pe,GetCommandLine(),256); pe[255]=0;
+
+  // get exec's full name
+  i=1;
+  while (pe[i] != 34)
+    pe[i-1]=pe[i++];
+  pe[--i]=0;
+
+  // find exec's short name
+  while (pe[i-1] != 92)
+	i--;
+
+  // is it 'xmplay.exe' ?
+  return (strnicmp(&pe[i],"XMPLAY.EXE",10)) ? false : true;
+}
 
 extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 {
@@ -1062,6 +1088,15 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
 		else
 			mod.UsesOutputPlug = 0;
 	}
+
+    // detect xmplay
+	if (is_xmplay())
+      if (nextusehardware >= opl2)
+	  {
+        nextusehardware = DFLEMU;
+        mod.UsesOutputPlug = 1;
+        MessageBox(NULL,"OPL2 hardware replay is impossible under XMPLAY!\n\nSwitching to emulation mode.",ADPLUGVERS,MB_OK | MB_ICONERROR);
+	  }
 
 	// set default values
 	replayfreq = nextreplayfreq;

@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 newpst.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib winmm.lib comctl32.lib adplug.lib /nologo /subsystem:windows /dll /profile /machine:I386 /out:"C:\Programme\Winamp\Plugins\in_adlib.dll" /libpath:"..\adplug\Release"
+# ADD LINK32 newpst.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib winmm.lib comctl32.lib adplug.lib /nologo /subsystem:windows /dll /profile /machine:I386 /out:"Release\in_adlib.dll" /libpath:"..\adplug\Release"
 # SUBTRACT LINK32 /debug /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "in_adlib - Win32 Debug"
@@ -82,7 +82,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib winmm.lib comctl32.lib adplug.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"C:\Programme\Winamp\Plugins\in_adlib.dll" /libpath:"..\adplug\Debug"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib winmm.lib comctl32.lib adplugd.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"Debug\in_adlib.dll" /libpath:"..\adplug\Debug"
 # SUBTRACT LINK32 /nodefaultlib
 
 !ENDIF 
@@ -119,15 +119,7 @@ SOURCE=.\in_adlib.rc
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
 # Begin Source File
 
-SOURCE=..\adplug\adplug.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\debug.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\emuopl.h
 # End Source File
 # Begin Source File
 
@@ -143,15 +135,7 @@ SOURCE=.\out.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\adplug\realopl.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\resource.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\adplug\silentopl.h
 # End Source File
 # End Group
 # Begin Group "Ressourcen-Dateien"
