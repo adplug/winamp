@@ -58,6 +58,7 @@ tFiletypes alltypes[] = {
 	"sci\0Sierra AdLib Audio Files (*.SCI)\0",false,
 	"d00\0EdLib Modules (*.D00)\0",false,
 	"s3m\0Screamtracker 3 AdLib Modules (*.S3M)\0",false,
+	"sat\0Surprise! Adlib Tracker Modules (*.SAT)\0",false,
 	"sa2\0Surprise! Adlib Tracker 2 Modules (*.SA2)\0",false,
 	"raw\0RdosPlay RAW Files (*.RAW)\0",false,
 	"mtk\0MPU-401 Trakker Modules (*.MTK)\0",false,
