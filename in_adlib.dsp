@@ -128,6 +128,10 @@ SOURCE=..\adplug\players\d00.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\adplug\players\dfm.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\adplug\emuopl.cpp
 # End Source File
 # Begin Source File
@@ -272,6 +276,10 @@ SOURCE=..\adplug\players\d00.h
 # Begin Source File
 
 SOURCE=.\debug.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\adplug\players\dfm.h
 # End Source File
 # Begin Source File
 
