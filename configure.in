@@ -18,8 +18,9 @@ AC_PROG_CXX
 
 # Check for needed libraries.
 AC_CHECK_LIB(stdc++,main,,AC_MSG_ERROR([libstdc++ not installed]))
-AC_CHECK_LIB(binio,main,,AC_MSG_ERROR([libbinio not installed]))
-AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([AdPlug not installed]))
+#AC_CHECK_LIB(binio,main,,AC_MSG_ERROR([libbinio not installed]))
+#AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([AdPlug not installed]))
+PKG_CHECK_MODULES([adplug], [adplug >= 1.6])
 
 # Sanitize some compiler features, which may be broken...
 AC_C_CONST

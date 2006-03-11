@@ -8,12 +8,14 @@ libin_adlib_la_SOURCES = callback.cpp config.cpp config.h debug.h \
 
 libin_adlib_la_LDFLAGS = -no-undefined -lwinmm -lgdi32 -lcomdlg32
 
-libin_adlib_la_LIBADD = in_adlib.lo
+libin_adlib_la_LIBADD = in_adlib.lo $(adplug_LIBS)
+
+AM_CPPFLAGS = $(adplug_CFLAGS)
 
 EXTRA_DIST = in_adlib.dsp vc6inst.bat
 
 LTRCCOMPILE = $(LIBTOOL) --mode=compile $(RC) $(DEFS) $(DEFAULT_INCLUDES) \
 	$(INCLUDES)
 
-.rc.o:
+.rc.lo:
 	$(LTRCCOMPILE) -i $^ -o $@
