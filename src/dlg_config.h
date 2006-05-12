@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -19,25 +19,25 @@
 
 class GuiDlgConfig
 {
-	public:
+ public:
 
-		void					open(HWND parent);
+  void	open(HWND parent);
 
-	private:
+ private:
 
-		static BOOL APIENTRY	DlgProc_Wrapper(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
-		static BOOL APIENTRY	TabDlgProc_Wrapper(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+  static BOOL APIENTRY	DlgProc_Wrapper(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+  static BOOL APIENTRY	TabDlgProc_Wrapper(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
-		BOOL APIENTRY			DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
-		BOOL APIENTRY			OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
-		BOOL APIENTRY			PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
-		BOOL APIENTRY			FormatsTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+  BOOL APIENTRY	DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+  BOOL APIENTRY	OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+  BOOL APIENTRY	PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+  BOOL APIENTRY	FormatsTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
-		HWND					tab_hwnd;
-		int						tab_index;
+  HWND			tab_hwnd;
+  int			tab_index;
 
-		t_config_data			next;
+  t_config_data		next;
 
-		bool					cancelled;
-		string					tmpxdiskdir;
+  bool			cancelled;
+  string		tmpxdiskdir;
 };

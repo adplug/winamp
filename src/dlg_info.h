@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -19,32 +19,32 @@
 
 class GuiDlgInfo
 {
-	public:
+ public:
 
-		GuiDlgInfo();
+  GuiDlgInfo();
 
-		int						open(const char *file, HWND parent);
+  int	open(const char *file, HWND parent);
 
-		void					dock();
-		void					undock();
+  void	dock();
+  void	undock();
 
-		void					update(bool all = false);
+  void	update(bool all = false);
 
-	private:
+ private:
 
-		static BOOL APIENTRY	DlgProc_Wrapper(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+  static BOOL APIENTRY	DlgProc_Wrapper(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
-		BOOL APIENTRY			DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+  BOOL APIENTRY		DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
-		string					fileinfo_file;
-		CPlayer *				fileinfo_player;
-		HWND					fileinfo_hwnd;
+  string	fileinfo_file;
+  CPlayer *	fileinfo_player;
+  HWND		fileinfo_hwnd;
 
-		unsigned int			fi_order;
-		unsigned int			fi_pattern;
-		unsigned int			fi_row;
-		unsigned int			fi_speed;
-		float					fi_refresh;
+  unsigned int	fi_order;
+  unsigned int	fi_pattern;
+  unsigned int	fi_row;
+  unsigned int	fi_speed;
+  float		fi_refresh;
 
-		CSilentopl				silent;
+  CSilentopl	silent;
 };

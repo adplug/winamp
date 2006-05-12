@@ -20,7 +20,13 @@ AC_PROG_CXX
 AC_CHECK_LIB(stdc++,main,,AC_MSG_ERROR([libstdc++ not installed]))
 #AC_CHECK_LIB(binio,main,,AC_MSG_ERROR([libbinio not installed]))
 #AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([AdPlug not installed]))
-PKG_CHECK_MODULES([adplug], [adplug >= 1.6])
+dnl PKG_CHECK_MODULES([adplug], [adplug >= 1.6])
+
+PKG_CHECK_MODULES([adplug], [adplug >= 2.0],,[
+AC_MSG_WARN([You seem to be using a version of AdPlug prior to 2.0. \
+I will try to do the old-style library search for which i cannot check \
+versions. Please bear in mind that i am requiring at least version 1.4.])
+AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([*** AdPlug not installed ***]))])
 
 # Sanitize some compiler features, which may be broken...
 AC_C_CONST

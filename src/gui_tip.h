@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -19,35 +19,34 @@
 
 class GuiCtrlTooltip
 {
-	public:
+ public:
 
-		GuiCtrlTooltip(HWND parent);
-		~GuiCtrlTooltip();
+  GuiCtrlTooltip(HWND parent);
+  ~GuiCtrlTooltip();
 
-		void					add(HWND hwnd, const char *title, const char *text);
+  void	add(HWND hwnd, const char *title, const char *text);
 
-		void					trigger(HWND hwnd);
+  void	trigger(HWND hwnd);
 
-	private:
+ private:
 
-		void					remove(int i);
+  void	remove(int i);
 
-		static LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam);
+  static LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam);
 
-		void					show(int i);
-		void					hide(int i);
+  void	show(int i);
+  void	hide(int i);
 
-		struct t_tooltip_data
-		{
-			vector<HWND>		hwnd;
-			vector<WNDPROC>		proc;
-			vector<char *>		text;
-			vector<char *>		title;
-		} work;
+  struct t_tooltip_data {
+    vector<HWND>	hwnd;
+    vector<WNDPROC>	proc;
+    vector<char *>	text;
+    vector<char *>	title;
+  } work;
 
-		HWND					tooltip_hwnd;
-		HWND					trigger_hwnd;
-		HWND					parent_hwnd;
+  HWND	tooltip_hwnd;
+  HWND	trigger_hwnd;
+  HWND	parent_hwnd;
 
-		POINT					pt1;
+  POINT	pt1;
 };

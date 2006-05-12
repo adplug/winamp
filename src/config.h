@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -22,65 +22,63 @@
 #define DFL_SUBSONG 0
 #define DFL_SNDBUFSIZE 576
 
-enum t_output
-{
-	emuts,
-	emuks,
-	opl2,
-	disk
+enum t_output {
+  emuts,
+  emuks,
+  opl2,
+  disk
 };
 
-struct t_config_data
-{
-	int            replayfreq;
-	bool           use16bit;
-	bool           stereo;
-	enum t_output  useoutput;
-	unsigned short adlibport;
-	bool           testopl2;
-	bool           testloop;
-	bool           fastseek;
-	int            priority;
-	int            stdtimer;
-	string         diskdir;
-	string         ignored;
-	bool           useoutputplug;
-	string         db_file;
-	bool           usedb;
-	bool           s3m_workaround;
+struct t_config_data {
+  int            replayfreq;
+  bool           use16bit;
+  bool           stereo;
+  enum t_output  useoutput;
+  unsigned short adlibport;
+  bool           testopl2;
+  bool           testloop;
+  bool           fastseek;
+  int            priority;
+  int            stdtimer;
+  string         diskdir;
+  string         ignored;
+  bool           useoutputplug;
+  string         db_file;
+  bool           usedb;
+  bool           s3m_workaround;
 };
 
 class Config
 {
-	public:
+ public:
 
-		Config();
+  Config();
 
-		void			load();
-		void			save();
+  void		load();
+  void		save();
 
-		void			get(t_config_data *cfg);
-		void			set(t_config_data *cfg);
+  void		get(t_config_data *cfg);
+  void		set(t_config_data *cfg);
 
-		const char *	get_ignored();
-		void			set_ignored(const char *ignore_list);
+  const char *	get_ignored();
+  void		set_ignored(const char *ignore_list);
 
-		bool			useoutputplug;
+  bool		useoutputplug;
 
-	private:
+ private:
 
-		void			apply(bool testout);
-		bool			use_database();
+  void		apply(bool testout);
+  bool		use_database();
 
-		void			check();
+  void		check();
 
-		bool			test_opl2();
-		bool			test_winnt();
-		bool			test_xmplay();
-		bool			test_porttalk();
+  bool		test_opl2();
+  bool		test_winnt();
+  bool		test_xmplay();
+  bool		test_porttalk();
 
-		string					fname;
-		static CAdPlugDatabase	*mydb;
+  string			fname;
+  static CAdPlugDatabase	*mydb;
 
-		t_config_data	work, next;
+  t_config_data	work, next;
 };

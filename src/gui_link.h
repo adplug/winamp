@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2002 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -19,32 +19,31 @@
 
 class GuiCtrlHyperlink
 {
-	public:
+ public:
 
-		void					add(HWND hwnd, const char *text, const char *link);
+  void		add(HWND hwnd, const char *text, const char *link);
 
-	private:
+ private:
 
-		void					remove(int i);
+  void		remove(int i);
 
-		static LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam);
+  static LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam);
 
-		void					goto_link(int i);
+  void		goto_link(int i);
 
-		bool					is_warm(int i);
+  bool		is_warm(int i);
 
-		void					paint(int i, bool msg = false);
+  void		paint(int i, bool msg = false);
 
-		void					set_normal(int i);
-		void					set_hover(int i);
-		void					set_warm(int i);
+  void		set_normal(int i);
+  void		set_hover(int i);
+  void		set_warm(int i);
 
-		struct t_hyperlink_data
-		{
-			vector<HWND>		hwnd;
-			vector<WNDPROC>		proc;
-			vector<string>		text;
-			vector<string>		link;
-			vector<int>			state;
-		} work;
+  struct t_hyperlink_data {
+    vector<HWND>		hwnd;
+    vector<WNDPROC>		proc;
+    vector<string>		text;
+    vector<string>		link;
+    vector<int>			state;
+  } work;
 };

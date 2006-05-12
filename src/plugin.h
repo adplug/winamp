@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2004 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -64,7 +64,7 @@ using namespace std;
 
 #include "resource.h"
 
-#define PLUGIN_VER "AdPlug/Winamp v1.6"
+#define PLUGIN_VER "AdPlug/Winamp v" VERSION
 
 #define WM_UPDATE     WM_USER+1
 #define WM_UPDATE_ALL WM_USER+2
