@@ -1,4 +1,4 @@
-Changes for version 1.7 (2006-04-30)
+Changes for version 1.7 (2006-05-13)
    - Now using the GNU build-system and compiled with MinGW by default. This
      fixes a lot of bugs.
    - MS Visual C++ 6 builds not actively supported anymore. The build files

@@ -1,7 +1,7 @@
 # Tell autoconf we're compiling a C++ DLL, using automake & libtool
 AC_INIT(in_adlib,1.7)
 AC_CONFIG_SRCDIR(src/plugin.cpp)
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile in_adlib.psc])
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_LIBTOOL_WIN32_DLL
