@@ -1,6 +1,6 @@
-AdPlug Winamp plugin v1.6
+AdPlug Winamp plugin v1.7
 
-Copyright (c) 1999 - 2004 Simon Peter <dn.tlp@gmx.net>
+Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
 Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
 Website: http://adplug.sourceforge.net
@@ -10,8 +10,9 @@ Description:
 ------------
 AdPlug is a Winamp input plugin. Winamp is a fast, high-fidelity audio player
 for Windows (get it at www.winamp.com). AdPlug plays music, originally
-composed for the AdLib (OPL2) audio board, on top of an OPL2 emulator or by
-using the real hardware. No OPL chip is required for playback.
+composed for the AdLib (OPL2) and Sound Blaster (Dual OPL2/OPL3) audio boards,
+directly from its original format on top of an emulator or by using the real
+hardware. No OPL chip is required for playback.
 
 Installation:
 -------------
@@ -23,10 +24,9 @@ be C:\Program Files\Winamp\Plugins).
 
 If, after installation, the plugin won't show up in Winamp's input plugin
 dialog, and you know you installed it to the right place, your system maybe
-doesn't fulfill AdPlug's library requirements. You need at least the files
-MSVCRT.DLL, MSVCIRT.DLL and MSVCP60.DLL in your WINDOWS\SYSTEM directory. If
-you are missing one of these, you can find them on the Internet. Just start
-your favorite search engine to find them.
+doesn't fulfill AdPlug's library requirements. You need the file MSVCRT.DLL
+in your WINDOWS\SYSTEM directory. If you are missing out, you can find it on
+the Internet. Just start your favorite search engine to find it.
 
 Usage:
 ------
@@ -113,16 +113,3 @@ driver can be downloaded from http://www.beyondlogic.org/porttalk/porttalk.htm.
 After downloading the driver, please read the enclosed PDF file for
 installation instructions. I strongly recommend the manual installation method,
 using the registry file!
-
-The emulator license issue:
----------------------------
-AdPlug uses MAME's fmopl OPL2 emulator. While this official distribution
-includes an old LGPL'd version of the emulator, which was developed by
-Tatsuyuki Satoh alone, who relicensed this version under the LGPL, there is
-a patch available at:
-
-http://www.informatik.uni-oldenburg.de/~dyna/adplug/
-
-that replaces the old version by the latest version from the MAME source
-distribution. The new version features improved emulation quality, but is
-licensed under the MAME license, which restricts commercial redistribution.
