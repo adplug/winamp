@@ -18,8 +18,8 @@ OutFile @PACKAGE@-@VERSION@.exe
 ; --------------------
 
 SetOutPath $DSPDIR
-AddFile @srcdir@/src/.libs/in_adlib.dll
-AddFile @srcdir@/README
+AddFile in_adlib.dll
+AddFile @srcdir@\README
 ;AddFile ..\..\adplug.db
 
 ; Post-install execute section

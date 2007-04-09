@@ -1,6 +1,6 @@
 /* -*- Mode: C -*-
  *
- * Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (c) 1999 - 2007 Simon Peter <dn.tlp@gmx.net>
  * Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
  *
  * This library is free software; you can redistribute it and/or
@@ -119,7 +119,7 @@ BEGIN
                     SS_REALSIZEIMAGE,5,41,267,71
     CTEXT           "",IDC_PLUGIN_VER,6,0,273,8,NOT WS_GROUP
     LTEXT           "url_sp",IDC_URL_SP,175,14,50,8,NOT WS_GROUP
-    RTEXT           "Copyright (c) 1999 - 2006 Simon Peter <",IDC_STATIC,49,
+    RTEXT           "Copyright (c) 1999 - 2007 Simon Peter <",IDC_STATIC,49,
                     14,126,8,NOT WS_GROUP
     LTEXT           ">",IDC_STATIC,226,14,8,8,NOT WS_GROUP
     LTEXT           "url_nk",IDC_URL_NK,181,23,38,8,NOT WS_GROUP

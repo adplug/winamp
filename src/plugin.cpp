@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2007 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -228,10 +228,11 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   mod.UsesOutputPlug = config.useoutputplug;
 
   filetypes.add("a2m", "Adlib Tracker 2 Modules (*.A2M)");
+  filetypes.add("adl", "Westwood ADL Files (*.ADL)");
   filetypes.add("amd", "AMUSIC Modules (*.AMD)");
   filetypes.add("bam", "Bob's Adlib Music Files (*.BAM)");
-  filetypes.add("cmf", "Creative Adlib Music Files (*.CMF)");
   filetypes.add("cff", "BoomTracker 4 Modules (*.CFF)");
+  filetypes.add("cmf", "Creative Adlib Music Files (*.CMF)");
   filetypes.add("d00", "Packed EdLib Modules (*.D00)");
   filetypes.add("dfm", "Digital-FM Modules (*.DFM)");
   filetypes.add("dmo", "TwinTeam Modules (*.DMO)");
@@ -255,14 +256,14 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("rol", "Adlib Visual Composer Modules (*.ROL)");
   if(!cfg.s3m_workaround)
     filetypes.add("s3m", "Scream Tracker 3 Modules (*.S3M)");
-  filetypes.add("sat", "Surprise! Adlib Tracker Modules (*.SAT)");
   filetypes.add("sa2", "Surprise! Adlib Tracker 2 Modules (*.SA2)");
+  filetypes.add("sat", "Surprise! Adlib Tracker Modules (*.SAT)");
   filetypes.add("sci", "Sierra Adlib Audio Files (*.SCI)");
   filetypes.add("sng", "Adlib Tracker Modules (*.SNG)");
   filetypes.add("sng", "Faust Music Creator Modules (*.SNG)");
   filetypes.add("sng", "SNGPlay Files (*.SNG)");
-  filetypes.add("xms", "XMS-Tracker Modules (*.XMS)");
   filetypes.add("xad", "Exotic Adlib Files (*.XAD)");
+  filetypes.add("xms", "XMS-Tracker Modules (*.XMS)");
   filetypes.add("xsm", "eXtra Simple Music Files (*.XSM)");
 
   filetypes.set_ignore_list(config.get_ignored());

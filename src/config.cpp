@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1999 - 2006 Simon Peter <dn.tlp@gmx.net>
+  Copyright (c) 1999 - 2007 Simon Peter <dn.tlp@gmx.net>
   Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
 
   This library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@
 #define DFL_EMU			emuts
 #define DFL_REPLAYFREQ		44100
 #define DFL_USE16BIT		true
-#define DFL_STEREO		false
+#define DFL_STEREO		true
 #define DFL_USEOUTPUT		DFL_EMU
 #define DFL_ADLIBPORT		0x388
 #define DFL_TESTOPL2		true
@@ -43,7 +43,7 @@
 #define DFL_PRIORITY		4
 #define DFL_STDTIMER		true
 #define DFL_DISKDIR		"C:\\"
-#define DFL_IGNORED		"17;"
+#define DFL_IGNORED		"19;"
 #define DFL_DBFILE		"adplug.db"
 #define DFL_USEDB		true
 #define DFL_S3M_WORKAROUND	true
