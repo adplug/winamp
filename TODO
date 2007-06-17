@@ -1,5 +1,7 @@
 AdPlug/Winamp To Do List:
 -------------------------
+- fix: subsong selection does not work if song is not playing. This hampers
+  selection of ADL files, which have a lot of subsongs with zero length.
 - fix: playlist sometimes fails in background
 - fix: make porttalk only occupy ports ADLIB_BASEPORT and ADLIB_BASEPORT + 1,
        instead of the whole range. [dynamite]
