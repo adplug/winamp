@@ -1,7 +1,8 @@
 /* -*- Mode: C -*-
  *
- * Copyright (c) 1999 - 2007 Simon Peter <dn.tlp@gmx.net>
- * Copyright (c) 2002 Nikita V. Kalaganov <riven@ok.ru>
+ * Copyright © 1999 - 2007 Simon Peter <dn.tlp@gmx.net>
+ * Copyright © 2002 Nikita V. Kalaganov <riven@ok.ru>
+ * Copyright © 2010 Wraithverge <liam82067@yahoo.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,7 +43,7 @@ BEGIN
     PUSHBUTTON      "&Select all",IDC_FTSELALL,7,130,101,14,BS_MULTILINE
     PUSHBUTTON      "&Deselect all",IDC_FTDESELALL,156,130,101,14,
                     BS_MULTILINE
-    CONTROL         "S3M File workaround for Nullsoft Module Decoder Plugin",
+    CONTROL         "S3M File work-around for Nullsoft Module Decoder Plugin",
                     IDC_FTWORKAROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     10,115,194,10
 END
@@ -52,63 +53,71 @@ STYLE WS_CHILD | WS_VISIBLE
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Emulator 1 (by &Tatsuyuki Satoh)",IDC_OUTTS,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,7,116,10
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,6,114,10
     CONTROL         "Emulator 2 (by &Ken Silverman)",IDC_OUTKS,"Button",
-                    BS_AUTORADIOBUTTON | WS_TABSTOP,7,17,110,10
-    CONTROL         "&OPL2 at port ",IDC_OUTOPL2,"Button",BS_AUTORADIOBUTTON | 
-                    WS_TABSTOP,7,76,53,8
-    CONTROL         "&Disk Writer (RAW format)",IDC_OUTDISK,"Button",
+                    BS_AUTORADIOBUTTON | WS_TABSTOP,7,17,108,10
+
+    #ifdef HAVE_ADPLUG_SURROUND
+    CONTROL         "&Harmonic Effect",IDC_HARMONIC,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,174,6,65,10
+    CONTROL         "D&ueling Synths",IDC_DUELSYNTH,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,174,17,61,10
+    #endif
+
+    CONTROL         "&OPL2 at Port ",IDC_OUTOPL2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP,7,76,54,8
+    CONTROL         "&Disk Writer (RAW Format)",IDC_OUTDISK,"Button",
                     BS_AUTORADIOBUTTON | WS_TABSTOP,7,116,95,10
-    CONTROL         "8-&bit",IDC_QUALITY8,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP | WS_TABSTOP,162,40,33,10
-    CONTROL         "16-bi&t",IDC_QUALITY16,"Button",BS_AUTORADIOBUTTON | 
-                    WS_TABSTOP,162,50,33,10
+    CONTROL         "8-&Bits",IDC_QUALITY8,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP | WS_TABSTOP,162,40,32,10
+    CONTROL         "16-B&its",IDC_QUALITY16,"Button",BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP,162,50,35,10
     GROUPBOX        " Resolution ",IDC_STATIC,156,28,48,35,BS_RIGHT
     CONTROL         "1&1025",IDC_FREQ1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP | WS_TABSTOP,25,40,36,10
+                    WS_GROUP | WS_TABSTOP,25,40,34,10
     CONTROL         "2&2050",IDC_FREQ2,"Button",BS_AUTORADIOBUTTON | 
-                    WS_TABSTOP,25,50,36,10
+                    WS_TABSTOP,25,50,34,10
     CONTROL         "4&4100",IDC_FREQ3,"Button",BS_AUTORADIOBUTTON | 
-                    WS_TABSTOP,63,40,36,10
+                    WS_TABSTOP,63,40,34,10
     CONTROL         "4&8000",IDC_FREQ4,"Button",BS_AUTORADIOBUTTON | 
-                    WS_TABSTOP,63,50,36,10
+                    WS_TABSTOP,63,50,34,10
     CONTROL         "",IDC_FREQC,"Button",BS_AUTORADIOBUTTON,101,46,11,8
     EDITTEXT        IDC_FREQC_VALUE,114,44,29,12,ES_UPPERCASE | ES_NUMBER
     GROUPBOX        " Frequency ",IDC_STATIC,19,28,131,35,BS_LEFT
     CONTROL         "&Mono",IDC_MONO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,215,40,34,10
+                    WS_TABSTOP,215,40,32,10
     CONTROL         "&Stereo",IDC_STEREO,"Button",BS_AUTORADIOBUTTON | 
-                    WS_TABSTOP,215,50,37,10
+                    WS_TABSTOP,215,50,35,10
     GROUPBOX        " Channels ",IDC_STATIC,210,28,47,35,BS_LEFT
     PUSHBUTTON      "C:\\",IDC_DIRECTORY,20,129,237,15
-    CONTROL         "&No OPL2 testing",IDC_NOTEST,"Button",BS_AUTOCHECKBOX | 
+    CONTROL         "&No OPL2 Testing",IDC_NOTEST,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,26,94,68,10
     GROUPBOX        "",IDC_STATIC,20,85,237,24
-    EDITTEXT        IDC_ADLIBPORT,63,74,21,12,ES_UPPERCASE
+    EDITTEXT        IDC_ADLIBPORT,63,74,21,12,ES_UPPERCASE | ES_NUMBER
 END
 
 IDD_CFG_PLAYBACK DIALOG 0, 0, 264, 151
 STYLE WS_CHILD | WS_VISIBLE
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "&Autodetect song end",IDC_TESTLOOP,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,7,7,82,10
-    CONTROL         "&Fast seek",IDC_FASTSEEK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,30,47,10
+    CONTROL         "&Auto-detect Song End",IDC_TESTLOOP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,7,84,10
+    CONTROL         "&Fast Seek",IDC_FASTSEEK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,30,46,10
     CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
                     WS_TABSTOP,12,116,238,11
     LTEXT           "Idle",IDC_STATIC,12,130,12,8
     LTEXT           "Normal",IDC_STATIC,119,130,23,8
-    RTEXT           "Realtime",IDC_STATIC,222,130,28,8
-    GROUPBOX        "Thread priority ",IDC_STATIC,7,105,250,39
-    CONTROL         "&Standard refresh rate",IDC_STDTIMER,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,12,54,82,10
+    RTEXT           "Real-time",IDC_STATIC,221,130,30,8
+    GROUPBOX        "Thread Priority ",IDC_STATIC,7,105,250,39
+    CONTROL         "&Standard Refresh Rate",IDC_STDTIMER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,54,87,10
     LTEXT           "OPL2:",IDC_STATIC,7,20,21,8
     LTEXT           "Disk Writer:",IDC_STATIC,7,43,38,8
-    LTEXT           "Database:",IDC_STATIC,7,68,34,8
+    LTEXT           "Database:",IDC_STATIC,7,67,34,8
     PUSHBUTTON      "adplug.db",IDC_DATABASE,13,88,237,15
     CONTROL         "&Use Database",IDC_USEDB,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,13,77,61,10
+                    WS_TABSTOP,12,76,61,10
 END
 
 IDD_ABT_ADPLUG DIALOG 0, 0, 279, 141
@@ -117,25 +126,29 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         101,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | 
                     SS_REALSIZEIMAGE,5,41,267,71
-    CTEXT           "",IDC_PLUGIN_VER,6,0,273,8,NOT WS_GROUP
-    LTEXT           "url_sp",IDC_URL_SP,175,14,50,8,NOT WS_GROUP
-    RTEXT           "Copyright (c) 1999 - 2007 Simon Peter <",IDC_STATIC,49,
+    CTEXT           "",IDC_PLUGIN_VER,6,0,266,8,NOT WS_GROUP
+    LTEXT           "url_sp",IDC_URL_SP,173,14,50,8,NOT WS_GROUP
+    RTEXT           "Copyright © 1999 - 2010 Simon Peter <",IDC_STATIC,47,
                     14,126,8,NOT WS_GROUP
-    LTEXT           ">",IDC_STATIC,226,14,8,8,NOT WS_GROUP
-    LTEXT           "url_nk",IDC_URL_NK,181,23,38,8,NOT WS_GROUP
-    RTEXT           "Copyright (c) 2002 Nikita V. Kalaganov <",IDC_STATIC,51,
+    LTEXT           ">",IDC_STATIC,224,14,8,8,NOT WS_GROUP
+    LTEXT           "url_nk",IDC_URL_NK,179,23,39,8,NOT WS_GROUP
+    RTEXT           "Copyright © 2002 Nikita V. Kalaganov <",IDC_STATIC,49,
                     23,129,8,NOT WS_GROUP
-    LTEXT           ">",IDC_STATIC,221,23,8,8,NOT WS_GROUP
-    RTEXT           "[ get latest version at ",IDC_STATIC,65,119,68,8,NOT 
+    LTEXT           ">",IDC_STATIC,219,23,8,8,NOT WS_GROUP
+    LTEXT           "url_wv",IDC_URL_WV,151,31,74,8,NOT WS_GROUP
+    RTEXT           "Copyright © 2010 Wraithverge <",IDC_STATIC,47,
+                    31,103,8,NOT WS_GROUP
+    LTEXT           ">",IDC_STATIC,226,31,8,8,NOT WS_GROUP
+    RTEXT           "[ Get the latest version at ",IDC_STATIC,55,119,82,8,NOT 
                     WS_GROUP
-    LTEXT           " ]",IDC_STATIC,207,119,8,8,NOT WS_GROUP
-    CTEXT           "url_adplug",IDC_URL_ADPLUG,133,119,74,8,NOT WS_GROUP
-    RTEXT           "[ get music at ",IDC_STATIC,5,130,45,8,NOT WS_GROUP
-    LTEXT           " ]",IDC_STATIC,131,130,8,8,NOT WS_GROUP
-    CTEXT           "url_chiptune",IDC_URL_CHIPTUNE,51,130,56,8,NOT WS_GROUP
-    RTEXT           "[ get soft at ",IDC_STATIC,149,130,38,8,NOT WS_GROUP
+    LTEXT           " ]",IDC_STATIC,211,119,8,8,NOT WS_GROUP
+    CTEXT           "url_adplug",IDC_URL_ADPLUG,138,119,75,8,NOT WS_GROUP
+    RTEXT           "[ Get music at ",IDC_STATIC,7,130,45,8,NOT WS_GROUP
+    LTEXT           " ]",IDC_STATIC,133,130,8,8,NOT WS_GROUP
+    CTEXT           "url_chiptune",IDC_URL_CHIPTUNE,53,130,81,8,NOT WS_GROUP
+    RTEXT           "[ Get soft at ",IDC_STATIC,147,130,40,8,NOT WS_GROUP
     LTEXT           " ]",IDC_STATIC,265,130,8,8,NOT WS_GROUP
-    CTEXT           "url_malf",IDC_URL_MALF,187,130,78,8,NOT WS_GROUP
+    CTEXT           "url_malf",IDC_URL_MALF,188,130,80,8,NOT WS_GROUP
 END
 
 IDD_ABT_LICENSE DIALOGEX 0, 0, 279, 141
@@ -143,7 +156,7 @@ STYLE WS_CHILD | WS_VISIBLE
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_LICENSE,0,0,279,124,ES_MULTILINE | ES_READONLY | NOT 
-                    WS_BORDER | NOT WS_TABSTOP,WS_EX_CLIENTEDGE
+                    WS_BORDER | WS_VSCROLL | NOT WS_TABSTOP,WS_EX_CLIENTEDGE
     LTEXT           "Read GNU LGPL: ",IDC_STATIC,0,132,60,8,NOT WS_GROUP
     LTEXT           "url_gnu",IDC_URL_GNU,61,132,95,8,NOT WS_GROUP
 END
@@ -164,8 +177,8 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,192,178,81,14,BS_MULTILINE
     PUSHBUTTON      "&OK",IDOK,102,178,81,14,BS_MULTILINE
     CONTROL         "Tab1",IDC_CTABS,"SysTabControl32",0x0,5,5,268,167
-    CONTROL         "ToolTips",IDC_TOOLTIPS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,14,181,55,8
+    CONTROL         "Tool-Tips",IDC_TOOLTIPS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,14,181,44,8
 END
 
 IDD_FILEINFO DIALOGEX 0, 0, 310, 260
@@ -173,15 +186,15 @@ STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "AdPlug :: File Info"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    RTEXT           "Title",IDC_STATIC,7,7,27,12,SS_CENTERIMAGE
-    RTEXT           "Author",IDC_STATIC,7,21,27,12,SS_CENTERIMAGE
+    RTEXT           "Title:",IDC_STATIC,11,7,27,12,SS_CENTERIMAGE
+    RTEXT           "Author:",IDC_STATIC,11,21,27,12,SS_CENTERIMAGE
     LTEXT           " Static",IDC_TITLE,41,7,262,12,SS_CENTERIMAGE,
                     WS_EX_CLIENTEDGE
     LTEXT           " Static",IDC_AUTHOR,41,21,262,12,SS_CENTERIMAGE,
                     WS_EX_CLIENTEDGE
     LTEXT           " Static",IDC_FORMAT,41,35,262,12,SS_CENTERIMAGE,
                     WS_EX_CLIENTEDGE
-    RTEXT           "Format",IDC_STATIC,7,35,27,12,SS_CENTERIMAGE
+    RTEXT           "Format:",IDC_STATIC,11,35,27,12,SS_CENTERIMAGE
     GROUPBOX        " Subsong ",IDC_STATIC,7,211,296,41,BS_LEFT
     CONTROL         "Slider1",IDC_SUBSONGSLIDER,"msctls_trackbar32",
                     TBS_AUTOTICKS,13,236,283,11
@@ -194,16 +207,16 @@ BEGIN
                     ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL | NOT 
                     WS_TABSTOP
     GROUPBOX        " Info ",IDC_STATIC,7,53,89,71
-    LTEXT           "Order",IDC_STATIC,14,63,18,8
-    LTEXT           "Pattern",IDC_STATIC,13,73,24,8
-    LTEXT           "Row",IDC_STATIC,13,83,16,8
-    LTEXT           "Speed",IDC_STATIC,13,98,22,8
-    LTEXT           "Timer",IDC_STATIC,13,108,18,8
+    LTEXT           "Order:",IDC_STATIC,13,63,21,8
+    LTEXT           "Pattern:",IDC_STATIC,13,73,26,8
+    LTEXT           "Row:",IDC_STATIC,13,83,18,8
+    LTEXT           "Speed:",IDC_STATIC,13,98,24,8
+    LTEXT           "Timer:",IDC_STATIC,13,108,21,8
     RTEXT           "00",IDC_ORDER,39,63,20,8
     RTEXT           "00",IDC_PATTERN,39,73,20,8
     RTEXT           "00",IDC_ROW,39,83,20,8
     RTEXT           "00",IDC_SPEED,39,98,20,8
-    LTEXT           "000.00 hz",IDC_TIMER,51,108,37,8
+    LTEXT           "000.00 Hz",IDC_TIMER,51,108,37,8
     LTEXT           "00",IDC_ORDERS,71,63,20,8
     LTEXT           "00",IDC_PATTERNS,71,73,20,8
     CTEXT           "/",IDC_STATIC,59,63,11,8
@@ -218,20 +231,21 @@ END
 
 IDR_TEXT_LICENSE TEXT
 BEGIN
+"GNU LGPL license:\r\n"
 "\r\n"
-"    This plugin is free software; you can redistribute it and/or\r\n"
-"    modify it under the terms of the GNU Lesser General Public\r\n"
-"    License as published by the Free Software Foundation; either\r\n"
-"    version 2.1 of the License, or (at your option) any later version.\r\n"
+"This plugin is free software; you can redistribute it and/or modify it\r\n"
+"under the terms of the GNU Lesser General Public License, as published by\r\n"
+"the Free Software Foundation; either version 2.1 of the License, or (at\r\n"
+"your option) any later version.\r\n"
 "\r\n"
-"    This plugin is distributed in the hope that it will be useful,\r\n"
-"    but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n"
-"    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\r\n"
-"    Lesser General Public License for more details.\r\n"
+"This plugin is distributed in the hope that it will be useful, but WITHOUT\r\n"
+"ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or\r\n"
+"FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public\r\n"
+"License for more details.\r\n"
 "\r\n"
-"    You should have received a copy of the GNU Lesser General Public\r\n"
-"    License along with this plugin; if not, write to the Free Software\r\n"
-"    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA\0"
+"You should have received a copy of the GNU Lesser General Public License\r\n"
+"along with this plugin; if not, write to the Free Software Foundation,\r\n"
+"Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA\0"
 END
 
 // The AdPlug logo
@@ -242,3 +256,32 @@ IDR_TEXT_HISTORY	TEXT	"../NEWS"
 
 // The common IE "Hand" cursor, used for the clickable URLs
 IDC_HAND2	CURSOR	"hand.cur"
+
+1 VERSIONINFO
+FILEVERSION 1,8,2,0
+PRODUCTVERSION 2,2,1,0
+FILEOS 0x4
+FILETYPE 0x2
+BEGIN
+ BLOCK "StringFileInfo"
+  BEGIN
+   BLOCK "040904E4"
+    BEGIN
+     VALUE "Comments", ""
+     VALUE "CompanyName", "http://adplug.sourceforge.net/"
+     VALUE "FileDescription", "AdPlug Winamp plugin"
+     VALUE "FileVersion", "1.8.2"
+     VALUE "InternalName", "in_adlib"
+     VALUE "LegalCopyright", "© 1999-2010 Simon Peter, et al."
+     VALUE "LegalTrademarks", "GNU Lesser General Public License"
+     VALUE "OriginalFilename", "in_adlib.dll"
+     VALUE "PrivateBuild", ""
+     VALUE "ProductName", "AdPlug"
+     VALUE "ProductVersion", "2.2.1"
+    END
+END
+BLOCK "VarFileInfo"
+ BEGIN
+  VALUE "Translation", 0x0409, 1252
+ END
+END

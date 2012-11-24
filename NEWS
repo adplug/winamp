@@ -1,3 +1,76 @@
+Changes for version 1.9 (2012-07-14)
+   - OPL Port entrybox allows entering hex-digits.
+
+Changes for in_adlib version 1.8.2 (2010-04-23) (Wraithverge)
+   - Added support for Adam Nielsen's Synth Wrapper, which can be configured
+     via "winamp.ini" and/or the GUI.  A big thanks goes out to Adam for his
+     help in us getting it to work properly in the plugin!  As a result of
+     our efforts, two new options have been added:
+     - Harmonic Effect: This option fully utilizes a process that pitch-
+       shifts OPL2 data very slightly on one channel in order to produce a
+       psuedo-stereo Phaser-like effect from a mono source.  Two copies of
+       Mr. Satoh's emulator are generated for it to accomplish this goal.
+       Note that a prerequisite for this option to work is that "Emulator 1"
+       must be selected as the chosen emulator.
+     - Dueling Synths: This option utilizes the OPL2 Synth Wrapper's ability
+       to host two separate streams of OPL2 data simultaneously and output
+       the combination as 16-Bits Stereo PCM data.  One copy each of Mr.
+       Satoh's and Mr. Silverman's emulators are generated for it to
+       accomplish this goal, with them being heard respectively on the left
+       and right channels.  Note that a prerequisite for this option to work
+       is that "Emulator 2" must be selected as the chosen emulator.
+
+   * Changes for the AdPlug core library 2.2.1:
+     ------------------------------------------
+     - Bug fixes:
+       - CMF: Fixed crash on v1.0 files.
+              Fixed a memory leak.
+              Clear OPL3 mode on playback to avoid a previous song affecting
+              the instruments.
+       - DRO: Updated DROv1 player to handle early files with a slightly
+              different header.  Fixes random bytes sent at the end of early
+              DROv1 files.
+
+Changes for in_adlib version 1.8.1 (2010-03-14) (Wraithverge)
+   - Some new file-types are now selectable on the "Formats" tab of the
+     plugin's configuration panel.
+   - The "About" panel now also shows the in_adlib version number.
+   - A "VERSIONINFO" section has been added onto the resources, which can be
+     viewed on its properties tab within the file manager.
+   - Many other resource items/elements have been modified or added upon.
+   - Added a "VERSIONINFO" resource for "adplugdb.exe", that can be viewed on
+     its properties tab within the file manager.
+
+   * Changes for the AdPlug core library v2.2:
+     -----------------------------------------
+      - New format support:
+        - JBM: JBM Adlib Music Format
+        - CMF: New player (more accurate) for Creative Music Format
+        - DRO: DOSBox Raw OPL v2.0 support
+      - Fixed current subsong rewind in D00 player.
+      - Added test case for ADL file format.
+      - Fixed replay bug in DRO player (thanks to Adam Nielsen).
+      - New surround/harmonic synth effect (sounds really nice!)
+ 
+   * Changes for the AdPlug core library v2.1:
+     -----------------------------------------
+      - New format support:
+      - ADL: Westwood ADL File Format
+      - Added OPL3 support:
+        - A2M: AdLib Tracker 2 versions 5-8
+      - All players are endian-clean now.
+      - Lots of security fixes (thanks to Luigi Auriemma).
+      - Fixed volume handling in AMD player.
+      - Fixed a buffer overflow in ROL player (thanks to HIGUCHI Daisuke).
+      - Fixed vibrato & volume slides in D00 player (thanks to Dennis
+        Lindroos).
+      - Removed superfluous exit() call in RIX player (thanks to Martin
+        Michlmayr).
+      - Enhanced generic Protracker player features:
+        - Supports up to 32 channels
+        - OPL3 output support
+        - New behavior flags and commands
+
 Changes for version 1.8 (2007-04-09)
    - Fixed default for ignored filetypes.
    - New default playback is in stereo.

@@ -9,6 +9,38 @@
 	* ChangeLog, Makefile.am, README, src/Makefile.am: Updated
 	  Makefiles to include binarydist target and updated README.
 
+2010-04-23 17:50  Wraithverge
+
+	* src/config.cpp: Revised some message-box strings to make them
+	  understandable.  README: Added some cautionary info regarding
+	  RAW-files, and one other minor edition.
+
+2010-04-05 00:00  Wraithverge
+
+	* NEWS, src/config.cpp, src/config.h, src/dlg_config.cpp,
+	  src/in_adplug.rc, src/plugin.h, src/resource.h, src/player.cpp:
+	  Added items for "Dueling Synths" and modified items for the
+	  "Harmonic Effect".  README: Heavily edited and appended to make it
+	  more readable (I mean no offense to its original author).
+	  COPYING: Added the MAME license segment to its heading.  AUTHORS:
+	  Added my name to the list, as I am now a contributing author.
+
+2010-03-21 14:31  Wraithverge
+
+	* src/config.cpp, src/config.h, src/dlg_config.cpp,
+	  src/in_adplug.rc, src/plugin.h, src/resource.h, src/player.cpp:
+	  Added items for the "Harmonic Effect", to allow for beta-testing.
+
+2010-03-11 19:08  Wraithverge
+
+	* NEWS, README, src/dlg_about.cpp, src/dlg_config.cpp,
+	  src/dlg_info.cpp, src/gui_tip.cpp, src/in_adplug.rc,
+	  src/plugin.cpp, and src/resource.h: Modified a bunch of resource-
+	  related stuff, and added a "Version" resource for the DLL-file.
+	  src/plugin.h: Added plugin version to the "About" Panel, which can
+	  be set within "makefile.am" via the definition -DPLUGIN\"1.8.1\",
+	  for example.
+
 2006-05-13 22:19  dynamite
 
 	* contrib/: README, MSVC6/in_adlib.dsp, MSVC6/readme.txt,

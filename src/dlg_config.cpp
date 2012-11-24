@@ -143,23 +143,29 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
     case WM_INITDIALOG:
 
       // add tooltips
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ1),      "freq1",      "Set 11 KHz frequency");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ2),      "freq2",      "Set 22 KHz frequency");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ3),      "freq3",      "Set 44 KHz frequency");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ4),      "freq4",      "Set 48 KHz frequency");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQC),      "freqc",      "Set custom frequency (in Hz)");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQC_VALUE),"freqc_value","Specify custom frequency value (in Hz)");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY8),   "quality8",   "Set 8-bit quality");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY16),  "quality16",  "Set 16-bit quality");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_MONO),       "mono",       "Set mono output");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_STEREO),     "stereo",     "Set stereo output");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTTS),      "outts",      "Use Tatsuyuki Satoh's emulator");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTKS),      "outks",      "Use Ken Silverman's emulator");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTDISK),    "outdisk",    "Use disk writer output\r\nWrites RdosPlay RAW files. These can be replayed by AdPlug again.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTOPL2),    "outopl2",    "Use OPL2 hardware output");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_ADLIBPORT),  "adlibport",  "Specify OPL2 port (default 0x388h)");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_NOTEST),     "notest",     "Disable OPL2 hardware detection");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_DIRECTORY),  "directory",  "Select output directory for disk writer");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ1),      "freq1",      "Set 11 KHz frequency.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ2),      "freq2",      "Set 22 KHz frequency.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ3),      "freq3",      "Set 44 KHz frequency.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ4),      "freq4",      "Set 48 KHz frequency.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQC),      "freqc",      "Set custom frequency (in Hz).");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQC_VALUE),"freqc_value","Specify custom frequency value (in Hz).");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY8),   "quality8",   "Set 8-Bits quality.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY16),  "quality16",  "Set 16-Bits quality.");
+
+      #ifdef HAVE_ADPLUG_SURROUND
+      tooltip->add(GetDlgItem(hwndDlg,IDC_HARMONIC),     "harmonic",     "Enables/Disables the pseudo-stereo harmonic effect.\r\nNote: This requires Emulator 1, and it forces 16-Bits Stereo.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_DUELSYNTH),    "duelsynth",    "Enables/Disables the stereo dueling synths.\r\nNote: This requires Emulator 2, and it forces 16-Bits Stereo.");
+      #endif
+
+      tooltip->add(GetDlgItem(hwndDlg,IDC_MONO),       "mono",       "Set Mono output.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_STEREO),     "stereo",     "Set Stereo output.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTTS),      "outts",      "Use Tatsuyuki Satoh's emulator.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTKS),      "outks",      "Use Ken Silverman's emulator.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTDISK),    "outdisk",    "Use Disk Writer output:\r\nWrites RdosPlay RAW files. These can be replayed by AdPlug again.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTOPL2),    "outopl2",    "Use OPL2 hardware output.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_ADLIBPORT),  "adlibport",  "Specify OPL2 port (default 0x388h).");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_NOTEST),     "notest",     "Disable OPL2 hardware detection.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_DIRECTORY),  "directory",  "Select output directory for Disk Writer.");
 
       // set "output"
       if (next.useoutput == emuts)
@@ -185,6 +191,16 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 	  CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQC);
 	  SetDlgItemInt(hwndDlg,IDC_FREQC_VALUE,next.replayfreq,FALSE);
 	}
+
+      #ifdef HAVE_ADPLUG_SURROUND
+      // Set "harmonic".
+      if (next.harmonic)
+	CheckDlgButton(hwndDlg,IDC_HARMONIC,BST_CHECKED);
+
+      // Set "duelsynth".
+      if (next.duelsynth)
+	CheckDlgButton(hwndDlg,IDC_DUELSYNTH,BST_CHECKED);
+      #endif
 
       // set "resolution"
       if (next.use16bit)
@@ -239,6 +255,26 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 	next.replayfreq = 48000;
       else
 	next.replayfreq = GetDlgItemInt(hwndDlg,IDC_FREQC_VALUE,NULL,FALSE);
+
+      #ifdef HAVE_ADPLUG_SURROUND
+      // Check "harmonic".
+      if (IsDlgButtonChecked(hwndDlg,IDC_HARMONIC) == BST_CHECKED) {
+	next.harmonic = true;
+	next.stereo = true;
+	next.use16bit = true;
+      } else {
+	next.harmonic = false;
+      }
+
+      // Check "duelsynth".
+      if (IsDlgButtonChecked(hwndDlg,IDC_DUELSYNTH) == BST_CHECKED) {
+	next.duelsynth = true;
+	next.stereo = true;
+	next.use16bit = true;
+      } else {
+	next.duelsynth = false;
+      }
+      #endif
 
       // check "resolution"
       if (IsDlgButtonChecked(hwndDlg,IDC_QUALITY16) == BST_CHECKED)
@@ -322,12 +358,12 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
     case WM_INITDIALOG:
 
       // add tooltips
-      tooltip->add(GetDlgItem(hwndDlg,IDC_TESTLOOP),"autoend" ,"Enable songend autodetection\r\nIf disabled, the song will loop endlessly and Winamp won't advance in the playlist.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FASTSEEK),"fastseek","Enable fast seeking for OPL2 hardware output\r\nWhile this speeds up seeking a lot, it can result in inaccurate replaying for quite some time after the seek.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_STDTIMER),"stdtimer","Use actual replay speed for disk writer output\r\nDisable this for full speed disk writing. Never disable this if you also disabled songend detection!");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_PRIORITY),"priority","Set replay thread priority\r\nIf you encounter sound skips, try to set this to a higher value.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_DATABASE),"database","Set path to database file to be used for replay information");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_USEDB),"usedb","If unchecked, the database will be disabled");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_TESTLOOP),"autoend" ,"Enable song-end auto-detection:\r\nIf disabled, the song will loop endlessly, and Winamp won't advance in the playlist.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FASTSEEK),"fastseek","Enable fast seeking for OPL2 hardware output:\r\nWhile this speeds up seeking a lot, it can result in inaccurate replaying for quite some time after the seek.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_STDTIMER),"stdtimer","Use actual replay speed for Disk Writer output:\r\nDisable this for full speed disk writing. Never disable this if you also disabled song-end auto-detection!");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_PRIORITY),"priority","Set replay thread priority:\r\nIf you encounter sound skips, try to set this to a higher value.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_DATABASE),"database","Set path to Database file to be used for replay information.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_USEDB),"usedb","If unchecked, the Database will be disabled.");
 
       // set checkboxes
       if (next.testloop)
@@ -424,10 +460,10 @@ BOOL APIENTRY GuiDlgConfig::FormatsTabDlgProc(HWND hwndDlg, UINT message, WPARAM
     case WM_INITDIALOG:
 
       // add tooltips
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FORMATLIST),"formatlist","All supported formats are listed here\r\nDeselected formats will be ignored by AdPlug to make room for other plugins to play these.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FTWORKAROUND),"ftworkaround","Enable this if you can't play any sample based S3M files with Nullsoft's Module Decoder plugin anymore");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FTSELALL),  "ftselall",  "Select all formats");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FTDESELALL),  "ftdeselall",  "Deselect all formats");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FORMATLIST),"formatlist","All supported formats are listed here:\r\nDeselected formats will be ignored by AdPlug to make room for other plugins to play these.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FTWORKAROUND),"ftworkaround","Enable this if you can't play any sample based S3M files with Nullsoft's Module Decoder plugin anymore.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FTSELALL),  "ftselall",  "Select all formats.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FTDESELALL),  "ftdeselall",  "Deselect all formats.");
 
       // fill listbox
       for (i=0;i<filetypes.get_size();i++)

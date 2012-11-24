@@ -40,6 +40,10 @@
 #include <adplug/realopl.h>
 #include <adplug/silentopl.h>
 
+#ifdef HAVE_ADPLUG_SURROUND
+#include <adplug/surroundopl.h>
+#endif
+
 // stl
 #include <string>
 #include <vector>
@@ -64,7 +68,7 @@ using namespace std;
 
 #include "resource.h"
 
-#define PLUGIN_VER "AdPlug/Winamp v" VERSION
+#define PLUGIN_VER "AdPlug/Winamp v" VERSION "/v" PLUGIN
 
 #define WM_UPDATE     WM_USER+1
 #define WM_UPDATE_ALL WM_USER+2

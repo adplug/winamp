@@ -31,6 +31,12 @@ enum t_output {
 
 struct t_config_data {
   int            replayfreq;
+
+  #ifdef HAVE_ADPLUG_SURROUND
+  bool           harmonic;
+  bool           duelsynth;
+  #endif
+
   bool           use16bit;
   bool           stereo;
   enum t_output  useoutput;

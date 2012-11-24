@@ -236,11 +236,12 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("d00", "Packed EdLib Modules (*.D00)");
   filetypes.add("dfm", "Digital-FM Modules (*.DFM)");
   filetypes.add("dmo", "TwinTeam Modules (*.DMO)");
-  filetypes.add("dro", "DOSBox Raw OPL2 Files (*.DRO)");
+  filetypes.add("dro", "DOSBox Raw OPL v1.0 and v2.0 Files (*.DRO)");
   filetypes.add("dtm", "DeFy Adlib Tracker Modules (*.DTM)");
   filetypes.add("hsc", "HSC-Tracker Modules (*.HSC)");
   filetypes.add("hsp", "Packed HSC-Tracker Modules (*.HSP)");
   filetypes.add("imf;wlf;adlib", "Apogee IMF Files (*.IMF;*.WLF;*.ADLIB)");
+  filetypes.add("jbm", "JBM Adlib Music Files (*.JBM)");
   filetypes.add("ksm", "Ken Silverman's Music Files (*.KSM)");
   filetypes.add("laa", "LucasArts Adlib Audio Files (*.LAA)");
   filetypes.add("lds", "LOUDNESS Sound System Files (*.LDS)");
@@ -252,17 +253,18 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("mtk", "MPU-401 Trakker Modules (*.MTK)");
   filetypes.add("rad", "Reality Adlib Tracker Modules (*.RAD)");
   filetypes.add("raw", "Rdos RAW Files (*.RAW)");
-  filetypes.add("rix", "Softstar RIX OPL Music Format (*.RIX)");
+  filetypes.add("rix", "Softstar RIX OPL Music Files (*.RIX)");
   filetypes.add("rol", "Adlib Visual Composer Modules (*.ROL)");
-  if(!cfg.s3m_workaround)
+  if(!cfg.s3m_workaround) {
     filetypes.add("s3m", "Scream Tracker 3 Modules (*.S3M)");
+  }
   filetypes.add("sa2", "Surprise! Adlib Tracker 2 Modules (*.SA2)");
   filetypes.add("sat", "Surprise! Adlib Tracker Modules (*.SAT)");
   filetypes.add("sci", "Sierra Adlib Audio Files (*.SCI)");
-  filetypes.add("sng", "Adlib Tracker Modules (*.SNG)");
+  filetypes.add("sng", "Adlib Tracker 1.0 Modules (*.SNG)");
   filetypes.add("sng", "Faust Music Creator Modules (*.SNG)");
   filetypes.add("sng", "SNGPlay Files (*.SNG)");
-  filetypes.add("xad", "Exotic Adlib Files (*.XAD)");
+  filetypes.add("xad", "eXotic Adlib Files (*.XAD)");
   filetypes.add("xms", "XMS-Tracker Modules (*.XMS)");
   filetypes.add("xsm", "eXtra Simple Music Files (*.XSM)");
 

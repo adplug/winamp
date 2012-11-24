@@ -210,7 +210,7 @@ BOOL APIENTRY GuiDlgInfo::DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPA
 	{
 	  fi_refresh = fileinfo_player->getrefresh();
 
-	  sprintf(bufstr,"%.2f hz",fi_refresh);
+	  sprintf(bufstr,"%.2f Hz",fi_refresh);
 	  SetDlgItemText(hwndDlg,IDC_TIMER,bufstr);
 	}
 

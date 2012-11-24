@@ -19,20 +19,21 @@
 
 #include "plugin.h"
 
-#define MSGA_WINAMP	"You must restart Winamp after switching from own to standard output."
-#define MSGC_DISK	"You selected GODSPEED ENDLESS Disk Writing mode."
-#define MSGC_DATABASE	"Database could not be loaded!"
-#define	MSGE_OPL2	"OPL2 chip on given port was not detected." "\n\n" \
-"Emulated output forced."
-#define MSGE_WINNT	"You can't use OPL2 output under plain Windows NT/2000/XP." "\n\n" \
-"However, there are some ways around it. Please refer to the readme file for\n" \
-"information on companion software that enables hardware replay with AdPlug.\n\n" \
-"Emulated output forced."
-#define MSGE_XMPLAY	"You can't use own output under XMPlay." "\n\n" \
-"Emulated output forced."
+#define MSGA_WINAMP	"You must now restart Winamp after switching from hardware OPL2 or Disk Writer to Emulator output mode."
+#define MSGC_DISK 	"You have selected *full speed* and *endless* Disk Writing modes. This combination of options is not recommended."
+#define MSGC_DATABASE	"An external Database could not be loaded!"
+#define MSGE_OPL2 	"An OPL2 chip is not being detected at the given Port address. An emulator must be used for output, instead."
+#define MSGE_WINNT	"Hardware OPL2 output is not allowed natively under Windows NT/2000/XP. However, there is a way to work-around the issue. Please refer to the documentation for a solution that has been tested to work with AdPlug. For now, an emulator must be used for output, instead."
+#define MSGE_XMPLAY	"Hardware OPL2 output is not supported when this plugin is used within XMPlay. An emulator must be used for output, instead."
 
 #define DFL_EMU			emuts
 #define DFL_REPLAYFREQ		44100
+
+#ifdef HAVE_ADPLUG_SURROUND
+#define DFL_HARMONIC		true
+#define DFL_DUELSYNTH		true
+#endif
+
 #define DFL_USE16BIT		true
 #define DFL_STEREO		true
 #define DFL_USEOUTPUT		DFL_EMU
@@ -74,6 +75,16 @@ void Config::load()
   bufval = GetPrivateProfileInt("in_adlib","replayfreq",DFL_REPLAYFREQ,fname.c_str());
   if (bufval != -1)
     next.replayfreq = bufval;
+
+  #ifdef HAVE_ADPLUG_SURROUND
+  bufval = GetPrivateProfileInt("in_adlib","harmonic",DFL_HARMONIC,fname.c_str());
+  if (bufval != -1)
+    next.harmonic = bufval ? true : false;
+
+  bufval = GetPrivateProfileInt("in_adlib","duelsynth",DFL_DUELSYNTH,fname.c_str());
+  if (bufval != -1)
+    next.duelsynth = bufval ? true : false;
+  #endif
 
   bufval = GetPrivateProfileInt("in_adlib","use16bit",DFL_USE16BIT,fname.c_str());
   if (bufval != -1)
@@ -144,6 +155,13 @@ void Config::save()
   char bufstr[11];
 
   WritePrivateProfileString("in_adlib","replayfreq",_itoa(next.replayfreq,bufstr,10),fname.c_str());
+
+  #ifdef HAVE_ADPLUG_SURROUND
+  WritePrivateProfileString("in_adlib","harmonic",_itoa(next.harmonic,bufstr,10),fname.c_str());
+
+  WritePrivateProfileString("in_adlib","duelsynth",_itoa(next.duelsynth,bufstr,10),fname.c_str());
+  #endif
+
   WritePrivateProfileString("in_adlib","use16bit",_itoa(next.use16bit,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","stereo",_itoa(next.stereo,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","useoutput",_itoa(next.useoutput,bufstr,10),fname.c_str());
@@ -214,6 +232,12 @@ void Config::apply(bool testout)
   check();
 
   work.replayfreq	= next.replayfreq;
+
+  #ifdef HAVE_ADPLUG_SURROUND
+  work.harmonic		= next.harmonic;
+  work.duelsynth		= next.duelsynth;
+  #endif
+
   work.use16bit		= next.use16bit;
   work.stereo		= next.stereo;
   work.adlibport	= next.adlibport;

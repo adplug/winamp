@@ -152,6 +152,7 @@ BOOL APIENTRY GuiDlgAbout::TabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam,
 
 	  hyperlink.add(GetDlgItem(hwndDlg,IDC_URL_SP),"dn.tlp@gmx.net", "mailto:dn.tlp@gmx.net");
 	  hyperlink.add(GetDlgItem(hwndDlg,IDC_URL_NK),"riven@ok.ru",    "mailto:riven@ok.ru");
+	  hyperlink.add(GetDlgItem(hwndDlg,IDC_URL_WV),"liam82067@yahoo.com", "mailto:liam82067@yahoo.com");
 
 	  /* sites */
 

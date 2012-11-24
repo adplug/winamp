@@ -7,14 +7,14 @@ in_adlib_la_SOURCES = callback.cpp config.cpp config.h debug.h \
 	plugin.cpp plugin.h in_adlib.rc resource.h adplug.bmp hand.cur
 
 in_adlib_la_LDFLAGS = -module -avoid-version -no-undefined -lwinmm -lgdi32 \
-	-lcomdlg32
+	-lcomdlg32 -mwindows
 
 in_adlib_la_LIBADD = in_adlib.lo $(adplug_LIBS)
 
-AM_CPPFLAGS = $(adplug_CFLAGS)
+AM_CPPFLAGS = $(adplug_CFLAGS) -DPLUGIN=\"1.8.2\" -DHAVE_ADPLUG_SURROUND
 
-LTRCCOMPILE = $(LIBTOOL) --mode=compile $(RC) $(DEFS) $(DEFAULT_INCLUDES) \
-	$(INCLUDES)
+LTRCCOMPILE = $(LIBTOOL) --mode=compile $(RC) -D HAVE_ADPLUG_SURROUND \
+	$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)
 
 .rc.lo:
 	$(LTRCCOMPILE) -i $^ -o $@

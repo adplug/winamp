@@ -276,9 +276,39 @@ Copl *MyPlayer::opl_init()
   Copl *opl;
 
   if (work.useoutput == emuts)
+
+  #ifdef HAVE_ADPLUG_SURROUND
+  	if (work.harmonic == true) {
+      Copl *a = new CEmuopl(work.replayfreq, work.use16bit, false);
+      Copl *b = new CEmuopl(work.replayfreq, work.use16bit, false);
+      opl = output.emu = new CSurroundopl(a, b, work.use16bit);
+      // CSurroundopl now owns "a" and "b", and will free it upon destruction.
+  	} else {
     opl = output.emu = new CEmuopl(work.replayfreq,work.use16bit,work.stereo);
+  	}
+  #endif
+
+  #ifndef HAVE_ADPLUG_SURROUND
+    opl = output.emu = new CEmuopl(work.replayfreq,work.use16bit,work.stereo);
+  #endif
+
   if (work.useoutput == emuks)
+
+  #ifdef HAVE_ADPLUG_SURROUND
+  	if (work.duelsynth == true) {
+      Copl *a = new CEmuopl(work.replayfreq, work.use16bit, false);
+      Copl *b = new CKemuopl(work.replayfreq, work.use16bit, false);
+      opl = output.emu = new CSurroundopl(a, b, work.use16bit);
+      // CSurroundopl now owns "a" and "b", and will free it upon destruction.
+  	} else {
     opl = output.emu = new CKemuopl(work.replayfreq,work.use16bit,work.stereo);
+  	}
+  #endif
+
+  #ifndef HAVE_ADPLUG_SURROUND
+    opl = output.emu = new CKemuopl(work.replayfreq,work.use16bit,work.stereo);
+  #endif
+
   if (work.useoutput == opl2)
     opl = output.real = new CRealopl(work.adlibport);
   if (work.useoutput == disk)

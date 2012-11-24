@@ -63,7 +63,7 @@ void GuiCtrlTooltip::trigger(HWND hwnd)
 
   SendMessage(hwnd,BM_SETCHECK,BST_CHECKED,0);
 
-  add(hwnd,"ToolTip trigger","You can enable/disable tooltips by changing the state of this checkbox");
+  add(hwnd,"ToolTip trigger","You can enable/disable Tool-Tips by changing the state of this checkbox.");
 }
 
 LRESULT CALLBACK GuiCtrlTooltip::WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
