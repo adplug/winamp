@@ -156,7 +156,7 @@ BOOL APIENTRY GuiDlgAbout::TabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam,
 
 	  /* sites */
 
-	  hyperlink.add(GetDlgItem(hwndDlg,IDC_URL_ADPLUG),  "adplug.sourceforge.net",   "http://adplug.sourceforge.net");
+	  hyperlink.add(GetDlgItem(hwndDlg,IDC_URL_ADPLUG),  "adplug.github.io",   "http://adplug.github.io");
 	  hyperlink.add(GetDlgItem(hwndDlg,IDC_URL_CHIPTUNE),"chiptunes.back2roots.org", "http://chiptunes.back2roots.org");
 	  hyperlink.add(GetDlgItem(hwndDlg,IDC_URL_MALF),    "www.astercity.net/~malf",  "http://www.astercity.net/~malf");
 
