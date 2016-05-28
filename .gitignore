@@ -8,3 +8,14 @@ depcomp
 install-sh
 ltmain.sh
 missing
+libtool
+compile
+config.log
+config.status
+src/.deps/
+src/.libs/
+src/*.o
+src/*.lo
+src/*.la
+Makefile
+in_adlib.psc
