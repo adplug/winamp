@@ -40,9 +40,7 @@
 #include <adplug/realopl.h>
 #include <adplug/silentopl.h>
 
-#ifdef HAVE_ADPLUG_SURROUND
 #include <adplug/surroundopl.h>
-#endif
 
 // stl
 #include <string>

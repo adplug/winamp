@@ -11,9 +11,9 @@ in_adlib_la_LDFLAGS = -module -avoid-version -no-undefined -lwinmm -lgdi32 \
 
 in_adlib_la_LIBADD = in_adlib.lo $(adplug_LIBS)
 
-AM_CPPFLAGS = $(adplug_CFLAGS) -DPLUGIN_VERSION=@VERSION@ -DHAVE_ADPLUG_SURROUND
+AM_CPPFLAGS = $(adplug_CFLAGS) -DPLUGIN_VERSION=@VERSION@
 
-LTRCCOMPILE = $(LIBTOOL) --mode=compile $(RC) -D HAVE_ADPLUG_SURROUND \
+LTRCCOMPILE = $(LIBTOOL) --mode=compile $(RC) \
 	$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)
 
 .rc.lo:

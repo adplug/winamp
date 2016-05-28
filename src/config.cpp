@@ -28,12 +28,8 @@
 
 #define DFL_EMU			emuts
 #define DFL_REPLAYFREQ		44100
-
-#ifdef HAVE_ADPLUG_SURROUND
 #define DFL_HARMONIC		true
 #define DFL_DUELSYNTH		true
-#endif
-
 #define DFL_USE16BIT		true
 #define DFL_STEREO		true
 #define DFL_USEOUTPUT		DFL_EMU
@@ -76,7 +72,6 @@ void Config::load()
   if (bufval != -1)
     next.replayfreq = bufval;
 
-  #ifdef HAVE_ADPLUG_SURROUND
   bufval = GetPrivateProfileInt("in_adlib","harmonic",DFL_HARMONIC,fname.c_str());
   if (bufval != -1)
     next.harmonic = bufval ? true : false;
@@ -84,7 +79,6 @@ void Config::load()
   bufval = GetPrivateProfileInt("in_adlib","duelsynth",DFL_DUELSYNTH,fname.c_str());
   if (bufval != -1)
     next.duelsynth = bufval ? true : false;
-  #endif
 
   bufval = GetPrivateProfileInt("in_adlib","use16bit",DFL_USE16BIT,fname.c_str());
   if (bufval != -1)
@@ -155,13 +149,8 @@ void Config::save()
   char bufstr[11];
 
   WritePrivateProfileString("in_adlib","replayfreq",_itoa(next.replayfreq,bufstr,10),fname.c_str());
-
-  #ifdef HAVE_ADPLUG_SURROUND
   WritePrivateProfileString("in_adlib","harmonic",_itoa(next.harmonic,bufstr,10),fname.c_str());
-
   WritePrivateProfileString("in_adlib","duelsynth",_itoa(next.duelsynth,bufstr,10),fname.c_str());
-  #endif
-
   WritePrivateProfileString("in_adlib","use16bit",_itoa(next.use16bit,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","stereo",_itoa(next.stereo,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","useoutput",_itoa(next.useoutput,bufstr,10),fname.c_str());
@@ -232,12 +221,8 @@ void Config::apply(bool testout)
   check();
 
   work.replayfreq	= next.replayfreq;
-
-  #ifdef HAVE_ADPLUG_SURROUND
   work.harmonic		= next.harmonic;
-  work.duelsynth		= next.duelsynth;
-  #endif
-
+  work.duelsynth	= next.duelsynth;
   work.use16bit		= next.use16bit;
   work.stereo		= next.stereo;
   work.adlibport	= next.adlibport;

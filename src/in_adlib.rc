@@ -57,14 +57,10 @@ BEGIN
                     BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,6,114,10
     CONTROL         "Emulator 2 (by &Ken Silverman)",IDC_OUTKS,"Button",
                     BS_AUTORADIOBUTTON | WS_TABSTOP,7,17,108,10
-
-    #ifdef HAVE_ADPLUG_SURROUND
     CONTROL         "&Harmonic Effect",IDC_HARMONIC,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,174,6,65,10
     CONTROL         "D&ueling Synths",IDC_DUELSYNTH,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,174,17,61,10
-    #endif
-
     CONTROL         "&OPL2 at Port ",IDC_OUTOPL2,"Button",BS_AUTORADIOBUTTON | 
                     WS_TABSTOP,7,76,54,8
     CONTROL         "&Disk Writer (RAW Format)",IDC_OUTDISK,"Button",

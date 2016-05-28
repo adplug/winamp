@@ -151,12 +151,8 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
       tooltip->add(GetDlgItem(hwndDlg,IDC_FREQC_VALUE),"freqc_value","Specify custom frequency value (in Hz).");
       tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY8),   "quality8",   "Set 8-Bits quality.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY16),  "quality16",  "Set 16-Bits quality.");
-
-      #ifdef HAVE_ADPLUG_SURROUND
-      tooltip->add(GetDlgItem(hwndDlg,IDC_HARMONIC),     "harmonic",     "Enables/Disables the pseudo-stereo harmonic effect.\r\nNote: This requires Emulator 1, and it forces 16-Bits Stereo.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_DUELSYNTH),    "duelsynth",    "Enables/Disables the stereo dueling synths.\r\nNote: This requires Emulator 2, and it forces 16-Bits Stereo.");
-      #endif
-
+      tooltip->add(GetDlgItem(hwndDlg,IDC_HARMONIC),   "harmonic",   "Enables/Disables the pseudo-stereo harmonic effect.\r\nNote: This requires Emulator 1, and it forces 16-Bits Stereo.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_DUELSYNTH),  "duelsynth",  "Enables/Disables the stereo dueling synths.\r\nNote: This requires Emulator 2, and it forces 16-Bits Stereo.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_MONO),       "mono",       "Set Mono output.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_STEREO),     "stereo",     "Set Stereo output.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_OUTTS),      "outts",      "Use Tatsuyuki Satoh's emulator.");
@@ -192,7 +188,6 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 	  SetDlgItemInt(hwndDlg,IDC_FREQC_VALUE,next.replayfreq,FALSE);
 	}
 
-      #ifdef HAVE_ADPLUG_SURROUND
       // Set "harmonic".
       if (next.harmonic)
 	CheckDlgButton(hwndDlg,IDC_HARMONIC,BST_CHECKED);
@@ -200,7 +195,6 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
       // Set "duelsynth".
       if (next.duelsynth)
 	CheckDlgButton(hwndDlg,IDC_DUELSYNTH,BST_CHECKED);
-      #endif
 
       // set "resolution"
       if (next.use16bit)
@@ -256,7 +250,6 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
       else
 	next.replayfreq = GetDlgItemInt(hwndDlg,IDC_FREQC_VALUE,NULL,FALSE);
 
-      #ifdef HAVE_ADPLUG_SURROUND
       // Check "harmonic".
       if (IsDlgButtonChecked(hwndDlg,IDC_HARMONIC) == BST_CHECKED) {
 	next.harmonic = true;
@@ -274,7 +267,6 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
       } else {
 	next.duelsynth = false;
       }
-      #endif
 
       // check "resolution"
       if (IsDlgButtonChecked(hwndDlg,IDC_QUALITY16) == BST_CHECKED)

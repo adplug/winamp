@@ -78,12 +78,8 @@
 #define IDC_LICENSE                     1054
 #define IDC_URL_GNU                     1060
 #define IDC_URL_WV                      1061
-
-#ifdef HAVE_ADPLUG_SURROUND
 #define IDC_HARMONIC                    1062
 #define IDC_DUELSYNTH                   1063
-#endif
-
 #define IDC_CTABS                       1070
 #define IDC_PLUGIN_VER                  1071
 #define IDC_URL_SP                      1072
