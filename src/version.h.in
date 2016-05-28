@@ -1,0 +1,5 @@
+#include <adplug/version.h>
+
+#define PLUGIN_VERSION "@VERSION@"
+
+#define PLUGIN_VER "AdPlug/Winamp v" ADPLUG_VERSION "/v" PLUGIN_VERSION

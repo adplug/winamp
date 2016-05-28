@@ -21,6 +21,7 @@
 
 #include "resource.h"
 #include "winresrc.h"
+#include "version.h"
 
 /***** Dialog boxes *****/
 
@@ -270,14 +271,14 @@ BEGIN
      VALUE "Comments", ""
      VALUE "CompanyName", "http://adplug.github.io"
      VALUE "FileDescription", "AdPlug Winamp plugin"
-     VALUE "FileVersion", "1.8.2"
+     VALUE "FileVersion", PLUGIN_VERSION
      VALUE "InternalName", "in_adlib"
-     VALUE "LegalCopyright", "© 1999-2010 Simon Peter, et al."
+     VALUE "LegalCopyright", "© 1999-2016 Simon Peter, et al."
      VALUE "LegalTrademarks", "GNU Lesser General Public License"
      VALUE "OriginalFilename", "in_adlib.dll"
      VALUE "PrivateBuild", ""
      VALUE "ProductName", "AdPlug"
-     VALUE "ProductVersion", "2.2.1"
+     VALUE "ProductVersion", ADPLUG_VERSION
     END
 END
 BLOCK "VarFileInfo"
