@@ -2,13 +2,13 @@
 AC_INIT(in_adlib,1.8.3)
 AC_CONFIG_SRCDIR(src/plugin.cpp)
 AC_CONFIG_FILES([Makefile src/Makefile in_adlib.psc])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE
+AM_PROG_LIBTOOL
+AC_LANG(C++)
 AC_LIBTOOL_WIN32_DLL
 AC_LIBTOOL_RC
 AM_DISABLE_STATIC
-AM_PROG_LIBTOOL
-AC_LANG(C++)
 
 # Check for a sane C/C++ build environment.
 AC_PROG_MAKE_SET
