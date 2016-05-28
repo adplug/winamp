@@ -304,6 +304,10 @@ bool Config::test_opl2()
 
 bool Config::test_winnt()
 {
+#if (_MSC_VER >= 1900) // VS2015+
+  // These functions no longer exist, but these systems all inherit from NT anyway.
+  return true;
+#else
   OSVERSIONINFO ver;
 
   ver.dwOSVersionInfoSize = sizeof(ver);
@@ -314,6 +318,7 @@ bool Config::test_winnt()
     return true;
 
   return false;
+#endif
 }
 
 bool Config::test_xmplay()
