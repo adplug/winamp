@@ -68,7 +68,7 @@ void FileTypes::set_ignore(int i, bool val)
 
 bool FileTypes::grata(const char *fname)
 {
-  char *tmpstr = strrchr(fname,'.');
+  const char *tmpstr = strrchr(fname,'.');
   if (!tmpstr)
     return true;
 
@@ -86,7 +86,7 @@ bool FileTypes::grata(const char *fname)
       string tmpxstr = work.type[i];
 
       const char *ext = tmpxstr.c_str();
-      char       *str = strstr(ext,_strlwr(p));
+      const char *str = strstr(ext,_strlwr(p));
 
       if (str)
 	{
