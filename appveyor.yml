@@ -24,13 +24,22 @@ build_script:
 
     msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Release /p:Platform=x86 /p:SolutionDir=..\ /v:minimal /nologo
 
+artifacts:
+- path: contrib\vs2015\Debug\in_adlib.dll
+  name: Debug 32-bit
+
+- path: contrib\vs2015\Release\in_adlib.dll
+  name: Release 32-bit
+
 deploy:
 - provider: GitHub
   release: ci
-  description: 'Latest git build'
+  description: 'Latest git build ($(APPVEYOR_BUILD_VERSION))'
   auth_token:
     secure: mC9b4zcILiIMORPIj2QHr4ZEQpA7w0lRPCCoVYVGdlmJSfHzpgyzo7wB1JKZyR5E
-  artifact: contrib/vs2015/Debug/in_adlib.dll
+  artifact: contrib\vs2015\Debug\in_adlib.dll
+  prerelease: true
+  force_update: true
   on:
     branch: master
 
@@ -39,7 +48,6 @@ deploy:
   description: 'AdPlug Winamp plugin $(APPVEYOR_REPO_TAG_NAME)'
   auth_token:
     secure: mC9b4zcILiIMORPIj2QHr4ZEQpA7w0lRPCCoVYVGdlmJSfHzpgyzo7wB1JKZyR5E
-  artifact: contrib/vs2015/Release/in_adlib.dll
+  artifact: contrib\vs2015\Release\in_adlib.dll
   on:
-    branch: master
     appveyor_repo_tag: true
