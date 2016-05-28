@@ -19,3 +19,11 @@ src/*.lo
 src/*.la
 Makefile
 in_adlib.psc
+
+contrib/vs2015/.vs
+contrib/vs2015/**/Debug
+contrib/vs2015/**/Release
+contrib/vs2015/**/x64
+contrib/vs2015/packages
+contrib/vs2015/**/*.filters
+src/*.aps
