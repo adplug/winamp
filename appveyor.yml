@@ -1,0 +1,49 @@
+version: 1.8.3-beta{build}
+
+before_build:
+- ps: >-
+    # This is the version header to create.
+
+    $file = "src\version.h"
+
+
+    # Get the ".in" version of the file, replace "@VERSION@" with the Appveyor version number, then save to the target file.
+
+    cat ($file + ".in") | % { $_ -replace "@VERSION@", $env:appveyor_build_version } > $file
+
+
+build_script:
+- cmd: >-
+    @echo off
+
+    "%VS140COMNTOOLS%\VsMSBuildCmd.bat" && ^
+
+    appveyor-retry nuget restore contrib\vs2015\vs2015.sln && ^
+
+    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Debug /p:Platform=x86 /p:SolutionDir=..\ /v:minimal /nologo && ^
+
+    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Release /p:Platform=x86 /p:SolutionDir=..\ /v:minimal /nologo && ^
+
+    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:SolutionDir=..\ /v:minimal /nologo && ^
+
+    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Release /p:Platform=x64 /p:SolutionDir=..\ /v:minimal /nologo
+
+deploy:
+- provider: GitHub
+  release: ci
+  description: 'Latest git build'
+  auth_token:
+    secure: mC9b4zcILiIMORPIj2QHr4ZEQpA7w0lRPCCoVYVGdlmJSfHzpgyzo7wB1JKZyR5E
+  artifact: contrib/vs2015/Debug/in_adlib.dll
+  on:
+    branch: master
+
+- provider: GitHub
+  release: $(APPVEYOR_REPO_TAG_NAME)
+  description: 'AdPlug Winamp plugin $(APPVEYOR_REPO_TAG_NAME)'
+  auth_token:
+    secure: mC9b4zcILiIMORPIj2QHr4ZEQpA7w0lRPCCoVYVGdlmJSfHzpgyzo7wB1JKZyR5E
+  artifact: contrib/vs2015/Release/in_adlib.dll
+  on:
+    branch: master
+    appveyor_repo_tag: true
