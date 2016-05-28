@@ -273,7 +273,7 @@ void MyPlayer::set_panning(int pan)
 
 Copl *MyPlayer::opl_init()
 {
-  Copl *opl;
+  Copl *opl = NULL;
 
   if (work.useoutput == emuts)
 
