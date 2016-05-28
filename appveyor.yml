@@ -22,11 +22,7 @@ build_script:
 
     msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Debug /p:Platform=x86 /p:SolutionDir=..\ /v:minimal /nologo && ^
 
-    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Release /p:Platform=x86 /p:SolutionDir=..\ /v:minimal /nologo && ^
-
-    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:SolutionDir=..\ /v:minimal /nologo && ^
-
-    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Release /p:Platform=x64 /p:SolutionDir=..\ /v:minimal /nologo
+    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Release /p:Platform=x86 /p:SolutionDir=..\ /v:minimal /nologo
 
 deploy:
 - provider: GitHub
