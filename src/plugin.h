@@ -68,7 +68,14 @@ using namespace std;
 
 #include "resource.h"
 
-#define PLUGIN_VER "AdPlug/Winamp v" VERSION "/v" PLUGIN
+#ifndef PLUGIN_VERSION
+// This is for Windows only.  For *nix, adjust the version number in configure.ac
+#define PLUGIN_VERSION 1.8.3
+#endif
+
+#define PLUGIN_STRINGIFY2(x) #x
+#define PLUGIN_STRINGIFY(x) PLUGIN_STRINGIFY2(x)
+#define PLUGIN_VER "AdPlug/Winamp v" PLUGIN_STRINGIFY(ADPLUG_VERSION) "/v" PLUGIN_STRINGIFY(PLUGIN_VERSION)
 
 #define WM_UPDATE     WM_USER+1
 #define WM_UPDATE_ALL WM_USER+2

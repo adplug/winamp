@@ -1,5 +1,5 @@
 # Tell autoconf we're compiling a C++ DLL, using automake & libtool
-AC_INIT(in_adlib,1.8.3)
+AC_INIT(in_adlib,1.8.3)  # Remember to update the version in src/plugin.h too
 AC_CONFIG_SRCDIR(src/plugin.cpp)
 AC_CONFIG_FILES([Makefile src/Makefile in_adlib.psc])
 AM_INIT_AUTOMAKE([foreign])
