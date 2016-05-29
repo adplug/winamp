@@ -187,11 +187,15 @@
     <ClInclude Include="..\..\..\src\version.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\NEWS" />
     <None Include="..\..\..\src\hand.cur" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\src\in_adlib.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\src\adplug.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
