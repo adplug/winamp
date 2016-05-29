@@ -553,6 +553,9 @@ void GuiDlgConfig::syncControlStates(HWND hwndDlg)
   } else if (enSurround && !bWasSurroundEnabled) {
     // Surround has just become enabled so select it
     CheckRadioButton(hwndDlg, IDC_MONO, IDC_SURROUND, IDC_SURROUND);
+  } else if (!enMono && !enStereo && enSurround) {
+    // Surround is the only option, select it
+    CheckRadioButton(hwndDlg, IDC_MONO, IDC_SURROUND, IDC_SURROUND);
   }
   return;
 }
