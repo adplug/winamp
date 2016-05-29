@@ -1,5 +1,12 @@
-Changes for version 1.9 (2012-07-14)
-   - OPL Port entrybox allows entering hex-digits.
+Changes for version 1.9 (2016-05-29)
+   - New emulator: WoodyOPL from DOSBox, set as the default because it sounds
+     so good
+   - 49716Hz added as a preset sample rate, because the sample rate affects
+     the pitch of some instruments, and this makes them sound more true to the
+     real chip (e.g. Keen 6 metal.imf)
+   - Support for real OPL chips removed (no choice, the Windows API doesn't
+     support this anymore)
+   - Duelling synths extended so that any two synths can be compared
 
 Changes for in_adlib version 1.8.2 (2010-04-23) (Wraithverge)
    - Added support for Adam Nielsen's Synth Wrapper, which can be configured
