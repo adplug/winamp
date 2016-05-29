@@ -24,13 +24,13 @@
 #define MSGC_DATABASE	"An external Database could not be loaded!"
 #define MSGE_XMPLAY	"Hardware OPL2 output is not supported when this plugin is used within XMPlay. An emulator must be used for output, instead."
 
-#define DFL_EMU			emuts
+#define DFL_EMU			emuwo
 #define DFL_REPLAYFREQ		44100
 #define DFL_HARMONIC		true
-#define DFL_DUELSYNTH		true
 #define DFL_USE16BIT		true
 #define DFL_STEREO		true
 #define DFL_USEOUTPUT		DFL_EMU
+#define DFL_USEOUTPUT_ALT	emunone
 #define DFL_TESTLOOP		true
 #define DFL_PRIORITY		4
 #define DFL_STDTIMER		true
@@ -71,10 +71,6 @@ void Config::load()
   if (bufval != -1)
     next.harmonic = bufval ? true : false;
 
-  bufval = GetPrivateProfileInt("in_adlib","duelsynth",DFL_DUELSYNTH,fname.c_str());
-  if (bufval != -1)
-    next.duelsynth = bufval ? true : false;
-
   bufval = GetPrivateProfileInt("in_adlib","use16bit",DFL_USE16BIT,fname.c_str());
   if (bufval != -1)
     next.use16bit = bufval ? true : false;
@@ -87,6 +83,9 @@ void Config::load()
   if (bufval != -1)
     next.useoutput = (enum t_output)bufval;
 
+  bufval = GetPrivateProfileInt("in_adlib","useoutput_alt",DFL_USEOUTPUT_ALT,fname.c_str());
+  if (bufval != -1)
+    next.useoutput_alt = (enum t_output)bufval;
 
   GetPrivateProfileString("in_adlib","diskdir",DFL_DISKDIR,bufstr,MAX_PATH,fname.c_str());
   if (SetCurrentDirectory(bufstr))
@@ -132,10 +131,10 @@ void Config::save()
 
   WritePrivateProfileString("in_adlib","replayfreq",_itoa(next.replayfreq,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","harmonic",_itoa(next.harmonic,bufstr,10),fname.c_str());
-  WritePrivateProfileString("in_adlib","duelsynth",_itoa(next.duelsynth,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","use16bit",_itoa(next.use16bit,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","stereo",_itoa(next.stereo,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","useoutput",_itoa(next.useoutput,bufstr,10),fname.c_str());
+  WritePrivateProfileString("in_adlib","useoutput_alt",_itoa(next.useoutput_alt,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","testloop",_itoa(next.testloop,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","priority",_itoa(next.priority,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","stdtimer",_itoa(next.stdtimer,bufstr,10),fname.c_str());
@@ -148,10 +147,16 @@ void Config::save()
 
 void Config::check()
 {
-  if ((next.useoutput == emuts) || (next.useoutput == emuks))
+  switch (next.useoutput) {
+  case emuts:
+  case emuks:
+  case emuwo:
     next.useoutputplug = true;
-  else
+    break;
+  default:
     next.useoutputplug = false;
+    break;
+  }
 
   if (!next.useoutputplug)
     if (test_xmplay())
@@ -180,7 +185,6 @@ void Config::apply(bool testout)
 
   work.replayfreq	= next.replayfreq;
   work.harmonic		= next.harmonic;
-  work.duelsynth	= next.duelsynth;
   work.use16bit		= next.use16bit;
   work.stereo		= next.stereo;
   work.testloop		= next.testloop;
@@ -195,6 +199,7 @@ void Config::apply(bool testout)
   if (!testout || (next.useoutputplug <= useoutputplug))
     {
       work.useoutput = next.useoutput;
+      work.useoutput_alt = next.useoutput_alt;
       useoutputplug  = next.useoutputplug;
     }
 }

@@ -33,6 +33,8 @@ class GuiDlgConfig
   BOOL APIENTRY	PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
   BOOL APIENTRY	FormatsTabDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
+  void syncControlStates(HWND hwndDlg);
+
   HWND			tab_hwnd;
   int			tab_index;
 

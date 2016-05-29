@@ -26,16 +26,18 @@ enum t_output {
   emuts,
   emuks,
   opl2_unused,
-  disk
+  disk,
+  emuwo,
+  emunone
 };
 
 struct t_config_data {
   int            replayfreq;
   bool           harmonic;
-  bool           duelsynth;
   bool           use16bit;
   bool           stereo;
   enum t_output  useoutput;
+  enum t_output  useoutput_alt;
   bool           testloop;
   int            priority;
   int            stdtimer;

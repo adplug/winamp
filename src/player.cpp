@@ -183,6 +183,7 @@ int MyPlayer::get_position()
     {
     case emuts:
     case emuks:
+    case emuwo:
       outtime = mod.outMod->GetOutputTime();
       break;
     case disk:
@@ -209,6 +210,7 @@ void MyPlayer::set_volume(int vol)
     {
     case emuts:
     case emuks:
+    case emuwo:
       mod.outMod->SetVolume(vol);
       break;
     case disk:
@@ -226,6 +228,7 @@ void MyPlayer::set_panning(int pan)
     {
     case emuts:
     case emuks:
+    case emuwo:
       mod.outMod->SetPan(pan);
       break;
 
@@ -235,46 +238,64 @@ void MyPlayer::set_panning(int pan)
     }
 }
 
+Copl *MyPlayer::make_opl(enum t_output type, bool stereo)
+{
+  switch (type) {
+  case emuwo:
+    return new CWemuopl(work.replayfreq, work.use16bit, stereo);
+    break;
+  case emuts:
+    return new CEmuopl(work.replayfreq, work.use16bit, stereo);
+    break;
+  case emuks:
+    return new CKemuopl(work.replayfreq, work.use16bit, stereo);
+    break;
+  case disk:
+    return new CDiskopl(get_diskfile(plr.fname));
+    break;
+  }
+  return NULL;
+}
+
 Copl *MyPlayer::opl_init()
 {
   Copl *opl = NULL;
 
-  if (work.useoutput == emuts)
+  // Stereo as far as the OPL synth is concerned is only true if set to stereo (not mono or surround)
+  bool stereo = !work.harmonic && work.stereo;
+  opl = output.emu = make_opl(work.useoutput, stereo);
+  if (!opl) return NULL;
 
-  if (work.harmonic == true) {
-    Copl *a = new CEmuopl(work.replayfreq, work.use16bit, false);
-    Copl *b = new CEmuopl(work.replayfreq, work.use16bit, false);
-    opl = output.emu = new CSurroundopl(a, b, work.use16bit);
-    // CSurroundopl now owns "a" and "b", and will free it upon destruction.
+  if (work.useoutput == disk) {
+    output.disk = (CDiskopl *)opl;
   } else {
-    opl = output.emu = new CEmuopl(work.replayfreq, work.use16bit, work.stereo);
+    if (work.harmonic == true) {
+      Copl *opl2;
+      if (work.useoutput_alt == emunone) {
+        opl2 = make_opl(work.useoutput, false);
+      } else {
+        opl2 = make_opl(work.useoutput_alt, false);
+      }
+      // CSurroundopl will take ownership of "opl" and "opl2", and will free them upon destruction.
+      opl = output.emu = new CSurroundopl(opl, opl2, work.use16bit);
+    }
   }
-
-  if (work.useoutput == emuks)
-
-  if (work.duelsynth == true) {
-    Copl *a = new CEmuopl(work.replayfreq, work.use16bit, false);
-    Copl *b = new CKemuopl(work.replayfreq, work.use16bit, false);
-    opl = output.emu = new CSurroundopl(a, b, work.use16bit);
-    // CSurroundopl now owns "a" and "b", and will free it upon destruction.
-  } else {
-    opl = output.emu = new CKemuopl(work.replayfreq,work.use16bit,work.stereo);
-  }
-
-  if (work.useoutput == disk)
-    opl = output.disk = new CDiskopl(get_diskfile(plr.fname));
 
   return opl;
 }
 
 void MyPlayer::opl_done()
 {
-  if (work.useoutput == emuts)
+  switch (work.useoutput) {
+  case emuts:
+  case emuks:
+  case emuwo:
     delete output.emu;
-  if (work.useoutput == emuks)
-    delete output.emu;
-  if (work.useoutput == disk)
+    break;
+  case disk:
     delete output.disk;
+    break;
+  }
 }
 
 bool MyPlayer::output_init()
@@ -283,6 +304,7 @@ bool MyPlayer::output_init()
     {
     case emuts:
     case emuks:
+    case emuwo:
       maxlatency = mod.outMod->Open(work.replayfreq,(work.stereo ? 2 : 1),(work.use16bit ? 16 : 8),-1,-1);
       if (maxlatency < 0)
 	return false;
@@ -304,6 +326,7 @@ void MyPlayer::output_done()
     {
     case emuts:
     case emuks:
+    case emuwo:
       mod.SAVSADeInit();
       mod.outMod->Close();
       break;
@@ -321,6 +344,7 @@ bool MyPlayer::thread_init()
     {
     case emuts:
     case emuks:
+    case emuwo:
       thread.emuts = (HANDLE)CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)callback_emuts,(void *)this,0,&tmpdword);
       if (!thread.emuts)
 	return false;
@@ -343,6 +367,7 @@ void MyPlayer::thread_done()
     {
     case emuts:
     case emuks:
+    case emuwo:
       if (WaitForSingleObject(thread.emuts,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)
 	TerminateThread(thread.emuts,0);
       CloseHandle(thread.emuts);

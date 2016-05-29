@@ -138,56 +138,59 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 
   switch (message)
     {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
 
       // add tooltips
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ1),      "freq1",      "Set 11 KHz frequency.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ2),      "freq2",      "Set 22 KHz frequency.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ3),      "freq3",      "Set 44 KHz frequency.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ4),      "freq4",      "Set 48 KHz frequency.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ1),      "freq1",      "Set 11 kHz frequency.  Be aware that some notes will be the wrong pitch if this rate is used.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ2),      "freq2",      "Set 22 kHz frequency.  Be aware that some notes will be the wrong pitch if this rate is used.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ3),      "freq3",      "Set 44 kHz frequency.  Be aware that some notes will be the wrong pitch if this rate is used.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ4),      "freq4",      "Set 48 kHz frequency.  Be aware that some notes will be the wrong pitch if this rate is used.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_FREQ5),      "freq5",      "Set 49.7 kHz sampling rate.  This is the rate that the original OPL chip used and provides the most accurate playback.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_FREQC),      "freqc",      "Set custom frequency (in Hz).");
       tooltip->add(GetDlgItem(hwndDlg,IDC_FREQC_VALUE),"freqc_value","Specify custom frequency value (in Hz).");
       tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY8),   "quality8",   "Set 8-Bits quality.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_QUALITY16),  "quality16",  "Set 16-Bits quality.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_HARMONIC),   "harmonic",   "Enables/Disables the pseudo-stereo harmonic effect.\r\nNote: This requires Emulator 1, and it forces 16-Bits Stereo.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_DUELSYNTH),  "duelsynth",  "Enables/Disables the stereo dueling synths.\r\nNote: This requires Emulator 2, and it forces 16-Bits Stereo.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_MONO),       "mono",       "Set Mono output.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_STEREO),     "stereo",     "Set Stereo output.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTTS),      "outts",      "Use Tatsuyuki Satoh's emulator.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTKS),      "outks",      "Use Ken Silverman's emulator.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTDISK),    "outdisk",    "Use Disk Writer output:\r\nWrites RdosPlay RAW files. These can be replayed by AdPlug again.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_MONO),       "mono",       "Set mono output.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_STEREO),     "stereo",     "Set stereo output.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_SURROUND),   "surround",   "Set stereo output with a harmonic chorus effect.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_DIRECTORY),  "directory",  "Select output directory for Disk Writer.");
 
       // set "output"
-      if (next.useoutput == emuts)
-	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTDISK,IDC_OUTTS);
-      else if (next.useoutput == emuks)
-	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTDISK,IDC_OUTKS);
-      else //if (next.useoutput == disk)
-	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTDISK,IDC_OUTDISK);
+      int target = IDC_OUTWO;
+      switch (next.useoutput) {
+      case emuts: target = IDC_OUTTS; break;
+      case emuks: target = IDC_OUTKS; break;
+      case disk:  target = IDC_OUTDISK; break;
+      case emuwo: target = IDC_OUTWO; break;
+      }
+      CheckRadioButton(hwndDlg, IDC_OUTWO, IDC_OUTDISK, target);
+
+      switch (next.useoutput_alt) {
+      case emuts: target = IDC_OUTTS2; break;
+      default:
+      case emuwo: target = IDC_OUTWO2; break;
+      }
+      CheckRadioButton(hwndDlg, IDC_OUTWO2, IDC_OUTTS2, target);
+
+      if (next.useoutput_alt != emunone)
+        CheckDlgButton(hwndDlg, IDC_ALTSYNTH, BST_CHECKED);
 
       // set "frequency"
       if (next.replayfreq == 11025)
-	CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ1);
+        CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ1);
       else if (next.replayfreq == 22050)
-	CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ2);
+        CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ2);
       else if (next.replayfreq == 44100)
-	CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ3);
+        CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ3);
       else if (next.replayfreq == 48000)
-	CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ4);
+        CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ4);
+      else if (next.replayfreq == 49716)
+        CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQ5);
       else
 	{
 	  CheckRadioButton(hwndDlg,IDC_FREQ1,IDC_FREQC,IDC_FREQC);
 	  SetDlgItemInt(hwndDlg,IDC_FREQC_VALUE,next.replayfreq,FALSE);
 	}
-
-      // Set "harmonic".
-      if (next.harmonic)
-	CheckDlgButton(hwndDlg,IDC_HARMONIC,BST_CHECKED);
-
-      // Set "duelsynth".
-      if (next.duelsynth)
-	CheckDlgButton(hwndDlg,IDC_DUELSYNTH,BST_CHECKED);
 
       // set "resolution"
       if (next.use16bit)
@@ -196,10 +199,12 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 	CheckRadioButton(hwndDlg,IDC_QUALITY8,IDC_QUALITY16,IDC_QUALITY8);
 
       // set "channels"
-      if (next.stereo)
-	CheckRadioButton(hwndDlg,IDC_MONO,IDC_STEREO,IDC_STEREO);
+      if (next.harmonic)
+        CheckRadioButton(hwndDlg,IDC_MONO,IDC_SURROUND,IDC_SURROUND);
+      else if (next.stereo)
+        CheckRadioButton(hwndDlg,IDC_MONO,IDC_SURROUND,IDC_STEREO);
       else
-	CheckRadioButton(hwndDlg,IDC_MONO,IDC_STEREO,IDC_MONO);
+        CheckRadioButton(hwndDlg,IDC_MONO,IDC_SURROUND,IDC_MONO);
 
       // set "directory"
       bufxstr = tmpxdiskdir = next.diskdir;
@@ -210,12 +215,13 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 	}
       SetDlgItemText(hwndDlg,IDC_DIRECTORY,bufxstr.c_str());
 
+      syncControlStates(hwndDlg);
+
       // move tab content on top
       SetWindowPos(hwndDlg,HWND_TOP,3,22,0,0,SWP_NOSIZE);
 
       return FALSE;
-
-
+    }
     case WM_DESTROY:
 
       if (cancelled)
@@ -226,54 +232,55 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 
       // check "frequency"
       if (IsDlgButtonChecked(hwndDlg,IDC_FREQ1) == BST_CHECKED)
-	next.replayfreq = 11025;
+        next.replayfreq = 11025;
       else if (IsDlgButtonChecked(hwndDlg,IDC_FREQ2) == BST_CHECKED)
-	next.replayfreq = 22050;
+        next.replayfreq = 22050;
       else if (IsDlgButtonChecked(hwndDlg,IDC_FREQ3) == BST_CHECKED)
-	next.replayfreq = 44100;
+        next.replayfreq = 44100;
       else if (IsDlgButtonChecked(hwndDlg,IDC_FREQ4) == BST_CHECKED)
-	next.replayfreq = 48000;
+        next.replayfreq = 48000;
+      else if (IsDlgButtonChecked(hwndDlg,IDC_FREQ5) == BST_CHECKED)
+        next.replayfreq = 49716;
       else
-	next.replayfreq = GetDlgItemInt(hwndDlg,IDC_FREQC_VALUE,NULL,FALSE);
-
-      // Check "harmonic".
-      if (IsDlgButtonChecked(hwndDlg,IDC_HARMONIC) == BST_CHECKED) {
-	next.harmonic = true;
-	next.stereo = true;
-	next.use16bit = true;
-      } else {
-	next.harmonic = false;
-      }
-
-      // Check "duelsynth".
-      if (IsDlgButtonChecked(hwndDlg,IDC_DUELSYNTH) == BST_CHECKED) {
-	next.duelsynth = true;
-	next.stereo = true;
-	next.use16bit = true;
-      } else {
-	next.duelsynth = false;
-      }
+        next.replayfreq = GetDlgItemInt(hwndDlg,IDC_FREQC_VALUE,NULL,FALSE);
 
       // check "resolution"
       if (IsDlgButtonChecked(hwndDlg,IDC_QUALITY16) == BST_CHECKED)
-	next.use16bit = true;
+        next.use16bit = true;
       else
-	next.use16bit = false;
+        next.use16bit = false;
 
-      // check " channels"
-      if (IsDlgButtonChecked(hwndDlg,IDC_STEREO) == BST_CHECKED)
-	next.stereo = true;
-      else
-	next.stereo = false;
+      // check "channels"
+      if (IsDlgButtonChecked(hwndDlg,IDC_SURROUND) == BST_CHECKED) {
+        next.stereo = true;
+        next.harmonic = true;
+      } else if (IsDlgButtonChecked(hwndDlg,IDC_STEREO) == BST_CHECKED) {
+        next.stereo = true;
+        next.harmonic = false;
+      } else {
+        next.stereo = false;
+        next.harmonic = false;
+      }
 
-      // check "output"
+      // check "emulator"
       if (IsDlgButtonChecked(hwndDlg,IDC_OUTTS) == BST_CHECKED)
-	next.useoutput = emuts;
+        next.useoutput = emuts;
       else if (IsDlgButtonChecked(hwndDlg,IDC_OUTKS) == BST_CHECKED)
-	next.useoutput = emuks;
-      else //if (IsDlgButtonChecked(hwndDlg,IDC_OUTDISK) == BST_CHECKED)
-	next.useoutput = disk;
+        next.useoutput = emuks;
+      else if (IsDlgButtonChecked(hwndDlg,IDC_OUTDISK) == BST_CHECKED)
+        next.useoutput = disk;
+      else //if (IsDlgButtonChecked(hwndDlg,IDC_OUTWO) == BST_CHECKED)
+        next.useoutput = emuwo;
 
+      // check secondary emulator
+      if (IsDlgButtonChecked(hwndDlg,IDC_ALTSYNTH) == BST_CHECKED) {
+        if (IsDlgButtonChecked(hwndDlg, IDC_OUTTS2) == BST_CHECKED)
+          next.useoutput_alt = emuts;
+        else //if (IsDlgButtonChecked(hwndDlg,IDC_OUTWO2) == BST_CHECKED)
+          next.useoutput_alt = emuwo;
+      } else {
+        next.useoutput_alt = emunone;
+      }
       return 0;
 
 
@@ -308,8 +315,16 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 	    }
 
 	  return 0;
-	}
+
+    case IDC_ALTSYNTH:
+    case IDC_OUTWO:
+    case IDC_OUTTS:
+    case IDC_OUTKS:
+    case IDC_OUTDISK:
+      syncControlStates(hwndDlg);
+      break;
     }
+  }
 
   return FALSE;
 }
@@ -506,4 +521,38 @@ BOOL APIENTRY GuiDlgConfig::TabDlgProc_Wrapper(HWND hwndDlg, UINT message, WPARA
     return the->PlaybackTabDlgProc(hwndDlg,message,wParam,lParam);
   //if (the->tab_index == 2)
   return the->FormatsTabDlgProc(hwndDlg,message,wParam,lParam);
+}
+
+void GuiDlgConfig::syncControlStates(HWND hwndDlg)
+{
+  bool bAltSynth = IsDlgButtonChecked(hwndDlg, IDC_ALTSYNTH) == BST_CHECKED;
+  bool bOutWO = IsDlgButtonChecked(hwndDlg, IDC_OUTWO) == BST_CHECKED;
+  bool bOutTS = IsDlgButtonChecked(hwndDlg, IDC_OUTTS) == BST_CHECKED;
+  bool bOutKS = IsDlgButtonChecked(hwndDlg, IDC_OUTKS) == BST_CHECKED;
+  bool bOutDisk = IsDlgButtonChecked(hwndDlg, IDC_OUTDISK) == BST_CHECKED;
+  bool bIsStereo = IsDlgButtonChecked(hwndDlg, IDC_STEREO) == BST_CHECKED;
+  bool bIsSurround = IsDlgButtonChecked(hwndDlg, IDC_SURROUND) == BST_CHECKED;
+  bool bWasSurroundEnabled = IsWindowEnabled(GetDlgItem(hwndDlg, IDC_SURROUND)) == TRUE;
+
+  // Figure out which controls we will enable and disable
+  bool enMono = !bOutDisk && !bAltSynth;
+  bool enStereo = !bOutDisk && !bAltSynth;
+  bool enSurround = !bOutDisk && (bAltSynth || !bOutKS);
+
+  EnableWindow(GetDlgItem(hwndDlg, IDC_MONO), enMono);
+  EnableWindow(GetDlgItem(hwndDlg, IDC_STEREO), enStereo);
+  EnableWindow(GetDlgItem(hwndDlg, IDC_SURROUND), enSurround);
+
+  // Switch the alternate synth choices on and off depending on the checkbox
+  EnableWindow(GetDlgItem(hwndDlg, IDC_OUTWO2), bAltSynth);
+  EnableWindow(GetDlgItem(hwndDlg, IDC_OUTTS2), bAltSynth);
+
+  if (bIsSurround && !enSurround) {
+    // Surround was selected but it's been disabled, move it to stereo
+    CheckRadioButton(hwndDlg, IDC_MONO, IDC_SURROUND, IDC_STEREO);
+  } else if (enSurround && !bWasSurroundEnabled) {
+    // Surround has just become enabled so select it
+    CheckRadioButton(hwndDlg, IDC_MONO, IDC_SURROUND, IDC_SURROUND);
+  }
+  return;
 }

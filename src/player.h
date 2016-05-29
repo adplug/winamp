@@ -45,6 +45,7 @@ class MyPlayer
 
  private:
 
+  Copl *	make_opl(enum t_output type, bool stereo);
   Copl *	opl_init();
   void		opl_done();
 

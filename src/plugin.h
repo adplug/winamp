@@ -39,8 +39,8 @@
 #include <adplug/kemuopl.h>
 #include <adplug/realopl.h>
 #include <adplug/silentopl.h>
-
 #include <adplug/surroundopl.h>
+#include <adplug/wemuopl.h>
 
 // stl
 #include <string>
