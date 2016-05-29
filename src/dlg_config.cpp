@@ -134,8 +134,6 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 #ifdef DEBUG
   //printf("GuiDlgConfig::OutputTabDlgProc(): Message 0x%08X received.\n",message);
 #endif
-  char bufstr[5];
-  unsigned long bufint;
   string bufxstr;
 
   switch (message)
@@ -158,20 +156,15 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
       tooltip->add(GetDlgItem(hwndDlg,IDC_OUTTS),      "outts",      "Use Tatsuyuki Satoh's emulator.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_OUTKS),      "outks",      "Use Ken Silverman's emulator.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_OUTDISK),    "outdisk",    "Use Disk Writer output:\r\nWrites RdosPlay RAW files. These can be replayed by AdPlug again.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_OUTOPL2),    "outopl2",    "Use OPL2 hardware output.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_ADLIBPORT),  "adlibport",  "Specify OPL2 port (default 0x388h).");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_NOTEST),     "notest",     "Disable OPL2 hardware detection.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_DIRECTORY),  "directory",  "Select output directory for Disk Writer.");
 
       // set "output"
       if (next.useoutput == emuts)
-	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTOPL2,IDC_OUTTS);
+	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTDISK,IDC_OUTTS);
       else if (next.useoutput == emuks)
-	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTOPL2,IDC_OUTKS);
-      else if (next.useoutput == opl2)
-	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTOPL2,IDC_OUTOPL2);
+	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTDISK,IDC_OUTKS);
       else //if (next.useoutput == disk)
-	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTOPL2,IDC_OUTDISK);
+	CheckRadioButton(hwndDlg,IDC_OUTTS,IDC_OUTDISK,IDC_OUTDISK);
 
       // set "frequency"
       if (next.replayfreq == 11025)
@@ -207,13 +200,6 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 	CheckRadioButton(hwndDlg,IDC_MONO,IDC_STEREO,IDC_STEREO);
       else
 	CheckRadioButton(hwndDlg,IDC_MONO,IDC_STEREO,IDC_MONO);
-
-      // set "port"
-      SetDlgItemText(hwndDlg,IDC_ADLIBPORT,_itoa(next.adlibport,bufstr,16));
-
-      // set "no-opl2-test"
-      if (!next.testopl2)
-	CheckDlgButton(hwndDlg,IDC_NOTEST,BST_CHECKED);
 
       // set "directory"
       bufxstr = tmpxdiskdir = next.diskdir;
@@ -285,18 +271,8 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 	next.useoutput = emuts;
       else if (IsDlgButtonChecked(hwndDlg,IDC_OUTKS) == BST_CHECKED)
 	next.useoutput = emuks;
-      else if (IsDlgButtonChecked(hwndDlg,IDC_OUTOPL2) == BST_CHECKED)
-	next.useoutput = opl2;
       else //if (IsDlgButtonChecked(hwndDlg,IDC_OUTDISK) == BST_CHECKED)
 	next.useoutput = disk;
-
-      // check "port"
-      GetDlgItemText(hwndDlg,IDC_ADLIBPORT,bufstr,5);
-      sscanf(bufstr,"%lx",&bufint);
-      next.adlibport = (unsigned short)bufint;
-
-      // check "options"
-      next.testopl2 = !(IsDlgButtonChecked(hwndDlg,IDC_NOTEST) == BST_CHECKED);
 
       return 0;
 
@@ -351,7 +327,6 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
 
       // add tooltips
       tooltip->add(GetDlgItem(hwndDlg,IDC_TESTLOOP),"autoend" ,"Enable song-end auto-detection:\r\nIf disabled, the song will loop endlessly, and Winamp won't advance in the playlist.");
-      tooltip->add(GetDlgItem(hwndDlg,IDC_FASTSEEK),"fastseek","Enable fast seeking for OPL2 hardware output:\r\nWhile this speeds up seeking a lot, it can result in inaccurate replaying for quite some time after the seek.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_STDTIMER),"stdtimer","Use actual replay speed for Disk Writer output:\r\nDisable this for full speed disk writing. Never disable this if you also disabled song-end auto-detection!");
       tooltip->add(GetDlgItem(hwndDlg,IDC_PRIORITY),"priority","Set replay thread priority:\r\nIf you encounter sound skips, try to set this to a higher value.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_DATABASE),"database","Set path to Database file to be used for replay information.");
@@ -360,8 +335,6 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
       // set checkboxes
       if (next.testloop)
 	CheckDlgButton(hwndDlg,IDC_TESTLOOP,BST_CHECKED);
-      if (next.fastseek)
-	CheckDlgButton(hwndDlg,IDC_FASTSEEK,BST_CHECKED);
       if (next.stdtimer)
 	CheckDlgButton(hwndDlg,IDC_STDTIMER,BST_CHECKED);
       if (next.usedb)
@@ -393,7 +366,6 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
 
       // check checkboxes :)
       next.testloop = (IsDlgButtonChecked(hwndDlg,IDC_TESTLOOP) == BST_CHECKED);
-      next.fastseek = (IsDlgButtonChecked(hwndDlg,IDC_FASTSEEK) == BST_CHECKED);
       next.stdtimer = (IsDlgButtonChecked(hwndDlg,IDC_STDTIMER) == BST_CHECKED);
       next.usedb = (IsDlgButtonChecked(hwndDlg,IDC_USEDB) == BST_CHECKED);
 

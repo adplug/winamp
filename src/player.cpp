@@ -19,9 +19,6 @@
 
 #include "plugin.h"
 
-#define MSGE_MIDIBUSY "The OPL2 chip is already in use by the MIDI sequencer!\n\n" \
-                      "Please quit all running MIDI applications."
-
 extern HWND *myWindow;
 extern In_Module mod;
 extern Config config;
@@ -48,27 +45,6 @@ int MyPlayer::play(const char *fname)
     {
       plr.subsong = DFL_SUBSONG;
       plr.fname = fname;
-    }
-
-  // init midiOut
-  if (work.useoutput == opl2)
-    {
-      MIDIOUTCAPS moc;
-
-      midiout = NULL;
-
-      printf("MyPlayer::play(): Number of MIDI devices: %d\n", midiOutGetNumDevs());
-
-      for (unsigned int i=0;i<midiOutGetNumDevs();i++)
-	if (midiOutGetDevCaps(i,&moc,sizeof(moc)) == MMSYSERR_NOERROR)
-	  if (moc.wTechnology == MOD_FMSYNTH) {
-	    printf("MyPlayer::play(): FM Synth found! Device ID: %d Name: %s\n", i, moc.szPname);
-	    if (midiOutOpen(&midiout,i,0,0,CALLBACK_NULL) != MMSYSERR_NOERROR && work.testopl2)
-	      {
-		MessageBox(NULL,MSGE_MIDIBUSY,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
-		return 1;
-	      }
-	  }
     }
 
   // init opl
@@ -135,10 +111,6 @@ void MyPlayer::stop()
 
   delete player;
   opl_done();
-
-  if (work.useoutput == opl2)
-    if (midiout)
-      midiOutClose(midiout);
 }
 
 int MyPlayer::is_playing()
@@ -149,12 +121,10 @@ int MyPlayer::is_playing()
 void MyPlayer::pause()
 {
   plr.paused = 1;
-  if(work.useoutput == opl2) output.real->setquiet();
 }
 
 void MyPlayer::unpause()
 {
-  if(work.useoutput == opl2) output.real->setquiet(false);
   plr.paused = 0;
 }
 
@@ -215,7 +185,6 @@ int MyPlayer::get_position()
     case emuks:
       outtime = mod.outMod->GetOutputTime();
       break;
-    case opl2:
     case disk:
       outtime = (int)plr.outtime;
       break;
@@ -242,10 +211,6 @@ void MyPlayer::set_volume(int vol)
     case emuks:
       mod.outMod->SetVolume(vol);
       break;
-    case opl2:
-      if (plr.playing)
-	output.real->setvolume(plr.volume);
-      break;
     case disk:
       // disk writer does not obey volume control
       break;
@@ -265,8 +230,7 @@ void MyPlayer::set_panning(int pan)
       break;
 
     case disk:
-    case opl2:
-      // Disk writer and hardware OPL2 do not support panning
+      // Disk writer does not support panning
       break;
     }
 }
@@ -297,8 +261,6 @@ Copl *MyPlayer::opl_init()
     opl = output.emu = new CKemuopl(work.replayfreq,work.use16bit,work.stereo);
   }
 
-  if (work.useoutput == opl2)
-    opl = output.real = new CRealopl(work.adlibport);
   if (work.useoutput == disk)
     opl = output.disk = new CDiskopl(get_diskfile(plr.fname));
 
@@ -311,8 +273,6 @@ void MyPlayer::opl_done()
     delete output.emu;
   if (work.useoutput == emuks)
     delete output.emu;
-  if (work.useoutput == opl2)
-    delete output.real;
   if (work.useoutput == disk)
     delete output.disk;
 }
@@ -330,9 +290,6 @@ bool MyPlayer::output_init()
       mod.SAVSAInit(maxlatency,work.replayfreq);
       mod.VSASetInfo((work.stereo ? 2 : 1),work.replayfreq);
       break;
-    case opl2:
-      output.real->setvolume(plr.volume);
-      break;
     case disk:
       // no init necessary
       break;
@@ -349,9 +306,6 @@ void MyPlayer::output_done()
     case emuks:
       mod.SAVSADeInit();
       mod.outMod->Close();
-      break;
-    case opl2:
-      output.real->setvolume(63);
       break;
     case disk:
       // no deinit necessary
@@ -371,13 +325,6 @@ bool MyPlayer::thread_init()
       if (!thread.emuts)
 	return false;
       SetThreadPriority(thread.emuts,thread_priority[work.priority]);
-      break;
-    case opl2:
-      timeGetDevCaps(&tc,sizeof(tc));
-      timeBeginPeriod(tc.wPeriodMin);
-      thread.opl2 = timeSetEvent((UINT)(1000/player->getrefresh()),0,callback_opl2,(DWORD)this,TIME_PERIODIC);
-      if (!thread.opl2)
-	return false;
       break;
     case disk:
       thread.disk = (HANDLE)CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)callback_disk,(void *)this,0,&tmpdword);
@@ -399,10 +346,6 @@ void MyPlayer::thread_done()
       if (WaitForSingleObject(thread.emuts,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)
 	TerminateThread(thread.emuts,0);
       CloseHandle(thread.emuts);
-      break;
-    case opl2:
-      timeKillEvent(thread.opl2);
-      timeEndPeriod(tc.wPeriodMin);
       break;
     case disk:
       if (WaitForSingleObject(thread.disk,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)

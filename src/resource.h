@@ -45,11 +45,7 @@
 #define IDC_OUTTS                       1011
 #define IDC_OUTKS                       1012
 #define IDC_OUTDISK                     1013
-#define IDC_OUTOPL2                     1014
-#define IDC_ADLIBPORT                   1015
-#define IDC_NOTEST                      1016
 #define IDC_TESTLOOP                    1017
-#define IDC_FASTSEEK                    1018
 #define IDC_PRIORITY                    1019
 #define IDC_FORMATLIST                  1020
 #define IDC_FTSELALL                    1021

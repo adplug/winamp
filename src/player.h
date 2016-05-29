@@ -77,7 +77,6 @@ class MyPlayer
   struct t_output_data {
     Copl *		emu;
     CDiskopl *		disk;
-    CRealopl *		real;
   } output;
 
   union {

@@ -153,18 +153,10 @@ void CALLBACK MyPlayer::callback_opl2(UINT wTimerID,UINT msg,DWORD dwUser,DWORD 
 	}
 
       // seek to needed position
-      if (the->work.fastseek)
-	the->output.real->setnowrite();
-
-      the->output.real->setquiet();
 
       while ((the->plr.outtime < the->plr.seek) && the->player->update())
 	the->plr.outtime += 1000/the->player->getrefresh();
 
-      the->output.real->setquiet(false);
-
-      if (the->work.fastseek)
-	the->output.real->setnowrite(false);
 
       the->plr.seek = -1;
 

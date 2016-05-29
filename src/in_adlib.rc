@@ -61,8 +61,6 @@ BEGIN
                     WS_TABSTOP,174,6,65,10
     CONTROL         "D&ueling Synths",IDC_DUELSYNTH,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,174,17,61,10
-    CONTROL         "&OPL2 at Port ",IDC_OUTOPL2,"Button",BS_AUTORADIOBUTTON | 
-                    WS_TABSTOP,7,76,54,8
     CONTROL         "&Disk Writer (RAW Format)",IDC_OUTDISK,"Button",
                     BS_AUTORADIOBUTTON | WS_TABSTOP,7,116,95,10
     CONTROL         "8-&Bits",IDC_QUALITY8,"Button",BS_AUTORADIOBUTTON | 
@@ -87,10 +85,6 @@ BEGIN
                     WS_TABSTOP,215,50,35,10
     GROUPBOX        " Channels ",IDC_STATIC,210,28,47,35,BS_LEFT
     PUSHBUTTON      "C:\\",IDC_DIRECTORY,20,129,237,15
-    CONTROL         "&No OPL2 Testing",IDC_NOTEST,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,26,94,68,10
-    GROUPBOX        "",IDC_STATIC,20,85,237,24
-    EDITTEXT        IDC_ADLIBPORT,63,74,21,12,ES_UPPERCASE | ES_NUMBER
 END
 
 IDD_CFG_PLAYBACK DIALOG 0, 0, 264, 151
@@ -99,8 +93,6 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "&Auto-detect Song End",IDC_TESTLOOP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,12,7,84,10
-    CONTROL         "&Fast Seek",IDC_FASTSEEK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,30,46,10
     CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
                     WS_TABSTOP,12,116,238,11
     LTEXT           "Idle",IDC_STATIC,12,130,12,8
@@ -109,7 +101,6 @@ BEGIN
     GROUPBOX        "Thread Priority ",IDC_STATIC,7,105,250,39
     CONTROL         "&Standard Refresh Rate",IDC_STDTIMER,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,12,54,87,10
-    LTEXT           "OPL2:",IDC_STATIC,7,20,21,8
     LTEXT           "Disk Writer:",IDC_STATIC,7,43,38,8
     LTEXT           "Database:",IDC_STATIC,7,67,34,8
     PUSHBUTTON      "adplug.db",IDC_DATABASE,13,88,237,15

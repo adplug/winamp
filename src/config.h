@@ -25,7 +25,7 @@
 enum t_output {
   emuts,
   emuks,
-  opl2,
+  opl2_unused,
   disk
 };
 
@@ -36,10 +36,7 @@ struct t_config_data {
   bool           use16bit;
   bool           stereo;
   enum t_output  useoutput;
-  unsigned short adlibport;
-  bool           testopl2;
   bool           testloop;
-  bool           fastseek;
   int            priority;
   int            stdtimer;
   string         diskdir;
@@ -74,10 +71,7 @@ class Config
 
   void		check();
 
-  bool		test_opl2();
-  bool		test_winnt();
   bool		test_xmplay();
-  bool		test_porttalk();
 
   string			fname;
   static CAdPlugDatabase	*mydb;

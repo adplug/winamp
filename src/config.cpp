@@ -19,11 +19,9 @@
 
 #include "plugin.h"
 
-#define MSGA_WINAMP	"You must now restart Winamp after switching from hardware OPL2 or Disk Writer to Emulator output mode."
+#define MSGA_WINAMP	"You must now restart Winamp after switching from Disk Writer to Emulator output mode."
 #define MSGC_DISK 	"You have selected *full speed* and *endless* Disk Writing modes. This combination of options is not recommended."
 #define MSGC_DATABASE	"An external Database could not be loaded!"
-#define MSGE_OPL2 	"An OPL2 chip is not being detected at the given Port address. An emulator must be used for output, instead."
-#define MSGE_WINNT	"Hardware OPL2 output is not allowed natively under Windows NT/2000/XP. However, there is a way to work-around the issue. Please refer to the documentation for a solution that has been tested to work with AdPlug. For now, an emulator must be used for output, instead."
 #define MSGE_XMPLAY	"Hardware OPL2 output is not supported when this plugin is used within XMPlay. An emulator must be used for output, instead."
 
 #define DFL_EMU			emuts
@@ -33,10 +31,7 @@
 #define DFL_USE16BIT		true
 #define DFL_STEREO		true
 #define DFL_USEOUTPUT		DFL_EMU
-#define DFL_ADLIBPORT		0x388
-#define DFL_TESTOPL2		true
 #define DFL_TESTLOOP		true
-#define DFL_FASTSEEK		false
 #define DFL_PRIORITY		4
 #define DFL_STDTIMER		true
 #define DFL_DISKDIR		"C:\\"
@@ -92,15 +87,6 @@ void Config::load()
   if (bufval != -1)
     next.useoutput = (enum t_output)bufval;
 
-  GetPrivateProfileString("in_adlib","adlibport","0",bufstr,5,fname.c_str());
-  if (strcmp(bufstr,"0"))
-    sscanf(bufstr,"%hx",&next.adlibport);
-  else
-    next.adlibport = DFL_ADLIBPORT;
-
-  bufval = GetPrivateProfileInt("in_adlib","testopl2",DFL_TESTOPL2,fname.c_str());
-  if (bufval != -1)
-    next.testopl2 = bufval ? true : false;
 
   GetPrivateProfileString("in_adlib","diskdir",DFL_DISKDIR,bufstr,MAX_PATH,fname.c_str());
   if (SetCurrentDirectory(bufstr))
@@ -111,10 +97,6 @@ void Config::load()
   bufval = GetPrivateProfileInt("in_adlib","testloop",DFL_TESTLOOP,fname.c_str());
   if (bufval != -1)
     next.testloop = bufval ? true : false;
-
-  bufval = GetPrivateProfileInt("in_adlib","fastseek",DFL_FASTSEEK,fname.c_str());
-  if (bufval != -1)
-    next.fastseek = bufval ? true : false;
 
   bufval = GetPrivateProfileInt("in_adlib","priority",DFL_PRIORITY,fname.c_str());
   if (bufval != -1)
@@ -154,10 +136,7 @@ void Config::save()
   WritePrivateProfileString("in_adlib","use16bit",_itoa(next.use16bit,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","stereo",_itoa(next.stereo,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","useoutput",_itoa(next.useoutput,bufstr,10),fname.c_str());
-  WritePrivateProfileString("in_adlib","adlibport",_itoa(next.adlibport,bufstr,16),fname.c_str());
-  WritePrivateProfileString("in_adlib","testopl2",_itoa(next.testopl2,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","testloop",_itoa(next.testloop,bufstr,10),fname.c_str());
-  WritePrivateProfileString("in_adlib","fastseek",_itoa(next.fastseek,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","priority",_itoa(next.priority,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","stdtimer",_itoa(next.stdtimer,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","diskdir",next.diskdir.c_str(),fname.c_str());
@@ -183,27 +162,6 @@ void Config::check()
 	MessageBox(NULL,MSGE_XMPLAY,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
       }
 
-  if (next.useoutput == opl2)
-    if (test_winnt())
-      if (!test_porttalk())
-	if (next.testopl2)
-	  {
-	    next.useoutput = DFL_EMU;
-	    next.useoutputplug = true;
-
-	    MessageBox(NULL,MSGE_WINNT,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
-	  }
-
-  if (next.useoutput == opl2)
-    if (next.testopl2)
-      if (!test_opl2())
-	{
-	  next.useoutput = DFL_EMU;
-	  next.useoutputplug = true;
-
-	  MessageBox(NULL,MSGE_OPL2,"AdPlug :: Error",MB_ICONERROR | MB_TASKMODAL);
-	}
-
   if (next.useoutput == disk)
     if (!next.stdtimer)
       if (!next.testloop)
@@ -225,10 +183,7 @@ void Config::apply(bool testout)
   work.duelsynth	= next.duelsynth;
   work.use16bit		= next.use16bit;
   work.stereo		= next.stereo;
-  work.adlibport	= next.adlibport;
-  work.testopl2		= next.testopl2;
   work.testloop		= next.testloop;
-  work.fastseek		= next.fastseek;
   work.priority		= next.priority;
   work.stdtimer		= next.stdtimer;
   work.diskdir		= next.diskdir;
@@ -280,82 +235,7 @@ bool Config::use_database()
   return success;
 }
 
-bool Config::test_opl2()
-{
-  CRealopl tmp(next.adlibport);
-
-  return tmp.detect();
-}
-
-bool Config::test_winnt()
-{
-#if (_MSC_VER >= 1900) // VS2015+
-  // These functions no longer exist, but these systems all inherit from NT anyway.
-  return true;
-#else
-  OSVERSIONINFO ver;
-
-  ver.dwOSVersionInfoSize = sizeof(ver);
-
-  GetVersionEx(&ver);
-
-  if (ver.dwPlatformId == VER_PLATFORM_WIN32_NT)
-    return true;
-
-  return false;
-#endif
-}
-
 bool Config::test_xmplay()
 {
   return GetModuleHandle("xmplay.exe") ? true : false;
-}
-
-bool Config::test_porttalk()
-  /* Enables I/O port permissions on Windows NT, using the PortTalk device driver.
-   * Returns true on success. Returns false if PortTalk isn't installed.
-   */
-{
-  DWORD BytesReturned, our_pid;
-  HANDLE PortTalk_Driver;
-
-  // Try to open PortTalk driver
-  if((PortTalk_Driver = CreateFile("\\\\.\\PortTalk",GENERIC_READ,0,NULL,
-				   OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE) {
-    puts("porttalk_enable(): PortTalk not installed.");
-    return false;
-  }
-
-  // Reset I/O permission map (deny all access)
-  if(!DeviceIoControl(PortTalk_Driver,
-		      CTL_CODE(40000, 0x900, METHOD_BUFFERED, FILE_ANY_ACCESS),
-		      NULL,0,NULL,0,&BytesReturned,NULL)) {
-    puts("porttalk_enable(): Error on resetting I/O permission map!");
-    CloseHandle(PortTalk_Driver);
-    return false;
-  }
-
-  // Set I/O permission map (exclusive access to all ports)
-  if(!DeviceIoControl(PortTalk_Driver,
-		      CTL_CODE(40000, 0x901, METHOD_BUFFERED, FILE_ANY_ACCESS),
-		      NULL,0,NULL,0,&BytesReturned,NULL)) {
-    puts("porttalk_enable(): Error on setting I/O permission map!");
-    CloseHandle(PortTalk_Driver);
-    return false;
-  }
-
-  // Enable I/O permissions on ourself
-  our_pid = GetCurrentProcessId();
-  printf("porttalk_enable(): Our process ID is %lu.\n",our_pid);
-  if(!DeviceIoControl(PortTalk_Driver,
-		      CTL_CODE(40000, 0x903, METHOD_BUFFERED, FILE_ANY_ACCESS),
-		      &our_pid,4,NULL,0,&BytesReturned,NULL)) {
-    puts("porttalk_enable(): Error on establishing I/O permissions on our process!");
-    CloseHandle(PortTalk_Driver);
-    return false;
-  }
-
-  CloseHandle(PortTalk_Driver);
-  Sleep(1);	// Very important !! Wait for device driver to carry out our requests.
-  return true;
 }
