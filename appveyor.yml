@@ -1,4 +1,5 @@
-version: 1.8.3-beta{build}
+# Remember to update the version in configure.ac and in_adlib.rc
+version: 1.9-beta{build}
 
 before_build:
 - ps: >-
