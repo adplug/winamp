@@ -72,6 +72,8 @@
   <PropertyGroup>
     <OutDir>$(SolutionDir)$(PlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformToolset)\$(Platform)\$(Configuration)\</IntDir>
+    <LocalDebuggerCommand>$(ProgramFiles)\Winamp\Winamp.exe"</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
