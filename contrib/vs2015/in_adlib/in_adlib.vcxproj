@@ -95,7 +95,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "C:\Program Files (x86)\Winamp\Plugins\" || echo "Ignoring inability to install plugin, assuming CI environment"</Command>
+      <Command>copy "$(TargetPath)" "C:\Program Files (x86)\Winamp\Plugins\" || echo "Ignoring inability to install plugin, assuming CI environment" &amp; exit 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
