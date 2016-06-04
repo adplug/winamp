@@ -58,7 +58,6 @@ class MyPlayer
   const char *	get_diskfile(string fname);
 
   static DWORD WINAPI	callback_emuts(LPVOID lpParameter);
-  static void CALLBACK	callback_opl2(UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2);
   static DWORD WINAPI	callback_disk(LPVOID lpParameter);
 
   t_config_data		work;

@@ -132,60 +132,6 @@ DWORD WINAPI MyPlayer::callback_emuts(LPVOID lpParameter)
   return 0;
 }
 
-void CALLBACK MyPlayer::callback_opl2(UINT wTimerID,UINT msg,DWORD dwUser,DWORD dw1,DWORD dw2)
-{
-  MyPlayer *the = (MyPlayer *)dwUser;
-
-  // paused ?
-  if (the->plr.paused)
-    return;
-
-  // seek requested ?
-  if (the->plr.seek != -1)
-    {
-      timeKillEvent(the->thread.opl2);
-
-      // backward seek ?
-      if (the->plr.seek < the->plr.outtime)
-	{
-	  the->player->rewind(the->plr.subsong);
-	  the->plr.outtime = 0.0f;
-	}
-
-      // seek to needed position
-
-      while ((the->plr.outtime < the->plr.seek) && the->player->update())
-	the->plr.outtime += 1000/the->player->getrefresh();
-
-
-      the->plr.seek = -1;
-
-      the->thread.opl2 = timeSetEvent((UINT)(1000/the->player->getrefresh()),0,callback_opl2,(DWORD)the,TIME_PERIODIC);
-    }
-
-  // update replayer
-  if (!the->player->update() && the->work.testloop)
-    {
-      PostMessage(*myWindow,WM_WA_MPEG_EOF,0,0);
-      return;
-    }
-
-  // refresh rate changed ?
-  if (the->refresh != the->player->getrefresh())
-    {
-      timeKillEvent(the->thread.opl2);
-
-      the->refresh = the->player->getrefresh();
-
-      the->thread.opl2 = timeSetEvent((UINT)(1000/the->refresh),0,callback_opl2,(DWORD)the,TIME_PERIODIC);
-    }
-
-  // update FileInfo, if needed
-  dlg_info.update();
-
-  the->plr.outtime += 1000/the->refresh;
-}
-
 DWORD WINAPI MyPlayer::callback_disk(LPVOID lpParameter)
 {
   MyPlayer *the = (MyPlayer *)lpParameter;
