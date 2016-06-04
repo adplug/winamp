@@ -21,15 +21,13 @@ build_script:
 
     appveyor-retry nuget restore contrib\vs2015\vs2015.sln && ^
 
-    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Debug /p:Platform=x86 /p:SolutionDir=..\ /v:minimal /nologo && ^
-
-    msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=Release /p:Platform=x86 /p:SolutionDir=..\ /v:minimal /nologo
+    FOR %%T IN (v140,v120_xp) DO ( FOR %%C IN (Debug,Release) DO ( echo *** Building %%T/x86/%%C *** && msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=%%C /p:Platform=x86 /p:PlatformToolset=%%T /p:SolutionDir=..\ /v:minimal /nologo || EXIT 1 ) )
 
 artifacts:
-- path: contrib\vs2015\Debug\in_adlib.dll
+- path: contrib\vs2015\v120_xp\Win32\Debug\in_adlib.dll
   name: Debug 32-bit
 
-- path: contrib\vs2015\Release\in_adlib.dll
+- path: contrib\vs2015\v120_xp\Win32\Release\in_adlib.dll
   name: Release 32-bit
 
 deploy:
@@ -38,7 +36,7 @@ deploy:
   description: 'Latest git build ($(APPVEYOR_BUILD_VERSION))'
   auth_token:
     secure: mC9b4zcILiIMORPIj2QHr4ZEQpA7w0lRPCCoVYVGdlmJSfHzpgyzo7wB1JKZyR5E
-  artifact: contrib\vs2015\Debug\in_adlib.dll
+  artifact: contrib\vs2015\v120_xp\Win32\Release\in_adlib.dll
   prerelease: true
   force_update: true
   on:
@@ -49,6 +47,6 @@ deploy:
   description: 'AdPlug Winamp plugin $(APPVEYOR_REPO_TAG_NAME)'
   auth_token:
     secure: mC9b4zcILiIMORPIj2QHr4ZEQpA7w0lRPCCoVYVGdlmJSfHzpgyzo7wB1JKZyR5E
-  artifact: contrib\vs2015\Release\in_adlib.dll
+  artifact: contrib\vs2015\v120_xp\Win32\Release\in_adlib.dll
   on:
     appveyor_repo_tag: true
