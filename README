@@ -104,12 +104,34 @@ trick. It can be downloaded at the AdPlug website.
 Realtime song position display in AdPlug's file info box is ahead of the heard
 sound when the emulator is used.
 
-OPL2 hardware output on Windows NT/2000/XP:
--------------------------------------------
-This version of AdPlug is capable to use a hardware OPL2 also under
-Windows NT/2000/XP! To do this, AdPlug uses the PortTalk device driver. This
-driver can be downloaded from http://www.beyondlogic.org/porttalk/porttalk.htm.
+OPL2 hardware output
+--------------------
+Since version 1.9 of this plugin, writing to a hardware OPL2 device is no
+longer possible, due to the removal of the necessary API functions from
+Windows.
 
-After downloading the driver, please read the enclosed PDF file for
-installation instructions. I strongly recommend the manual installation method,
-using the registry file!
+Should anyone still have an OPL2 sound card in a computer that can run this
+plugin, only versions 1.8.2 or earlier will be able to control the device.
+
+Development
+-----------
+A Visual Studio 2015 solution is located in contrib\vs2015\vs2015.sln.  This
+will allow you to build the plugin in Visual Studio 2015, which is available
+as a free download.
+
+The project is set up by default to launch Winamp when run, allowing the
+plugin to be debugged while operating in Winamp.  In order for this to work
+successfully, you may need to update the path of the Winamp .exe if you did
+not install it in the default path (Program Files\Winamp).  You can do this
+by right-clicking on the in_adlib project in the Solution Explorer and
+choosing Properties, then under Configuration Properties/Debugging change
+the Command to the full path of Winamp.exe.
+
+In Winamp, you will also need to disable the crash handler plugin, otherwise
+a crash will generate an error report instead of being caught by Visual
+Studio for you to debug.  This is done by deleting or renaming
+gen_crasher.dll so that it does not have a .dll extension.
+
+The project is capable of being set to x64 builds, however these do not work
+and will produce many errors.  Winamp is a 32-bit program, so stick to x86
+builds.
