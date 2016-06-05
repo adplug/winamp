@@ -19,7 +19,9 @@ build_script:
 
     appveyor-retry nuget restore contrib\vs2015\vs2015.sln
 
-    appveyor-retry nuget update contrib\vs2015\vs2015.sln
+    REM Disable auto package updates until NuGet is fixed: https://github.com/NuGet/Home/issues/1291
+
+    REM appveyor-retry nuget update contrib\vs2015\vs2015.sln
 
     FOR %%T IN (v140,v120_xp) DO ( FOR %%C IN (Debug,Release) DO ( echo *** Building %%T/x86/%%C *** && msbuild contrib\vs2015\in_adlib\in_adlib.vcxproj /p:Configuration=%%C /p:Platform=x86 /p:PlatformToolset=%%T /p:SolutionDir=..\ /v:minimal /nologo || EXIT 1 ) )
 
