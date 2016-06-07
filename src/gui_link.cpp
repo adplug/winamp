@@ -116,7 +116,7 @@ LRESULT CALLBACK GuiCtrlHyperlink::WndProc(HWND hwnd,UINT message,WPARAM wParam,
 
 void GuiCtrlHyperlink::goto_link(int i)
 {
-  ShellExecute(NULL,"open","iexplore",work.link[i].c_str(),NULL,SW_SHOWDEFAULT);
+  ShellExecute(NULL,"open",work.link[i].c_str(),NULL,NULL,SW_SHOWDEFAULT);
 }
 
 bool GuiCtrlHyperlink::is_warm(int i)
