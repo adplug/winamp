@@ -238,6 +238,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("dmo", "TwinTeam Modules (*.DMO)");
   filetypes.add("dro", "DOSBox Raw OPL v1.0 and v2.0 Files (*.DRO)");
   filetypes.add("dtm", "DeFy Adlib Tracker Modules (*.DTM)");
+  filetypes.add("got", "God of Thunder Music (*.GOT)");
   filetypes.add("hsc", "HSC-Tracker Modules (*.HSC)");
   filetypes.add("hsp", "Packed HSC-Tracker Modules (*.HSP)");
   filetypes.add("imf;wlf;adlib", "Apogee IMF Files (*.IMF;*.WLF;*.ADLIB)");
