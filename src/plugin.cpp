@@ -233,6 +233,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("bam", "Bob's Adlib Music Files (*.BAM)");
   filetypes.add("cff", "BoomTracker 4 Modules (*.CFF)");
   filetypes.add("cmf", "Creative Adlib Music Files (*.CMF)");
+  filetypes.add("cmf", "SoundFX Macs Opera (*.CMF)");
   filetypes.add("d00", "Packed EdLib Modules (*.D00)");
   filetypes.add("dfm", "Digital-FM Modules (*.DFM)");
   filetypes.add("dmo", "TwinTeam Modules (*.DMO)");
