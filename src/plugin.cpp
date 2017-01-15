@@ -182,6 +182,78 @@ int wa2_DlgInfo(char *file, HWND hwndParent)
   return dlg_info.open(file,hwndParent);
 }
 
+extern "C" __declspec(dllexport) bool winampGetExtendedFileInfo(char *file, char *meta, char *ret, int retlen)
+{
+  if (ret == NULL || !retlen) return false;
+
+  const char *my_file;
+
+  // current file ?
+  if ((!file) || (!(*file)))
+    my_file = my_player.get_file();
+  else
+  {
+    // our file ?
+    if (!wa2_IsOurFile(file))
+      return false;
+
+    my_file = file;
+  }
+
+  CSilentopl silent;
+
+  CPlayer *p = CAdPlug::factory(my_file, &silent);
+  if (!p) return false;
+
+  // default to a blank string
+  *ret = L'\0';
+  bool result = false;
+
+  if (!stricmp(meta, "title"))
+  {
+    result = !p->gettitle().empty() && ((int)p->gettitle().length() < retlen);
+    if (result)
+      strcpy(ret, p->gettitle().c_str());
+  }
+  else if (!stricmp(meta, "artist"))
+  {
+    result = !p->getauthor().empty() && ((int)p->getauthor().length() < retlen);
+    if (result)
+      strcpy(ret, p->getauthor().c_str());
+  }
+  else if (!stricmp(meta, "comment"))
+  {
+    result = !p->getdesc().empty() && ((int)p->getdesc().length() < retlen);
+    if (result)
+      strcpy(ret, p->getdesc().c_str());
+  }
+  else if (!stricmp(meta, "family") || !stricmp(meta, "genre"))
+  {
+    result = !p->gettype().empty() && ((int)p->gettype().length() < retlen);
+    if (result)
+      strcpy(ret, p->gettype().c_str());
+  }
+  else if (!stricmp(meta, "length"))
+  {
+    int length_in_ms;
+    if (file)
+      length_in_ms = my_player.get_length(my_file, my_player.get_subsong());
+    else
+      length_in_ms = my_player.get_length(my_file, DFL_SUBSONG);
+    sprintf(ret, "%d", length_in_ms);
+    result = true;
+  }
+  else if (!stricmp(meta, "type"))
+  {
+    ret[0] = '0'; // Audio
+    ret[1] = 0;
+    result = true;
+  }
+
+  delete p;
+  return result;
+}
+
 In_Module mod =
   {
     IN_VER,
