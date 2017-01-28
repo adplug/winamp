@@ -99,8 +99,18 @@ void wa2_GetFileInfo(char *file, char *title, int *length_in_ms)
   if (p)
     {
       if (title)
-	if (!p->gettitle().empty())
-	  strcpy(title,p->gettitle().c_str());
+      {
+        // Wraithverge: modified this code to show the "Author" + "Title"
+        // in the "Song Title" window, instead of just "Title", but only
+        // if both Tag-data exists.
+        if (!p->getauthor().empty() && !p->gettitle().empty()) {
+          strcpy(title, p->getauthor().c_str());
+          strcat(title, " - ");
+          strcat(title, p->gettitle().c_str());
+        }
+        else if (!p->gettitle().empty())
+          strcpy(title, p->gettitle().c_str());
+      }
 
       if (length_in_ms)
 	if (file)
@@ -329,7 +339,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("mtk", "MPU-401 Trakker Modules (*.MTK)");
   filetypes.add("mus", "AdLib MIDI Music Files (*.MUS)");
   filetypes.add("rad", "Reality Adlib Tracker Modules (*.RAD)");
-  filetypes.add("raw", "Rdos RAW Files (*.RAW)");
+  filetypes.add("rac;raw", "Raw AdLib Capture Files (*.RAC;*.RAW)");
   filetypes.add("rix", "Softstar RIX OPL Music Files (*.RIX)");
   filetypes.add("rol", "Adlib Visual Composer Modules (*.ROL)");
   if(!cfg.s3m_workaround) {
