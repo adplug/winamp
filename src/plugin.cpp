@@ -351,6 +351,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("sng", "Adlib Tracker 1.0 Modules (*.SNG)");
   filetypes.add("sng", "Faust Music Creator Modules (*.SNG)");
   filetypes.add("sng", "SNGPlay Files (*.SNG)");
+  filetypes.add("sop", "Note Sequencer by sopepos (*.SOP)");
   filetypes.add("vgm", "Video Game Music (*.VGM)");
   filetypes.add("xad", "eXotic Adlib Files (*.XAD)");
   filetypes.add("xms", "XMS-Tracker Modules (*.XMS)");
