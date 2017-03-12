@@ -18,6 +18,7 @@
 */
 
 #include "plugin.h"
+#pragma comment(lib, "shlwapi.lib")
 
 #define MSGA_WINAMP	"You must now restart Winamp after switching from Disk Writer to Emulator output mode."
 #define MSGC_DISK 	"You have selected *full speed* and *endless* Disk Writing modes. This combination of options is not recommended."
@@ -34,7 +35,7 @@
 #define DFL_TESTLOOP		true
 #define DFL_PRIORITY		4
 #define DFL_STDTIMER		true
-#define DFL_DISKDIR		"C:\\"
+#define DFL_DISKDIR		".\\"
 #define DFL_IGNORED		"19;"
 #define DFL_DBFILE		"adplug.db"
 #define DFL_USEDB		true
@@ -49,7 +50,7 @@ Config::Config()
 
 void Config::load()
 {
-  char bufstr[MAX_PATH+1], dbfile[MAX_PATH];
+  char bufstr[MAX_PATH+1], dbfile[MAX_PATH], curdir[MAX_PATH + 1];
 
   // get default path to .ini file
   GetModuleFileName(NULL,bufstr,MAX_PATH);
@@ -87,9 +88,15 @@ void Config::load()
   if (bufval != -1)
     next.useoutput_alt = (enum t_output)bufval;
 
-  GetPrivateProfileString("in_adlib","diskdir",DFL_DISKDIR,bufstr,MAX_PATH,fname.c_str());
-  if (SetCurrentDirectory(bufstr))
-    next.diskdir = bufstr;
+  if (GetCurrentDirectory(MAX_PATH, curdir))
+  {
+    strcat(curdir, "\\");
+    GetPrivateProfileString("in_adlib", "diskdir", curdir, bufstr, MAX_PATH, fname.c_str());
+    if (PathIsDirectory(bufstr))
+      next.diskdir = bufstr;
+    else
+      next.diskdir = curdir;
+  }
   else
     next.diskdir = DFL_DISKDIR;
 
