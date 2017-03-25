@@ -342,6 +342,7 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
 
       // add tooltips
       tooltip->add(GetDlgItem(hwndDlg,IDC_TESTLOOP),"autoend" ,"Enable song-end auto-detection:\r\nIf disabled, the song will loop endlessly, and Winamp won't advance in the playlist.");
+      tooltip->add(GetDlgItem(hwndDlg,IDC_SUBSEQ),"subseq" ,"Play all subsongs in the file:\r\nIf enabled, the player will switch to the next available subsong on the song end. This option requires song-end auto-detection to be enabled.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_STDTIMER),"stdtimer","Use actual replay speed for Disk Writer output:\r\nDisable this for full speed disk writing. Never disable this if you also disabled song-end auto-detection!");
       tooltip->add(GetDlgItem(hwndDlg,IDC_PRIORITY),"priority","Set replay thread priority:\r\nIf you encounter sound skips, try to set this to a higher value.");
       tooltip->add(GetDlgItem(hwndDlg,IDC_DATABASE),"database","Set path to Database file to be used for replay information.");
@@ -350,10 +351,14 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
       // set checkboxes
       if (next.testloop)
 	CheckDlgButton(hwndDlg,IDC_TESTLOOP,BST_CHECKED);
+      if (next.subseq)
+	CheckDlgButton(hwndDlg,IDC_SUBSEQ,BST_CHECKED);
       if (next.stdtimer)
 	CheckDlgButton(hwndDlg,IDC_STDTIMER,BST_CHECKED);
       if (next.usedb)
 	CheckDlgButton(hwndDlg,IDC_USEDB,BST_CHECKED);
+
+	EnableWindow(GetDlgItem(hwndDlg, IDC_SUBSEQ), next.testloop);
 
       // set "priority"
       SendDlgItemMessage(hwndDlg,IDC_PRIORITY,TBM_SETRANGE,(WPARAM)FALSE,(LPARAM)MAKELONG(1,7));
@@ -381,6 +386,7 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
 
       // check checkboxes :)
       next.testloop = (IsDlgButtonChecked(hwndDlg,IDC_TESTLOOP) == BST_CHECKED);
+      next.subseq = (IsDlgButtonChecked(hwndDlg,IDC_SUBSEQ) == BST_CHECKED);
       next.stdtimer = (IsDlgButtonChecked(hwndDlg,IDC_STDTIMER) == BST_CHECKED);
       next.usedb = (IsDlgButtonChecked(hwndDlg,IDC_USEDB) == BST_CHECKED);
 
@@ -421,6 +427,10 @@ BOOL APIENTRY GuiDlgConfig::PlaybackTabDlgProc(HWND hwndDlg, UINT message, WPARA
 	    }
 
 	  return 0;
+	case IDC_TESTLOOP:
+	  bool bTestloop = IsDlgButtonChecked(hwndDlg, IDC_TESTLOOP) == BST_CHECKED;
+	  EnableWindow(GetDlgItem(hwndDlg, IDC_SUBSEQ), bTestloop);
+	  break;
 	}
     }
 

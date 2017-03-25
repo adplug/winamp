@@ -76,10 +76,17 @@ DWORD WINAPI MyPlayer::callback_emuts(LPVOID lpParameter)
       if (stopped && the->work.testloop)
 	{
 	  if (!mod.outMod->IsPlaying())
-	    {
-	      PostMessage(*myWindow,WM_WA_MPEG_EOF,0,0);
+	  {
+		  unsigned int subsong = the->player->getsubsong();
+		  if (the->work.subseq && subsong < the->player->getsubsongs() - 1)
+		  {
+			  the->set_subsong(subsong + 1);
+		  }
+		  else {
+			  PostMessage(*myWindow, WM_WA_MPEG_EOF, 0, 0);
+		  }
 	      break;
-	    }
+	  }
    
 	  Sleep(10);
 
@@ -166,10 +173,16 @@ DWORD WINAPI MyPlayer::callback_disk(LPVOID lpParameter)
 
 	// update replayer
 	if (!the->player->update() && the->work.testloop)
-	  {
-	    PostMessage(*myWindow,WM_WA_MPEG_EOF,0,0);
-	    break;
-	  }
+	{
+		unsigned int subsong = the->player->getsubsong();
+		if (the->work.subseq && subsong < the->player->getsubsongs() - 1)
+		{
+			the->set_subsong(subsong + 1);
+		} else {
+			PostMessage(*myWindow, WM_WA_MPEG_EOF, 0, 0);
+		}
+		break;
+	}
 
 	the->plr.outtime += 1000/the->player->getrefresh();
 

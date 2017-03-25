@@ -33,6 +33,7 @@
 #define DFL_USEOUTPUT		DFL_EMU
 #define DFL_USEOUTPUT_ALT	emunone
 #define DFL_TESTLOOP		true
+#define DFL_SUBSEQ		true
 #define DFL_PRIORITY		4
 #define DFL_STDTIMER		true
 #define DFL_DISKDIR		".\\"
@@ -104,6 +105,10 @@ void Config::load()
   if (bufval != -1)
     next.testloop = bufval ? true : false;
 
+  bufval = GetPrivateProfileInt("in_adlib","subseq",DFL_SUBSEQ,fname.c_str());
+  if (bufval != -1)
+    next.subseq = bufval ? true : false;
+
   bufval = GetPrivateProfileInt("in_adlib","priority",DFL_PRIORITY,fname.c_str());
   if (bufval != -1)
     next.priority = bufval;
@@ -143,6 +148,7 @@ void Config::save()
   WritePrivateProfileString("in_adlib","useoutput",_itoa(next.useoutput,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","useoutput_alt",_itoa(next.useoutput_alt,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","testloop",_itoa(next.testloop,bufstr,10),fname.c_str());
+  WritePrivateProfileString("in_adlib","subseq",_itoa(next.subseq,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","priority",_itoa(next.priority,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","stdtimer",_itoa(next.stdtimer,bufstr,10),fname.c_str());
   WritePrivateProfileString("in_adlib","diskdir",next.diskdir.c_str(),fname.c_str());
@@ -195,6 +201,7 @@ void Config::apply(bool testout)
   work.use16bit		= next.use16bit;
   work.stereo		= next.stereo;
   work.testloop		= next.testloop;
+  work.subseq		= next.subseq;
   work.priority		= next.priority;
   work.stdtimer		= next.stdtimer;
   work.diskdir		= next.diskdir;

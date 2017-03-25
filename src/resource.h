@@ -96,6 +96,7 @@
 #define IDC_ATABWND                     1078
 #define IDC_DATABASE                    1079
 #define IDC_FTWORKAROUND                1080
+#define IDC_SUBSEQ                      1081
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

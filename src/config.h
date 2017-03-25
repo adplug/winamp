@@ -39,6 +39,7 @@ struct t_config_data {
   enum t_output  useoutput;
   enum t_output  useoutput_alt;
   bool           testloop;
+  bool           subseq;
   int            priority;
   int            stdtimer;
   string         diskdir;
