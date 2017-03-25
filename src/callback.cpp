@@ -105,7 +105,8 @@ DWORD WINAPI MyPlayer::callback_emuts(LPVOID lpParameter)
 
 	  sndbufpos += i * sampsize;
 	  towrite -= i;
-	  toadd -= (long)(i * the->player->getrefresh());
+	  i = (long)(i * the->player->getrefresh());
+	  toadd -= max(1, i);
 	}
 
       // update dsp
