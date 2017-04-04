@@ -23,12 +23,13 @@
 #define DFL_SNDBUFSIZE 576
 
 enum t_output {
-  emuts,
-  emuks,
-  opl2_unused,
-  disk,
-  emuwo,
-  emunone
+  emuts,         /* Tatsuyuki Satoh */
+  emuks,         /* Ken Silverman */
+  opl2_unused,   /* unused */
+  disk,          /* Disk Writer */
+  emuwo,         /* WoodyOPL */
+  emunk,         /* Nuked OPL3 */
+  emunone        /* used for alt_synth */
 };
 
 struct t_config_data {

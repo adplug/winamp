@@ -184,6 +184,7 @@ int MyPlayer::get_position()
     case emuts:
     case emuks:
     case emuwo:
+    case emunk:
       outtime = mod.outMod->GetOutputTime();
       break;
     case disk:
@@ -211,6 +212,7 @@ void MyPlayer::set_volume(int vol)
     case emuts:
     case emuks:
     case emuwo:
+    case emunk:
       mod.outMod->SetVolume(vol);
       break;
     case disk:
@@ -229,6 +231,7 @@ void MyPlayer::set_panning(int pan)
     case emuts:
     case emuks:
     case emuwo:
+    case emunk:
       mod.outMod->SetPan(pan);
       break;
 
@@ -249,6 +252,9 @@ Copl *MyPlayer::make_opl(enum t_output type, bool stereo)
     break;
   case emuks:
     return new CKemuopl(work.replayfreq, work.use16bit, stereo);
+    break;
+  case emunk:
+    return new CNemuopl(work.replayfreq);
     break;
   case disk:
     return new CDiskopl(get_diskfile(plr.fname));
@@ -290,6 +296,7 @@ void MyPlayer::opl_done()
   case emuts:
   case emuks:
   case emuwo:
+  case emunk:
     delete output.emu;
     break;
   case disk:
@@ -305,6 +312,7 @@ bool MyPlayer::output_init()
     case emuts:
     case emuks:
     case emuwo:
+    case emunk:
       maxlatency = mod.outMod->Open(work.replayfreq,(work.stereo ? 2 : 1),(work.use16bit ? 16 : 8),-1,-1);
       if (maxlatency < 0)
 	return false;
@@ -327,6 +335,7 @@ void MyPlayer::output_done()
     case emuts:
     case emuks:
     case emuwo:
+    case emunk:
       mod.SAVSADeInit();
       mod.outMod->Close();
       break;
@@ -345,6 +354,7 @@ bool MyPlayer::thread_init()
     case emuts:
     case emuks:
     case emuwo:
+    case emunk:
       thread.emuts = (HANDLE)CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)callback_emuts,(void *)this,0,&tmpdword);
       if (!thread.emuts)
 	return false;
@@ -363,18 +373,20 @@ bool MyPlayer::thread_init()
 
 void MyPlayer::thread_done()
 {
+  DWORD wait_ms = (DWORD)(7 * 1000 / player->getrefresh());
   switch (work.useoutput)
     {
     case emuts:
     case emuks:
     case emuwo:
-      if (WaitForSingleObject(thread.emuts,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)
-	TerminateThread(thread.emuts,0);
+    case emunk:
+      if (WaitForSingleObject(thread.emuts, wait_ms) == WAIT_TIMEOUT)
+        TerminateThread(thread.emuts, 0);
       CloseHandle(thread.emuts);
       break;
     case disk:
-      if (WaitForSingleObject(thread.disk,(DWORD)(7*1000/player->getrefresh())) == WAIT_TIMEOUT)
-	TerminateThread(thread.disk,0);
+      if (WaitForSingleObject(thread.disk, wait_ms) == WAIT_TIMEOUT)
+        TerminateThread(thread.disk, 0);
       CloseHandle(thread.disk);
       break;
     }

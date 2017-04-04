@@ -42,6 +42,7 @@
 #include <adplug/silentopl.h>
 #include <adplug/surroundopl.h>
 #include <adplug/wemuopl.h>
+#include <adplug/nemuopl.h>
 
 // stl
 #include <string>

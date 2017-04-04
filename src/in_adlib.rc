@@ -58,37 +58,35 @@ IDD_CFG_OUTPUT DIALOGEX 0, 0, 326, 223
 STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Emulator",IDC_STATIC,6,6,144,210,BS_LEFT
-    LTEXT           "This is the most accurate OPL emulator, especially when the frequency is set to 49716 Hz.",IDC_STATIC,24,30,96,26
-    LTEXT           "While not perfect, this synth comes very close and for many years was the best there was.",IDC_STATIC,24,72,116,27
-    LTEXT           "While inaccurate by today's standards, this emulator was one of the earliest open-source OPL synths available.",IDC_STATIC,24,114,116,32
-    LTEXT           "This virtual emulator will save the OPL data of each song played as a file in RDOS .raw format.",IDC_STATIC,24,162,116,30
-    CONTROL         "&WoodyOPL (DOSBox, 2016)",IDC_OUTWO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,12,18,108,10
-    CONTROL         "&Tatsuyuki Satoh 0.72 (MAME, 2003)",IDC_OUTTS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,60,129,10
-    CONTROL         "&Ken Silverman (2001)",IDC_OUTKS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,102,84,10
-    CONTROL         "&Disk Writer (RAW Format)",IDC_OUTDISK,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,150,95,10
-    PUSHBUTTON      "C:\\",IDC_DIRECTORY,12,192,132,15
-    GROUPBOX        "",IDC_STATIC,156,6,162,72,BS_LEFT
+    GROUPBOX        "Emulator",IDC_STATIC,6,6,144,60,BS_LEFT
+    COMBOBOX        IDC_COMBO1,10,19,135,12,CBS_DROPDOWNLIST | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "",IDC_EMUINFO,10,36,135,26
+    GROUPBOX        "",IDC_STATIC,156,6,162,60,BS_LEFT
     CONTROL         "Use a different emulator for the right-channel",IDC_ALTSYNTH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,162,6,155,10
-    LTEXT           "Normally this will be the same as the left channel, but you can change it to compare two different emulators at the same time.",IDC_STATIC,168,18,138,30
-    CONTROL         "WoodyOPL",IDC_OUTWO2,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,174,48,54,10
-    CONTROL         "Satoh",IDC_OUTTS2,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,174,60,36,10
-    GROUPBOX        "Frequency ",IDC_STATIC,156,84,60,92,BS_LEFT
-    CONTROL         "1&1025",IDC_FREQ1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,168,96,34,10
-    CONTROL         "2&2050",IDC_FREQ2,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,168,108,34,10
-    CONTROL         "4&4100",IDC_FREQ3,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,168,120,34,10
-    CONTROL         "4&8000",IDC_FREQ4,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,168,132,34,10
-    CONTROL         "4&9716",IDC_FREQ5,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,168,144,36,10
-    CONTROL         "",IDC_FREQC,"Button",BS_AUTORADIOBUTTON,168,158,11,8
-    EDITTEXT        IDC_FREQC_VALUE,179,156,29,12,ES_UPPERCASE | ES_NUMBER
-    GROUPBOX        "Resolution ",IDC_STATIC,222,138,54,39,BS_LEFT
-    CONTROL         "8-&Bits",IDC_QUALITY8,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,228,150,32,10
-    CONTROL         "16-B&its",IDC_QUALITY16,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,228,162,35,10
-    GROUPBOX        "Channels ",IDC_STATIC,222,84,54,50,BS_LEFT
-    CONTROL         "&Mono",IDC_MONO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,228,96,32,10
-    CONTROL         "&Stereo",IDC_STEREO,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,228,108,35,10
-    CONTROL         "S&urround",IDC_SURROUND,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,228,120,42,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,161,6,153,10
+    COMBOBOX        IDC_COMBO2,168,19,135,12,CBS_DROPDOWNLIST | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Normally this will be the same as the left channel, but you can change it to compare two different emulators at the same time.",IDC_STATIC,168,36,138,26
+    GROUPBOX        "Frequency ",IDC_STATIC,156,72,60,91,BS_LEFT
+    CONTROL         "1&1025",IDC_FREQ1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,168,84,34,10
+    CONTROL         "2&2050",IDC_FREQ2,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,168,96,34,10
+    CONTROL         "4&4100",IDC_FREQ3,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,168,108,34,10
+    CONTROL         "4&8000",IDC_FREQ4,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,168,120,34,10
+    CONTROL         "4&9716",IDC_FREQ5,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,168,132,36,10
+    CONTROL         "",IDC_FREQC,"Button",BS_AUTORADIOBUTTON,168,146,11,8
+    EDITTEXT        IDC_FREQC_VALUE,179,144,29,12,ES_UPPERCASE | ES_NUMBER
+    GROUPBOX        "Resolution ",IDC_STATIC,222,128,54,35,BS_LEFT
+    CONTROL         "8-&Bits",IDC_QUALITY8,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,228,138,32,10
+    CONTROL         "16-B&its",IDC_QUALITY16,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,228,150,35,10
+    GROUPBOX        "Channels ",IDC_STATIC,222,72,54,50,BS_LEFT
+    CONTROL         "&Mono",IDC_MONO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,228,84,32,10
+    CONTROL         "&Stereo",IDC_STEREO,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,228,96,35,10
+    CONTROL         "S&urround",IDC_SURROUND,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,228,108,42,10
+    GROUPBOX        "Frequency ",IDC_STATIC,156,72,60,91,BS_LEFT
+    GROUPBOX        "",IDC_STATIC,6,72,144,54,BS_LEFT
+    CONTROL         "Enable Disk Writer (RAW Format)",IDC_OUTDISK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,72,120,10
+    LTEXT           "This will save the OPL data of each song played as a file in RDOS .raw format.",IDC_STATIC,10,84,135,26
+    PUSHBUTTON      "C:\\",IDC_DIRECTORY,15,104,125,15
 END
 
 IDD_CFG_PLAYBACK DIALOGEX 0, 0, 326, 223

@@ -48,13 +48,11 @@
 #define IDC_MONO                        1010
 #define IDC_STEREO                      1011
 #define IDC_SURROUND                    1012
-#define IDC_OUTWO                       1013
-#define IDC_OUTTS                       1014
-#define IDC_OUTKS                       1015
+#define IDC_COMBO1                      1013
+#define IDC_COMBO2                      1014
+#define IDC_EMUINFO                     1015
 #define IDC_OUTDISK                     1016
 #define IDC_ALTSYNTH                    1017
-#define IDC_OUTWO2                      1018
-#define IDC_OUTTS2                      1019
 #define IDC_TESTLOOP                    1020
 #define IDC_FASTSEEK                    1021
 #define IDC_PRIORITY                    1022

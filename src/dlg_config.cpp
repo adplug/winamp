@@ -28,6 +28,82 @@ extern FileTypes	filetypes;
 
 GuiCtrlTooltip		*tooltip;
 
+#define MAX_EMULATORS 4
+const char *lpstrEmuls[MAX_EMULATORS] = {
+  {"Nuked OPL3 (Nuke.YKT, 2017)"},
+  {"WoodyOPL (DOSBox, 2016)"},
+  {"Tatsuyuki Satoh 0.72 (MAME, 2003)"},
+  {"Ken Silverman (2001)"},
+};
+const char *lpstrInfos[MAX_EMULATORS] = {
+  {"Nuked OPL3 emulator by Alexey Khokholov (Nuke.YKT). Set output frequency to 49716 Hz for best quality."},
+  {"This is the most accurate OPL emulator, especially when the frequency is set to 49716 Hz."},
+  {"While not perfect, this synth comes very close and for many years was the best there was."},
+  {"While inaccurate by today's standards, this emulator was one of the earliest open-source OPL synths available."},
+};
+
+void AdjustComboBoxHeight(HWND hWndCmbBox, DWORD MaxVisItems) {
+RECT rc;
+  GetWindowRect(hWndCmbBox, &rc);
+  rc.right -= rc.left;
+  ScreenToClient(GetParent(hWndCmbBox), (POINT *) &rc);
+  rc.bottom = (MaxVisItems + 2) * SendMessage(hWndCmbBox, CB_GETITEMHEIGHT, 0, 0);
+  MoveWindow(hWndCmbBox, rc.left, rc.top, rc.right, rc.bottom, TRUE);
+  SetWindowLong(hWndCmbBox, GWL_STYLE, (GetWindowLong(hWndCmbBox, GWL_STYLE) | CBS_NOINTEGRALHEIGHT) ^ CBS_NOINTEGRALHEIGHT);
+}
+
+int getComboIndexByEmul(int emul, bool duo)
+{
+  if (duo)
+  {
+    switch (emul)
+    {
+      case emuts:
+        return 1;
+      case emuwo:
+        return 0;
+    }
+  }
+  switch (emul)
+  {
+    case emuts:
+      return 2;
+    case emuks:
+      return 3;
+    case emuwo:
+      return 1;
+    case emunk:
+      return 0;
+  }
+  return 0; // by default
+}
+
+t_output getEmulByComboIndex(int i, bool duo)
+{
+  if (duo)
+  {
+    switch (i)
+    {
+      case 0:
+        return emuwo;
+      case 1:
+        return emuts;
+    }
+  }
+  switch (i)
+  {
+    case 0:
+      return emunk;
+    case 1:
+      return emuwo;
+    case 2:
+      return emuts;
+    case 3:
+      return emuks;
+  }
+  return emunone; // by default
+}
+
 void GuiDlgConfig::open(HWND parent)
 {
   config.get(&next);
@@ -135,6 +211,7 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
   //printf("GuiDlgConfig::OutputTabDlgProc(): Message 0x%08X received.\n",message);
 #endif
   string bufxstr;
+  int i;
 
   switch (message)
     {
@@ -156,21 +233,27 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
       tooltip->add(GetDlgItem(hwndDlg,IDC_DIRECTORY),  "directory",  "Select output directory for Disk Writer.");
 
       // set "output"
-      int target = IDC_OUTWO;
-      switch (next.useoutput) {
-      case emuts: target = IDC_OUTTS; break;
-      case emuks: target = IDC_OUTKS; break;
-      case disk:  target = IDC_OUTDISK; break;
-      case emuwo: target = IDC_OUTWO; break;
-      }
-      CheckRadioButton(hwndDlg, IDC_OUTWO, IDC_OUTDISK, target);
+      if (next.useoutput == disk)
+        CheckDlgButton(hwndDlg, IDC_OUTDISK, BST_CHECKED);
 
-      switch (next.useoutput_alt) {
-      case emuts: target = IDC_OUTTS2; break;
-      default:
-      case emuwo: target = IDC_OUTWO2; break;
+      // fill comboboxes
+      for (i = 0; i < MAX_EMULATORS; i++) {
+        SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)lpstrEmuls[i]);
+        if (getEmulByComboIndex(i, false) == emuwo ||
+            getEmulByComboIndex(i, false) == emuts)
+          SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_ADDSTRING, 0, (LPARAM)lpstrEmuls[i]);
       }
-      CheckRadioButton(hwndDlg, IDC_OUTWO2, IDC_OUTTS2, target);
+      // adjust combobox height or dropdown lists won't be visible at all
+      AdjustComboBoxHeight(GetDlgItem(hwndDlg, IDC_COMBO1), 5);
+      AdjustComboBoxHeight(GetDlgItem(hwndDlg, IDC_COMBO2), 5);
+      i = getComboIndexByEmul(next.useoutput, false);
+      // check range
+      if ((i < 0) || (i >= MAX_EMULATORS)) { i = 0; }
+      SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_SETCURSEL, i, 0);
+      i = getComboIndexByEmul(next.useoutput_alt, true);
+      // check range
+      if ((i < 0) || (i >= MAX_EMULATORS)) { i = 0; }
+      SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_SETCURSEL, i, 0);
 
       if (next.useoutput_alt != emunone)
         CheckDlgButton(hwndDlg, IDC_ALTSYNTH, BST_CHECKED);
@@ -263,22 +346,18 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
       }
 
       // check "emulator"
-      if (IsDlgButtonChecked(hwndDlg,IDC_OUTTS) == BST_CHECKED)
-        next.useoutput = emuts;
-      else if (IsDlgButtonChecked(hwndDlg,IDC_OUTKS) == BST_CHECKED)
-        next.useoutput = emuks;
-      else if (IsDlgButtonChecked(hwndDlg,IDC_OUTDISK) == BST_CHECKED)
+      i = SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_GETCURSEL, 0, 0);
+      i = max(i, 0);
+      next.useoutput = getEmulByComboIndex(i, false);
+      i = SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_GETCURSEL, 0, 0);
+      i = max(i, 0);
+      next.useoutput_alt = getEmulByComboIndex(i, true);
+
+      if (IsDlgButtonChecked(hwndDlg, IDC_OUTDISK) == BST_CHECKED)
         next.useoutput = disk;
-      else //if (IsDlgButtonChecked(hwndDlg,IDC_OUTWO) == BST_CHECKED)
-        next.useoutput = emuwo;
 
       // check secondary emulator
-      if (IsDlgButtonChecked(hwndDlg,IDC_ALTSYNTH) == BST_CHECKED) {
-        if (IsDlgButtonChecked(hwndDlg, IDC_OUTTS2) == BST_CHECKED)
-          next.useoutput_alt = emuts;
-        else //if (IsDlgButtonChecked(hwndDlg,IDC_OUTWO2) == BST_CHECKED)
-          next.useoutput_alt = emuwo;
-      } else {
+      if (IsDlgButtonChecked(hwndDlg,IDC_ALTSYNTH) != BST_CHECKED) {
         next.useoutput_alt = emunone;
       }
       return 0;
@@ -316,10 +395,9 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
 
 	  return 0;
 
+    case IDC_COMBO1:
+    case IDC_COMBO2:
     case IDC_ALTSYNTH:
-    case IDC_OUTWO:
-    case IDC_OUTTS:
-    case IDC_OUTKS:
     case IDC_OUTDISK:
       syncControlStates(hwndDlg);
       break;
@@ -535,27 +613,35 @@ BOOL APIENTRY GuiDlgConfig::TabDlgProc_Wrapper(HWND hwndDlg, UINT message, WPARA
 
 void GuiDlgConfig::syncControlStates(HWND hwndDlg)
 {
-  bool bAltSynth = IsDlgButtonChecked(hwndDlg, IDC_ALTSYNTH) == BST_CHECKED;
-  bool bOutWO = IsDlgButtonChecked(hwndDlg, IDC_OUTWO) == BST_CHECKED;
-  bool bOutTS = IsDlgButtonChecked(hwndDlg, IDC_OUTTS) == BST_CHECKED;
-  bool bOutKS = IsDlgButtonChecked(hwndDlg, IDC_OUTKS) == BST_CHECKED;
+  int i = SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_GETCURSEL, 0, 0);
+  bool bOutNK = getEmulByComboIndex(i, false) == emunk;
+  bool bOutWO = getEmulByComboIndex(i, false) == emuwo;
+  bool bOutTS = getEmulByComboIndex(i, false) == emuts;
+  bool bOutKS = getEmulByComboIndex(i, false) == emuks;
   bool bOutDisk = IsDlgButtonChecked(hwndDlg, IDC_OUTDISK) == BST_CHECKED;
+  if ((i >= 0) && (i < MAX_EMULATORS)) {
+    SetDlgItemText(hwndDlg, IDC_EMUINFO, lpstrInfos[i]);
+  }
+  if (bOutNK)
+    CheckDlgButton(hwndDlg, IDC_ALTSYNTH, BST_UNCHECKED);
+  bool bAltSynth = IsDlgButtonChecked(hwndDlg, IDC_ALTSYNTH) == BST_CHECKED;
   bool bIsStereo = IsDlgButtonChecked(hwndDlg, IDC_STEREO) == BST_CHECKED;
   bool bIsSurround = IsDlgButtonChecked(hwndDlg, IDC_SURROUND) == BST_CHECKED;
   bool bWasSurroundEnabled = IsWindowEnabled(GetDlgItem(hwndDlg, IDC_SURROUND)) == TRUE;
 
   // Figure out which controls we will enable and disable
-  bool enMono = !bOutDisk && !bAltSynth;
+  bool enMono = !bOutDisk && !bAltSynth && !bOutNK;
   bool enStereo = !bOutDisk && !bAltSynth;
-  bool enSurround = !bOutDisk && (bAltSynth || !bOutKS);
+  bool enSurround = !bOutDisk && (bAltSynth || !bOutKS) && !bOutNK;
 
+  EnableWindow(GetDlgItem(hwndDlg, IDC_COMBO1), !bOutDisk);
+  EnableWindow(GetDlgItem(hwndDlg, IDC_ALTSYNTH), !bOutDisk && !bOutNK);
   EnableWindow(GetDlgItem(hwndDlg, IDC_MONO), enMono);
   EnableWindow(GetDlgItem(hwndDlg, IDC_STEREO), enStereo);
   EnableWindow(GetDlgItem(hwndDlg, IDC_SURROUND), enSurround);
 
   // Switch the alternate synth choices on and off depending on the checkbox
-  EnableWindow(GetDlgItem(hwndDlg, IDC_OUTWO2), bAltSynth);
-  EnableWindow(GetDlgItem(hwndDlg, IDC_OUTTS2), bAltSynth);
+  EnableWindow(GetDlgItem(hwndDlg, IDC_COMBO2), bAltSynth && !bOutDisk);
 
   if (bIsSurround && !enSurround) {
     // Surround was selected but it's been disabled, move it to stereo
@@ -567,5 +653,8 @@ void GuiDlgConfig::syncControlStates(HWND hwndDlg)
     // Surround is the only option, select it
     CheckRadioButton(hwndDlg, IDC_MONO, IDC_SURROUND, IDC_SURROUND);
   }
+  EnableWindow(GetDlgItem(hwndDlg, IDC_QUALITY8), !bOutNK);
+  if (bOutNK)
+    CheckRadioButton(hwndDlg, IDC_QUALITY8, IDC_QUALITY16, IDC_QUALITY16);
   return;
 }

@@ -25,9 +25,9 @@
 #define MSGC_DATABASE	"An external Database could not be loaded!"
 #define MSGE_XMPLAY	"Hardware OPL2 output is not supported when this plugin is used within XMPlay. An emulator must be used for output, instead."
 
-#define DFL_EMU			emuwo
-#define DFL_REPLAYFREQ		44100
-#define DFL_HARMONIC		true
+#define DFL_EMU			emunk
+#define DFL_REPLAYFREQ		49716
+#define DFL_HARMONIC		false
 #define DFL_USE16BIT		true
 #define DFL_STEREO		true
 #define DFL_USEOUTPUT		DFL_EMU
@@ -164,6 +164,7 @@ void Config::check()
   case emuts:
   case emuks:
   case emuwo:
+  case emunk:
     next.useoutputplug = true;
     break;
   default:
