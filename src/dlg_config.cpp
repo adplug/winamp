@@ -30,16 +30,16 @@ GuiCtrlTooltip		*tooltip;
 
 #define MAX_EMULATORS 4
 const char *lpstrEmuls[MAX_EMULATORS] = {
-  {"Nuked OPL3 (Nuke.YKT, 2017)"},
-  {"WoodyOPL (DOSBox, 2016)"},
-  {"Tatsuyuki Satoh 0.72 (MAME, 2003)"},
-  {"Ken Silverman (2001)"},
+  "Nuked OPL3 (Nuke.YKT, 2017)",
+  "WoodyOPL (DOSBox, 2016)",
+  "Tatsuyuki Satoh 0.72 (MAME, 2003)",
+  "Ken Silverman (2001)",
 };
 const char *lpstrInfos[MAX_EMULATORS] = {
-  {"Nuked OPL3 emulator by Alexey Khokholov (Nuke.YKT). Set output frequency to 49716 Hz for best quality."},
-  {"This is the most accurate OPL emulator, especially when the frequency is set to 49716 Hz."},
-  {"While not perfect, this synth comes very close and for many years was the best there was."},
-  {"While inaccurate by today's standards, this emulator was one of the earliest open-source OPL synths available."},
+  "Nuked OPL3 emulator by Alexey Khokholov (Nuke.YKT). Set output frequency to 49716 Hz for best quality.",
+  "This is the most accurate OPL emulator, especially when the frequency is set to 49716 Hz.",
+  "While not perfect, this synth comes very close and for many years was the best there was.",
+  "While inaccurate by today's standards, this emulator was one of the earliest open-source OPL synths available.",
 };
 
 void AdjustComboBoxHeight(HWND hWndCmbBox, DWORD MaxVisItems) {

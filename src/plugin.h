@@ -21,6 +21,9 @@
 #ifdef _MSC_VER
 #	pragma warning(disable: 4786)
 #endif
+#ifndef max
+#  define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
 
 // We use some special functions of Internet Explorer 3.x
 #define _WIN32_IE	0x0300
