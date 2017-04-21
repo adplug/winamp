@@ -67,12 +67,12 @@ int getComboIndexByEmul(int emul, bool duo)
   return 0; // by default
 }
 
-t_output getEmulByComboIndex(int i, bool duo)
+t_output getEmulByComboIndex(int combo, bool duo)
 {
   int idx = 0;
   for (int i = 0; i < MAX_EMULATORS; i++)
   {
-    if (idx == i && (!duo || infoEmuls[i].s_multi && infoEmuls[i].s_mono))
+    if (idx == combo && (!duo || infoEmuls[i].s_multi && infoEmuls[i].s_mono))
       return infoEmuls[i].emul;
     if (!duo || infoEmuls[i].s_multi && infoEmuls[i].s_mono)
       idx++;
