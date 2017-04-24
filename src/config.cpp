@@ -54,6 +54,7 @@ void Config::load()
   char bufstr[MAX_PATH+1], dbfile[MAX_PATH], curdir[MAX_PATH + 1];
 
   // get default path to .ini file
+  /*
   GetModuleFileName(NULL,bufstr,MAX_PATH);
 
   _strlwr(strrchr(bufstr,'\\'));
@@ -61,6 +62,14 @@ void Config::load()
   fname.assign(bufstr);
   fname.resize(fname.size() - 3);
   fname.append("ini");
+  */
+  fname.assign(std::getenv("APPDATA"));
+  if (fname.empty())
+    fname.assign(std::getenv("ALLUSERSPROFILE"));
+  fname.append("\\Winamp");
+  if (!PathIsDirectory(fname.c_str()))
+    CreateDirectory(fname.c_str(), NULL);
+  fname.append("\\winamp.ini");
 
   // load configuration from .ini file
   int bufval;
@@ -89,7 +98,12 @@ void Config::load()
   if (bufval != -1)
     next.useoutput_alt = (enum t_output)bufval;
 
-  if (GetCurrentDirectory(MAX_PATH, curdir))
+  strcpy(curdir, std::getenv("USERPROFILE"));
+  if (curdir == "")
+    strcpy(curdir, std::getenv("ALLUSERSPROFILE"));
+  if (curdir == "")
+    GetCurrentDirectory(MAX_PATH, curdir);
+  if (curdir != "")
   {
     strcat(curdir, "\\");
     GetPrivateProfileString("in_adlib", "diskdir", curdir, bufstr, MAX_PATH, fname.c_str());
