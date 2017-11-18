@@ -325,6 +325,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("got", "God of Thunder Music (*.GOT)");
   filetypes.add("hsc", "HSC-Tracker Modules (*.HSC)");
   filetypes.add("hsp", "Packed HSC-Tracker Modules (*.HSP)");
+  filetypes.add("hsq;sqx;sdb;agd;ha2", "HERAD System (*.HSQ;*.SQX;*.SDB;*.AGD;*.HA2)");
   filetypes.add("imf;wlf;adlib", "Apogee IMF Files (*.IMF;*.WLF;*.ADLIB)");
   filetypes.add("ims", "IMPlay Song Files (*.IMS)");
   filetypes.add("jbm", "JBM Adlib Music Files (*.JBM)");
