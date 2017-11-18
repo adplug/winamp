@@ -83,6 +83,7 @@
 #define IDC_LICENSE                     1054
 #define IDC_URL_GNU                     1060
 #define IDC_URL_WV                      1061
+#define IDC_URL_BM                      1062
 #define IDC_CTABS                       1070
 #define IDC_PLUGIN_VER                  1071
 #define IDC_URL_SP                      1072
