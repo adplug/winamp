@@ -35,6 +35,21 @@ GuiDlgAbout		dlg_about;
 GuiDlgConfig		dlg_config;
 GuiDlgInfo		dlg_info;
 
+TEmulInfo infoEmuls[MAX_EMULATORS] = {
+  {emunk, "Nuked OPL3 (Nuke.YKT, 2017)",
+    "Nuked OPL3 emulator by Alexey Khokholov (Nuke.YKT). Set output frequency to 49716 Hz for best quality.",
+    true, false, false},
+  {emuwo, "WoodyOPL (DOSBox, 2016)",
+    "This is the most accurate OPL emulator, especially when the frequency is set to 49716 Hz.",
+    true, true, true},
+  {emuts, "Tatsuyuki Satoh 0.72 (MAME, 2003)",
+    "While not perfect, this synth comes very close and for many years was the best there was.",
+    true, true, true},
+  {emuks, "Ken Silverman (2001)",
+    "While inaccurate by today's standards, this emulator was one of the earliest open-source OPL synths available.",
+    false, true, true},
+};
+
 void wa2_Init()
 {
   myInstance = mod.hDllInstance;

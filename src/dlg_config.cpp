@@ -25,24 +25,9 @@
 extern HINSTANCE	myInstance;
 extern Config		config;
 extern FileTypes	filetypes;
+extern TEmulInfo	infoEmuls[MAX_EMULATORS];
 
 GuiCtrlTooltip		*tooltip;
-
-#define MAX_EMULATORS 4
-TEmulInfo infoEmuls[] = {
-  {emunk, "Nuked OPL3 (Nuke.YKT, 2017)",
-    "Nuked OPL3 emulator by Alexey Khokholov (Nuke.YKT). Set output frequency to 49716 Hz for best quality.",
-    true, false, false},
-  {emuwo, "WoodyOPL (DOSBox, 2016)",
-    "This is the most accurate OPL emulator, especially when the frequency is set to 49716 Hz.",
-    true, true, true},
-  {emuts, "Tatsuyuki Satoh 0.72 (MAME, 2003)",
-    "While not perfect, this synth comes very close and for many years was the best there was.",
-    true, true, true},
-  {emuks, "Ken Silverman (2001)",
-    "While inaccurate by today's standards, this emulator was one of the earliest open-source OPL synths available.",
-    false, true, true},
-};
 
 void AdjustComboBoxHeight(HWND hWndCmbBox, DWORD MaxVisItems) {
 RECT rc;
@@ -59,9 +44,9 @@ int getComboIndexByEmul(int emul, bool duo)
   int idx = 0;
   for (int i = 0; i < MAX_EMULATORS; i++)
   {
-    if (infoEmuls[i].emul == emul && (!duo || infoEmuls[i].s_multi && infoEmuls[i].s_mono))
+    if (infoEmuls[i].emul == emul && (!duo || infoEmuls[i].s_multi))
       return idx;
-    if (!duo || infoEmuls[i].s_multi && infoEmuls[i].s_mono)
+    if (!duo || infoEmuls[i].s_multi)
       idx++;
   }
   return 0; // by default
@@ -72,9 +57,9 @@ t_output getEmulByComboIndex(int combo, bool duo)
   int idx = 0;
   for (int i = 0; i < MAX_EMULATORS; i++)
   {
-    if (idx == combo && (!duo || infoEmuls[i].s_multi && infoEmuls[i].s_mono))
+    if (idx == combo && (!duo || infoEmuls[i].s_multi))
       return infoEmuls[i].emul;
-    if (!duo || infoEmuls[i].s_multi && infoEmuls[i].s_mono)
+    if (!duo || infoEmuls[i].s_multi)
       idx++;
   }
   return emunone; // by default
@@ -215,7 +200,7 @@ BOOL APIENTRY GuiDlgConfig::OutputTabDlgProc(HWND hwndDlg, UINT message, WPARAM 
       // fill comboboxes
       for (i = 0; i < MAX_EMULATORS; i++) {
         SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)infoEmuls[i].name);
-        if (infoEmuls[i].s_multi && infoEmuls[i].s_mono)
+        if (infoEmuls[i].s_multi)
           SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_ADDSTRING, 0, (LPARAM)infoEmuls[i].name);
       }
       // adjust combobox height or dropdown lists won't be visible at all
@@ -596,8 +581,6 @@ void GuiDlgConfig::syncControlStates(HWND hwndDlg)
   if ((i >= 0) && (i < MAX_EMULATORS)) {
     SetDlgItemText(hwndDlg, IDC_EMUINFO, infoEmuls[i].description);
   }
-  if (!bEmuMono)
-    CheckDlgButton(hwndDlg, IDC_ALTSYNTH, BST_UNCHECKED);
   bool bAltSynth = IsDlgButtonChecked(hwndDlg, IDC_ALTSYNTH) == BST_CHECKED;
   bool bIsStereo = IsDlgButtonChecked(hwndDlg, IDC_STEREO) == BST_CHECKED;
   bool bIsSurround = IsDlgButtonChecked(hwndDlg, IDC_SURROUND) == BST_CHECKED;
@@ -606,10 +589,10 @@ void GuiDlgConfig::syncControlStates(HWND hwndDlg)
   // Figure out which controls we will enable and disable
   bool enMono = !bOutDisk && !bAltSynth && bEmuMono;
   bool enStereo = !bOutDisk && !bAltSynth;
-  bool enSurround = !bOutDisk && (bAltSynth || bEmuMulti) && bEmuMono;
+  bool enSurround = !bOutDisk && (bAltSynth || bEmuMulti);
 
   EnableWindow(GetDlgItem(hwndDlg, IDC_COMBO1), !bOutDisk);
-  EnableWindow(GetDlgItem(hwndDlg, IDC_ALTSYNTH), !bOutDisk && bEmuMono);
+  EnableWindow(GetDlgItem(hwndDlg, IDC_ALTSYNTH), !bOutDisk);
   EnableWindow(GetDlgItem(hwndDlg, IDC_MONO), enMono);
   EnableWindow(GetDlgItem(hwndDlg, IDC_STEREO), enStereo);
   EnableWindow(GetDlgItem(hwndDlg, IDC_SURROUND), enSurround);

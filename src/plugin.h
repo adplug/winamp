@@ -74,3 +74,14 @@ using namespace std;
 
 #define WM_UPDATE     WM_USER+1
 #define WM_UPDATE_ALL WM_USER+2
+
+#define MAX_EMULATORS 4
+
+struct TEmulInfo {
+	t_output emul;
+	char * name;
+	char * description;
+	bool s_multi;       /* emulator allows multiple instances */
+	bool s_mono;        /* emulator supports mono output */
+	bool s_8bit;        /* emulator supports 8-bit PCM output */
+};

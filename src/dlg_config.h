@@ -43,12 +43,3 @@ class GuiDlgConfig
   bool			cancelled;
   string		tmpxdiskdir;
 };
-
-struct TEmulInfo {
-  t_output emul;
-  char * name;
-  char * description;
-  bool s_multi;       /* emulator allows multiple instances */
-  bool s_mono;        /* emulator supports mono output */
-  bool s_8bit;        /* emulator supports 8-bit PCM output */
-};
