@@ -35,6 +35,17 @@ int thread_priority[] = {
   THREAD_PRIORITY_TIME_CRITICAL
 };
 
+TEmulInfo *getEmulInfo(int emul)
+{
+  int idx = 0;
+  for (int i = 0; i < MAX_EMULATORS; i++)
+  {
+    if (infoEmuls[i].emul == emul)
+      return &infoEmuls[i];
+  }
+  return NULL; // by default
+}
+
 int MyPlayer::play(const char *fname)
 {
   Copl *opl;
@@ -268,12 +279,14 @@ Copl *MyPlayer::opl_init()
 {
   COPLprops a, b;
   Copl *opl = NULL;
+  TEmulInfo *info = NULL;
 
   // Stereo as far as the OPL synth is concerned is only true if set to stereo (not mono or surround)
   a.stereo = b.stereo = !work.harmonic && work.stereo;
   a.use16bit = b.use16bit = work.use16bit;
 
-  if (!infoEmuls[work.useoutput].s_mono)
+  info = getEmulInfo(work.useoutput);
+  if (info != NULL && !info->s_mono)
     a.stereo = true;
   opl = output.emu = make_opl(work.useoutput, a.stereo);
   if (!opl) return NULL;
@@ -283,7 +296,8 @@ Copl *MyPlayer::opl_init()
   } else {
     if (work.harmonic == true) {
       t_output b_out = work.useoutput_alt == emunone ? work.useoutput : work.useoutput_alt;
-      if (!infoEmuls[b_out].s_mono)
+      info = getEmulInfo(b_out);
+      if (info != NULL && !info->s_mono)
         b.stereo = true;
       a.opl = opl;
       b.opl = make_opl(b_out, b.stereo);
