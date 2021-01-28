@@ -1,12 +1,51 @@
-Changes for version 1.9 (2016-05-29)
-   - New emulator: WoodyOPL from DOSBox, set as the default because it sounds
-     so good
+Changes for version 1.9 (2017-11-18)
+   - New emulators:
+     - Nuked OPL3 by Nuke.YKT (a new default one)
+     - WoodyOPL from DOSBox (sounds good too)
    - 49716Hz added as a preset sample rate, because the sample rate affects
      the pitch of some instruments, and this makes them sound more true to the
      real chip (e.g. Keen 6 metal.imf)
    - Support for real OPL chips removed (no choice, the Windows API doesn't
      support this anymore)
    - Duelling synths extended so that any two synths can be compared
+   - Fixed opening web links in default browser
+   - Support for Winamp 5.5+ (and XMPlay) extended meta tags
+     (shows song title, author name, song comment and file format)
+   - Improved directory detection for disk writer
+   - Fixed endless playback of some songs
+   - New feature to play subsongs sequentially (enabled by default)
+   - Configuration window is rearranged for comfortable output switching
+   - Added support for per-user plugin configuration
+
+   * Changes for the AdPlug core library 2.3:
+     ------------------------------------------
+     - New format support:
+       - BMF: Easy AdLib 1.0
+       - CMF: SoundFX Macs Opera
+       - GOT: God of Thunder
+       - HSQ/SQX/SDB/AGD/HA2: Herbulot AdLib System (HERAD)
+       - MUS/IMS/MDI: AdLib Visual Composer ROL derivatives
+       - SOP: sopepos' Note Player
+       - VGM: Video Game Music
+     - Bug fixes and improvements:
+       - ADL: Improve support for different format versions
+       - CMF: Fix uninitialised variable use (thanks binarymaster)
+              Handle invalid offsets without crashing
+              Improve transpose support (per-channel now)
+       - DRO: Player refactored (thanks to Laurence Myers and William Yates)
+              Add support for Arbitrary Tag Data
+       - HSC: Handle out of range patterns more gracefully
+       - LDS: Use the tempo stored inside the Loudness-File instead of
+              simply returning 70Hz
+       - MID: Fix for issue #2 - out of range array read
+       - MSC: Fix use of uninitialised variable
+       - RAW: Add support for Arbitrary Tag Data
+       - RIX: Fix several replay bugs (thanks to Palxex)
+              Big-endian fix by Wei Mingzhi
+       - ROL: Prevent access beyond end of vector
+              Add display for comment and instrument names
+       - XAD: Tempo fix
+       - Various other out of bounds array fixes, timing fixes, etc.
 
 Changes for in_adlib version 1.8.2 (2010-04-23) (Wraithverge)
    - Added support for Adam Nielsen's Synth Wrapper, which can be configured

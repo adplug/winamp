@@ -23,6 +23,7 @@ extern HWND *myWindow;
 extern In_Module mod;
 extern Config config;
 extern GuiDlgInfo dlg_info;
+extern TEmulInfo infoEmuls[MAX_EMULATORS];
 
 int thread_priority[] = {
   THREAD_PRIORITY_IDLE,
@@ -265,25 +266,29 @@ Copl *MyPlayer::make_opl(enum t_output type, bool stereo)
 
 Copl *MyPlayer::opl_init()
 {
+  COPLprops a, b;
   Copl *opl = NULL;
 
   // Stereo as far as the OPL synth is concerned is only true if set to stereo (not mono or surround)
-  bool stereo = !work.harmonic && work.stereo;
-  opl = output.emu = make_opl(work.useoutput, stereo);
+  a.stereo = b.stereo = !work.harmonic && work.stereo;
+  a.use16bit = b.use16bit = work.use16bit;
+
+  if (!infoEmuls[work.useoutput].s_mono)
+    a.stereo = true;
+  opl = output.emu = make_opl(work.useoutput, a.stereo);
   if (!opl) return NULL;
 
   if (work.useoutput == disk) {
     output.disk = (CDiskopl *)opl;
   } else {
     if (work.harmonic == true) {
-      Copl *opl2;
-      if (work.useoutput_alt == emunone) {
-        opl2 = make_opl(work.useoutput, false);
-      } else {
-        opl2 = make_opl(work.useoutput_alt, false);
-      }
-      // CSurroundopl will take ownership of "opl" and "opl2", and will free them upon destruction.
-      opl = output.emu = new CSurroundopl(opl, opl2, work.use16bit);
+      t_output b_out = work.useoutput_alt == emunone ? work.useoutput : work.useoutput_alt;
+      if (!infoEmuls[b_out].s_mono)
+        b.stereo = true;
+      a.opl = opl;
+      b.opl = make_opl(b_out, b.stereo);
+      // CSurroundopl will take ownership of "a.opl" and "b.opl", and will free them upon destruction.
+      opl = output.emu = new CSurroundopl(&a, &b, work.use16bit);
     }
   }
 
