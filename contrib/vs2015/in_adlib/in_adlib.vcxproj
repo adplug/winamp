@@ -191,13 +191,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\libbinio.1.5.35\build\native\libbinio.targets" Condition="Exists('..\packages\libbinio.1.5.35\build\native\libbinio.targets')" />
-    <Import Project="..\packages\adplug.2.3.4-beta468\build\native\adplug.targets" Condition="Exists('..\packages\adplug.2.3.4-beta468\build\native\adplug.targets')" />
+    <Import Project="..\packages\adplug.2.3.4-beta476\build\native\adplug.targets" Condition="Exists('..\packages\adplug.2.3.4-beta476\build\native\adplug.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\libbinio.1.5.35\build\native\libbinio.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libbinio.1.5.35\build\native\libbinio.targets'))" />
-    <Error Condition="!Exists('..\packages\adplug.2.3.4-beta468\build\native\adplug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\adplug.2.3.4-beta468\build\native\adplug.targets'))" />
+    <Error Condition="!Exists('..\packages\adplug.2.3.4-beta476\build\native\adplug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\adplug.2.3.4-beta476\build\native\adplug.targets'))" />
   </Target>
 </Project>
