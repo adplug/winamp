@@ -325,6 +325,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   mod.UsesOutputPlug = config.useoutputplug;
 
   filetypes.add("a2m", "Adlib Tracker 2 Modules (*.A2M)");
+  filetypes.add("adl", "Coktel Vision ADL Files (*.ADL)");
   filetypes.add("adl", "Westwood ADL Files (*.ADL)");
   filetypes.add("amd", "AMUSIC Modules (*.AMD)");
   filetypes.add("bam", "Bob's Adlib Music Files (*.BAM)");
@@ -354,7 +355,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("mkj", "MKJamz Audio Files (*.MKJ)");
   filetypes.add("msc", "AdLib MSCplay (*.MSC)");
   filetypes.add("mtk", "MPU-401 Trakker Modules (*.MTK)");
-  filetypes.add("mus", "AdLib MIDI Music Files (*.MUS)");
+  filetypes.add("mus;mdy", "AdLib MIDI Music Files (*.MUS;*.MDY)");
   filetypes.add("rad", "Reality Adlib Tracker Modules (*.RAD)");
   filetypes.add("rac;raw", "Raw AdLib Capture Files (*.RAC;*.RAW)");
   filetypes.add("rix", "Softstar RIX OPL Music Files (*.RIX)");
