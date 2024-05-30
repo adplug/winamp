@@ -35,7 +35,7 @@ deploy:
   release: ci
   description: 'Latest git build ($(APPVEYOR_BUILD_VERSION))'
   auth_token:
-    secure: 0byO+pTg9ldWPhhdKB0QWexO7iJZI4cbn6jjZQemzE2cBfstI9T7WMK3tg7AQogO
+    secure: GF8U8TSB1M3go7zoz3tqlAppk/sjKEhTiB+Zdr8OU7inbPogDQlsQgFmUhRxqblO
   artifact: contrib\vs2015\v120_xp\Win32\Release\in_adlib.dll
   prerelease: true
   force_update: true
@@ -46,7 +46,7 @@ deploy:
   release: $(APPVEYOR_REPO_TAG_NAME)
   description: 'AdPlug Winamp plugin $(APPVEYOR_REPO_TAG_NAME)'
   auth_token:
-    secure: 0byO+pTg9ldWPhhdKB0QWexO7iJZI4cbn6jjZQemzE2cBfstI9T7WMK3tg7AQogO
+    secure: GF8U8TSB1M3go7zoz3tqlAppk/sjKEhTiB+Zdr8OU7inbPogDQlsQgFmUhRxqblO
   artifact: contrib\vs2015\v120_xp\Win32\Release\in_adlib.dll
   on:
     appveyor_repo_tag: true
