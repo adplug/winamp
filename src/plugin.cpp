@@ -347,7 +347,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("jbm", "JBM Adlib Music Files (*.JBM)");
   filetypes.add("ksm", "Ken Silverman's Music Files (*.KSM)");
   filetypes.add("laa", "LucasArts Adlib Audio Files (*.LAA)");
-  filetypes.add("lds", "LOUDNESS Sound System Files (*.LDS)");
+  filetypes.add("lds;ld0", "LOUDNESS Sound System Files (*.LDS;*.LD0)");
   filetypes.add("m", "Ultima 6 Music Files (*.M)");
   filetypes.add("mad", "Mlat Adlib Tracker Modules (*.MAD)");
   filetypes.add("mdi", "AdLib MIDIPlay Files (*.MDI)");
@@ -356,6 +356,7 @@ extern "C" __declspec(dllexport) In_Module *winampGetInModule2()
   filetypes.add("msc", "AdLib MSCplay (*.MSC)");
   filetypes.add("mtk", "MPU-401 Trakker Modules (*.MTK)");
   filetypes.add("mus;mdy", "AdLib MIDI Music Files (*.MUS;*.MDY)");
+  filetypes.add("plx", "PALLADIX Sound System (*.PLX)");
   filetypes.add("rad", "Reality Adlib Tracker Modules (*.RAD)");
   filetypes.add("rac;raw", "Raw AdLib Capture Files (*.RAC;*.RAW)");
   filetypes.add("rix", "Softstar RIX OPL Music Files (*.RIX)");
